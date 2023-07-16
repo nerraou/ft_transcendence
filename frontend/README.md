@@ -1,7 +1,7 @@
 ## Engines Requirement
 
 `node: >=18.16.0`  
-`npm: >=9.5.0"`
+`npm: >=9.5.0`
 
 ## Getting Started
 
