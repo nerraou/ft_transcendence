@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "extends": [
+    "next/core-web-vitals",
+    "prettier",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:storybook/recommended"
+  ],
+  "rules": {
+    "curly": ["error", "all"],
+    "no-console": "warn",
+    "no-shadow": "error",
+    "no-unused-vars": "error",
+    "@next/next/no-img-element": "off",
+    "@typescript-eslint/no-unused-vars": "off"
+  }
+}

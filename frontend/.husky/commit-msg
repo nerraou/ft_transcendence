@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+dir_name=$(dirname $0)
+. "$dir_name/_/husky.sh"
+
+cd $dir_name && npm run commitlint ${1}
