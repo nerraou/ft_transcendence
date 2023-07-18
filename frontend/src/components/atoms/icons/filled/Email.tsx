@@ -1,16 +1,28 @@
-function Email() {
+interface EmailProps {
+  color: string;
+  backgroundColor: string;
+  onClick?: () => void;
+}
+
+function Email(props: EmailProps) {
   return (
-    <div>
+    <div
+      className={
+        props.backgroundColor +
+        " " +
+        "w-8 h-8 rounded-lg inline-flex justify-center items-center"
+      }
+      onClick={props.onClick}
+    >
       <svg
-        xmlns="http://www.w3.org/2000/svg"
+        className={props.color}
         width="24"
         height="24"
         viewBox="0 0 24 24"
-        stroke-width="1"
-        stroke="currentColor"
+        strokeWidth="1"
         fill="none"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       >
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"></path>
