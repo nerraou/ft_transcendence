@@ -1,11 +1,14 @@
+import { MouseEvent } from "react";
 interface EmailProps {
   color: string;
+  onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Email(props: EmailProps) {
   return (
     <svg
       className={props.color}
+      onClick={props.onClick}
       width="24"
       height="24"
       viewBox="0 0 24 24"
