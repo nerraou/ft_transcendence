@@ -1,10 +1,11 @@
 import clsx from "clsx";
 import EmailOutline from "@icons/outline/Email";
+import { MouseEvent } from "react";
 
 interface EmailProps {
   color: string;
   backgroundColor: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLDivElement>) => void;
 }
 
 function Email(props: EmailProps) {
