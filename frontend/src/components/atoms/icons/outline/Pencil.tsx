@@ -1,18 +1,21 @@
-interface pencilProps {
+import { MouseEvent } from "react";
+interface PencilProps {
   color: string;
+  onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function Pencil(props: pencilProps) {
+function Pencil(props: PencilProps) {
   return (
     <svg
       className={props.color}
+      onClick={props.onClick}
       width="24"
       height="24"
       viewBox="0 0 24 24"
-      stroke-width="1"
+      strokeWidth="1"
       fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
