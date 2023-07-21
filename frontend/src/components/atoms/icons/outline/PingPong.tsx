@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import { MouseEvent } from "react";
 
-interface PingPong {
+interface PingPongProps {
   color: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function PingPong(props: PingPong) {
+function PingPong(props: PingPongProps) {
   return (
     <svg
       className={clsx(props.color, "rotate-90")}
