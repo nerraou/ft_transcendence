@@ -5,7 +5,7 @@ import { MouseEvent } from "react";
 interface PingPongProps {
   color: string;
   backgroundColor: string;
-  onClick?: (event: MouseEvent<HTMLElement>) => void;
+  onClick?: (event: MouseEvent<HTMLDivElement>) => void;
 }
 
 function PingPong(props: PingPongProps) {
