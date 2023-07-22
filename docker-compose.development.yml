@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./docker/Dockerfile.development
+    volumes:
+      - ./frontend:/home/node/app
+    env_file:
+      - ./frontend/.env.local
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - ${FRONTEND_STORYBOOK_PORT}:6006

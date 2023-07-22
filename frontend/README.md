@@ -5,7 +5,7 @@
 
 ## Getting Started
 
-> :warning: **You must be inside ./frontend directory**
+> :warning: **You must at the ./frontend directory**
 
 ### Run from host machine
 
@@ -19,13 +19,15 @@ npm run dev
 
 ### Run with docker
 
+> :warning: **You must at the root of the repository**
+
 ```bash
-docker compose -f docker/docker-compose.development.yml up -d --build
+docker compose -f ./docker-compose.development.yml up frontend -d --build
 ```
 
 ## Storybook
 
-> :warning: **You must be inside ./frontend directory**
+> :warning: **You must at the ./frontend directory**
 
 ### Run Storybook from host machine
 
@@ -33,10 +35,12 @@ docker compose -f docker/docker-compose.development.yml up -d --build
 npm run storybook
 ```
 
+> :warning: **You must at the root of the repository**
+
 ### Run Storybook from docker
 
 ```bash
-docker compose -f docker/docker-compose.development.yml exec app sh
+docker compose -f ./docker-compose.development.yml exec frontend sh
 
 # if docker command executed successfuly, run
 npm run storybook
