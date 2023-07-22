@@ -5,7 +5,7 @@ interface ClockProps {
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function Clcok(props: ClockProps) {
+function Clock(props: ClockProps) {
   return (
     <svg
       className={props.color}
@@ -26,4 +26,4 @@ function Clcok(props: ClockProps) {
   );
 }
 
-export default Clcok;
+export default Clock;
