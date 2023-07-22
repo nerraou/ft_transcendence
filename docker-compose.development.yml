@@ -12,3 +12,14 @@ services:
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
       - ${FRONTEND_STORYBOOK_PORT}:6006
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./docker/Dockerfile.development
+    volumes:
+      - ./backend:/home/node/app
+    env_file:
+      - ./backend/.env
+    ports:
+      - ${BACKEND_PORT}:5000

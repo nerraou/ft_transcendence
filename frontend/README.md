@@ -46,7 +46,7 @@ docker compose -f ./docker-compose.development.yml exec frontend sh
 npm run storybook
 ```
 
-Open [http://localhost:3000](http://localhost:300) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Commits
 
