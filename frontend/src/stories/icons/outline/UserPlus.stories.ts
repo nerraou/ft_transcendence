@@ -13,6 +13,6 @@ type Story = StoryObj<typeof UserPlus>;
 
 export const Default: Story = {
   args: {
-    color: "stroke-flashGreen",
+    color: "stroke-light-fg-primary ",
   },
 };

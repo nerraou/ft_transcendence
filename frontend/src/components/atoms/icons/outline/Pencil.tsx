@@ -10,18 +10,17 @@ function Pencil(props: PencilProps) {
     <svg
       className={props.color}
       onClick={props.onClick}
-      width="24"
-      height="24"
+      width="32"
+      height="32"
       viewBox="0 0 24 24"
-      strokeWidth="1"
+      strokeWidth="2"
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-      <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
-      <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
-      <path d="M16 5l3 3"></path>
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
     </svg>
   );
 }

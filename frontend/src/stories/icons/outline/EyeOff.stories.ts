@@ -13,6 +13,6 @@ type Story = StoryObj<typeof EyeOff>;
 
 export const Default: Story = {
   args: {
-    color: "stroke-secondary",
+    color: "stroke-light-fg-primary ",
   },
 };

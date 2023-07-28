@@ -13,6 +13,6 @@ type Story = StoryObj<typeof Email>;
 
 export const Default: Story = {
   args: {
-    color: "stroke-flashGreen",
+    color: "stroke-light-fg-primary ",
   },
 };

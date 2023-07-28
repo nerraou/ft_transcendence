@@ -1,11 +1,11 @@
 import { MouseEvent } from "react";
 
-interface UserMinusProps {
+interface EmailProps {
   color: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function UserMinus(props: UserMinusProps) {
+function DeviceGamePad(props: EmailProps) {
   return (
     <svg
       className={props.color}
@@ -14,17 +14,17 @@ function UserMinus(props: UserMinusProps) {
       height="32"
       viewBox="0 0 24 24"
       strokeWidth="2"
-      stroke="#2c3e50"
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-      <path d="M6 21v-2a4 4 0 0 1 4 -4h4c.348 0 .686 .045 1.009 .128" />
-      <path d="M16 19h6" />
+      <path d="M12 5h3.5a5 5 0 0 1 0 10h-5.5l-4.015 4.227a2.3 2.3 0 0 1 -3.923 -2.035l1.634 -8.173a5 5 0 0 1 4.904 -4.019h3.4z" />
+      <path d="M14 15l4.07 4.284a2.3 2.3 0 0 0 3.925 -2.023l-1.6 -8.232" />
+      <path d="M8 9v2" />
+      <path d="M7 10h2" />
+      <path d="M14 10h2" />
     </svg>
   );
 }
-
-export default UserMinus;
+export default DeviceGamePad;
