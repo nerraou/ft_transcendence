@@ -1,16 +1,29 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   theme: {
     colors: {
-      primary: "#047940",
-      secondary: "#2C4C5C",
-      white: "#FFFFFF",
-      black: "#000000",
-      whitesmoke: "#E6E6E6",
-      orange: "#F0761B",
-      flashGreen: "#69ED6A",
-      lightGreen: "#5CA48C",
-      neutral: "#A3CBB5",
+      "light-bg-primary": "#F4C127",
+      "light-bg-secondary": "#EF9935",
+      "light-bg-tertiary": "#FDEECD",
+      "light-fg-primary": "#7E2625",
+      "light-fg-secondary": "#E94635",
+      "light-fg-tertiary": "#FCF9E8",
+      "light-fg-link": "#956362",
+      "light-useless": "#EDA92C",
+      "light-accent": "#EF9935",
+      "light-pressed": "#EDA92C",
+
+      "dark-bg-primary": "#3E3E3E",
+      "dark-bg-secondary": "#FDEECD",
+      "dark-bg-tertiary": "#EF9935",
+      "dark-fg-primary": "#192525",
+      "dark-fg-secondary": "#E94635",
+      "dark-fg-tertiary": "#FCF9E8",
+      "dark-fg-link": "#956362",
+      "dark-useless": "#956362",
+      "dark-accent": "#EF9935",
+      "dark-pressed": "#EDA92C",
     },
   },
   content: [

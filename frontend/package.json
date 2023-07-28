@@ -51,6 +51,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.0",
-    "storybook": "^7.1.0"
+    "storybook": "^7.1.0",
+    "storybook-tailwind-dark-mode": "^1.0.22"
   }
 }
