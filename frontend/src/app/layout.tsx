@@ -1,5 +1,12 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Electrolize } from "next/font/google";
+
+const electrolize = Electrolize({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Home",
@@ -12,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={electrolize.className}>
       <body>{children}</body>
     </html>
   );
