@@ -3,11 +3,23 @@
 `node: >=18.16.0`  
 `npm: >=9.5.0`
 
+### Create .env files
+
+```bash
+# at the root of the repository
+# copy and set the backend related appropriate values
+cp .env.example .env
+
+# at the ./backend directory
+# copy and set the backend related appropriate values
+cp .env.example .env.local
+```
+
 ## Getting Started
 
-> :warning: **You must at the ./frontend directory**
-
 ### Run from host machine
+
+> :warning: **You must at the ./frontend directory**
 
 ```bash
 # install packages
