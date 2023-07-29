@@ -30,6 +30,9 @@ npm run prisma:generate
 
 # run dev server
 npm run start:dev
+
+# run prisma studio
+npm run prisma:studio
 ```
 
 ### Run with docker
@@ -38,4 +41,10 @@ npm run start:dev
 
 ```bash
 docker compose -f ./docker-compose.development.yml up backend database -d --build
+
+# run prisma studio
+docker compose -f ./docker-compose.development.yml exec backend sh
+
+# if docker command executed successfuly, run
+npm run prisma:studio
 ```
