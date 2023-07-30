@@ -9,17 +9,27 @@
 
 ```bash
 # at the root of the repository
-# copy and set the backend related appropriate values
+# copy and set the backend related values
 cp .env.example .env
 
 # at the ./backend directory
-# copy and set the backend related appropriate values
+# copy and set the backend related values
 cp .env.example .env
+```
+
+### Run database container
+
+> :warning: **You must be at the root of the repository**
+
+```bash
+docker compose -f ./docker-compose.development.yml up database -d --build
 ```
 
 ### Run from host machine
 
-> :warning: **You must at the ./backend directory**
+> :warning: **You must change database host(DATABASE_HOST, DATABASE_URL) in the .env at ./backend directory to `localhost`**
+
+> :warning: **Change directory to ./backend**
 
 ```bash
 # install packages
@@ -28,16 +38,19 @@ npm i
 # generate prisma client
 npm run prisma:generate
 
-# run dev server
+# run prisma migrations
+npm run prisma:migrate:dev
+
+# to run dev server
 npm run start:dev
 
-# run prisma studio
+# to run prisma studio
 npm run prisma:studio
 ```
 
 ### Run with docker
 
-> :warning: **You must at the root of the repository**
+> :warning: **You must be at the root of the repository**
 
 ```bash
 docker compose -f ./docker-compose.development.yml up backend database -d --build

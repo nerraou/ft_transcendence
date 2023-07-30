@@ -25,7 +25,8 @@
     "commitlint": "commitlint --edit",
     "prepare": "cd .. && husky install ./backend/.husky",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prisma:migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

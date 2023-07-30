@@ -19,7 +19,7 @@ cp .env.example .env.local
 
 ### Run from host machine
 
-> :warning: **You must at the ./frontend directory**
+> :warning: **You must be at the ./frontend directory**
 
 ```bash
 # install packages
@@ -31,7 +31,7 @@ npm run dev
 
 ### Run with docker
 
-> :warning: **You must at the root of the repository**
+> :warning: **You must be at the root of the repository**
 
 ```bash
 docker compose -f ./docker-compose.development.yml up frontend -d --build
@@ -39,7 +39,7 @@ docker compose -f ./docker-compose.development.yml up frontend -d --build
 
 ## Storybook
 
-> :warning: **You must at the ./frontend directory**
+> :warning: **You must be at the ./frontend directory**
 
 ### Run Storybook from host machine
 
@@ -47,7 +47,7 @@ docker compose -f ./docker-compose.development.yml up frontend -d --build
 npm run storybook
 ```
 
-> :warning: **You must at the root of the repository**
+> :warning: **You must be at the root of the repository**
 
 ### Run Storybook from docker
 
