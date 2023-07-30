@@ -23,7 +23,8 @@
     "paths": {
       "@*": ["./src/*"],
       "@icons/*": ["./src/components/atoms/icons/*"],
-      "@atoms/*": ["./src/components/atoms/*"]
+      "@atoms/*": ["./src/components/atoms/*"],
+      "@molecules/*": ["./src/components/molecules/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

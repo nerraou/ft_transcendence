@@ -24,7 +24,7 @@ function PlayerImage(props: PlayerImageProps) {
       width="112"
       height="112"
       className={clsx(
-        "border-8 object-none rounded-full w-28 h-28 custom-position ",
+        "border-8 object-none rounded-full w-28 h-28 custom-position",
         {
           "border-light-fg-tertiary": props.state == "win",
           "border-light-fg-secondary": props.state == "lose",
@@ -47,17 +47,12 @@ function PlayerName(props: PlayerNameProps) {
 
 function Player(props: PlayerProps) {
   return (
-    <div className="inline-flex justify-around items-center  box-border rounded-full border-light-fg-primary  bg-light-bg-secondary border-8 h-44 w-96">
-      <div>
-        <PlayerImage image={props.image} state={props.state} />
-        <PlayerName name={props.name} />
-      </div>
-      <div>
-        <PlayerImage image={props.image} state={props.state} />
-        <PlayerName name={props.name} />
-      </div>
+    <div>
+      <PlayerImage image={props.image} state={props.state} />
+      <PlayerName name={props.name} />
     </div>
   );
 }
 
 export default Player;
+export type { PlayerProps };
