@@ -4,7 +4,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: ./docker/Dockerfile.development
+      dockerfile: ./docker/Dockerfile.app.development
     volumes:
       - ./frontend:/home/node/app
     env_file:
@@ -16,7 +16,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: ./docker/Dockerfile.development
+      dockerfile: ./docker/Dockerfile.app.development
     volumes:
       - ./backend:/home/node/app
     env_file:
@@ -32,6 +32,8 @@ services:
     restart: always
     volumes:
       - ./pg-data:/var/lib/postgresql/data
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
