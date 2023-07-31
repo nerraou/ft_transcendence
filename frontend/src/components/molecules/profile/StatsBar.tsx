@@ -1,5 +1,3 @@
-import clsx from "clsx";
-
 interface StatsBarProps {
   matches: number;
   losses: number;
@@ -18,10 +16,10 @@ function Result(props: ResultProps) {
   return (
     <div className="flex justify-between">
       <label className="text-light-fg-tertiary text-2xl">
-        {clsx(props.wins, "wins")}
+        {props.wins} won
       </label>
       <label className="text-light-fg-secondary text-2xl">
-        {clsx(props.losses, "losts")}
+        {props.losses} lost
       </label>
     </div>
   );
@@ -42,15 +40,15 @@ function Percentage(props: PercentageProps) {
 
 function Bar(props: PercentageProps) {
   return (
-    <div className="flex border-2 box-border rounded-2xl border-light-fg-primary w-full h-8">
+    <div className="flex border-2 box-border rounded-2xl border-light-fg-primary w-full h-8 overflow-hidden">
       <div
-        className={clsx("bg-light-bg-tertiary rounded-l-2xl")}
+        className="bg-light-bg-tertiary rounded-l-2xl"
         style={{
           width: `${props.wins}%`,
         }}
       ></div>
       <div
-        className={clsx("bg-light-fg-secondary rounded-r-2xl")}
+        className="bg-light-fg-secondary rounded-r-2xl"
         style={{
           width: `${props.losses}%`,
         }}
@@ -65,7 +63,7 @@ function StatsBar(props: StatsBarProps) {
 
   return (
     <div className="w-full">
-      <Percentage losses={losses} wins={wins} />
+      <Percentage losses={Math.trunc(losses)} wins={Math.trunc(wins)} />
       <Bar losses={losses} wins={wins} />
       <Result losses={props.losses} wins={props.wins} />
     </div>

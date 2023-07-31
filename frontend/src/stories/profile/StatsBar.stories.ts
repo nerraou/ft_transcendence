@@ -2,7 +2,7 @@ import StatsBar from "@components/molecules/profile/StatsBar";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof StatsBar> = {
-  title: "player/StatsBar",
+  title: "profile/StatsBar",
   component: StatsBar,
   tags: ["autodocs"],
 };
