@@ -7,6 +7,8 @@
 
 ### Create .env files
 
+> :warning: **Check Create .env files step in ./frontend**
+
 ```bash
 # at the root of the repository
 # copy and set the backend related values
@@ -27,7 +29,7 @@ docker compose -f ./docker-compose.development.yml up database -d --build
 
 ### Run from host machine
 
-> :warning: **You must change database host(DATABASE_HOST, DATABASE_URL) in the .env at ./backend directory to `localhost`**
+> :warning: **You must change database host in DATABASE_URL and DATABASE_HOST in the .env at ./backend directory to `localhost`**
 
 > :warning: **Change directory to ./backend**
 
@@ -51,6 +53,8 @@ npm run prisma:studio
 ### Run with docker
 
 > :warning: **You must be at the root of the repository**
+
+> :warning: **You must change database host in DATABASE_URL and DATABASE_HOST in the .env at ./backend directory to `database`**
 
 ```bash
 docker compose -f ./docker-compose.development.yml up backend database -d --build

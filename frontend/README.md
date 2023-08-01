@@ -7,11 +7,11 @@
 
 ```bash
 # at the root of the repository
-# copy and set the backend related appropriate values
+# copy and set the backend related values
 cp .env.example .env
 
-# at the ./backend directory
-# copy and set the backend related appropriate values
+# at the ./frontend directory
+# copy and set the frontend related values
 cp .env.example .env.local
 ```
 

@@ -1,2 +1,2 @@
 .env
-./pg-data
+/pg-data
