@@ -1,5 +1,3 @@
-"use client";
-
 import { ChangeEvent } from "react";
 import clsx from "clsx";
 
@@ -18,7 +16,7 @@ function TextInput(props: TextInputProps) {
       value={props.value}
       className={clsx(
         props.borderColor,
-        "border-2 rounded-full w-64 h-10 bg-light-bg-tertiary outline-none focus:border-light-bg-secondary pl-2",
+        "border-2 rounded-full w-64 h-10 bg-light-bg-tertiary outline-none focus:border-light-bg-secondary",
       )}
       onChange={props.onChange}
     />
