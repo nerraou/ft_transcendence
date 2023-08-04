@@ -2,7 +2,7 @@ import PasswordInput from "@atoms/PasswordInput";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof PasswordInput> = {
-  title: "./PasswordInput",
+  title: "Input/PasswordInput",
   component: PasswordInput,
   tags: ["autodocs"],
 };
@@ -13,7 +13,7 @@ type Story = StoryObj<typeof PasswordInput>;
 
 export const Default: Story = {
   args: {
-	borderColor: "border-light-fg-secondary",
+	borderColor: "border-border-dark-fg-primary",
 	value: "Text input",
   },
 };
