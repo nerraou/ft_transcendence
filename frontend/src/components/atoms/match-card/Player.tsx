@@ -38,7 +38,7 @@ function PlayerName(props: PlayerNameProps) {
   return (
     <div className="flex justify-center items-center flex-col self-auto">
       <div className="h-6 w-20 flex justify-center items-center bg-light-fg-link m-1 rounded-xl border-light-fg-primary border-2">
-        <label className="text-light-fg-tertiary text-base">{props.name}</label>
+        <label className="text-light-fg-tertiary text-sm">{props.name}</label>
       </div>
       <div className="bg-light-fg-primary h-1.5 w-8"></div>
     </div>
