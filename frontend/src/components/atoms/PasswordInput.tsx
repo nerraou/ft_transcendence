@@ -48,14 +48,14 @@ function PasswordInput(props: PasswordInputProps) {
 
       {props.isPasswordVisible && (
         <Eye
-          color="stroke-light-fg-primary"
+          color="stroke-dark-fg-primary"
           onClick={props.onPasswordVisibilityChange}
         />
       )}
 
       {!props.isPasswordVisible && (
         <EyeOff
-          color="stroke-light-fg-primary"
+          color="stroke-dark-fg-primary"
           onClick={props.onPasswordVisibilityChange}
         />
       )}
