@@ -8,20 +8,20 @@ interface PasswordInputProps {
   borderColor: string;
   placeholder: string;
   width?: string;
-  heigth?: "base" | "large";
+  height?: "base" | "large";
   isPasswordVisible?: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onPasswordVisibilityChange?: () => void;
 }
 
 function PasswordInput(props: PasswordInputProps) {
-  let heigth = "h-10";
+  let height = "h-10";
   const defaultWidth = "w-64";
   const width = props.width || defaultWidth;
   let type = "password";
 
-  if (props.heigth == "large") {
-    heigth = "h-16";
+  if (props.height == "large") {
+    height = "h-16";
   }
 
   if (props.isPasswordVisible) {
@@ -33,7 +33,7 @@ function PasswordInput(props: PasswordInputProps) {
       className={clsx(
         props.borderColor,
         width,
-        heigth,
+        height,
         "border-2 rounded-full bg-light-bg-tertiary outline-none focus-within:border-dark-useless",
         "flex justify-between items-center box-border px-5 overflow-hidden",
       )}
