@@ -15,10 +15,8 @@ interface ResultProps {
 function Result(props: ResultProps) {
   return (
     <div className="flex justify-between">
-      <label className="text-light-fg-tertiary text-2xl">
-        {props.wins} won
-      </label>
-      <label className="text-light-fg-secondary text-2xl">
+      <label className="text-light-fg-tertiary text-xl">{props.wins} won</label>
+      <label className="text-light-fg-secondary text-xl">
         {props.losses} lost
       </label>
     </div>
@@ -28,10 +26,10 @@ function Result(props: ResultProps) {
 function Percentage(props: PercentageProps) {
   return (
     <div className="flex justify-between">
-      <label className="text-light-fg-tertiary text-2xl">
+      <label className="text-light-fg-tertiary text-xl">
         {props.wins + "%"}
       </label>
-      <label className="text-light-fg-secondary text-2xl">
+      <label className="text-light-fg-secondary text-xl">
         {props.losses + "%"}
       </label>
     </div>
@@ -40,15 +38,15 @@ function Percentage(props: PercentageProps) {
 
 function Bar(props: PercentageProps) {
   return (
-    <div className="flex border-2 box-border rounded-2xl border-light-fg-primary w-full h-8 overflow-hidden">
+    <div className="flex border-2 box-border rounded-lg border-light-fg-primary w-full h-8 overflow-hidden">
       <div
-        className="bg-light-bg-tertiary rounded-l-2xl"
+        className="bg-light-bg-tertiary rounded-l-lg"
         style={{
           width: `${props.wins}%`,
         }}
       ></div>
       <div
-        className="bg-light-fg-secondary rounded-r-2xl"
+        className="bg-light-fg-secondary rounded-r-lg"
         style={{
           width: `${props.losses}%`,
         }}
