@@ -24,7 +24,7 @@ function PlayerImage(props: PlayerImageProps) {
       width="112"
       height="112"
       className={clsx(
-        "border-8 object-none rounded-full w-28 h-28 custom-position",
+        "border-8 object-cover rounded-full w-28 h-28 custom-position",
         {
           "border-light-fg-tertiary": props.state == "win",
           "border-light-fg-secondary": props.state == "lose",
