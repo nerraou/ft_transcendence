@@ -33,6 +33,9 @@ module.exports = {
       xxl: "64px",
     },
     extend: {
+      boxShadow: {
+        xl: "0 8px 8px 0 rgb(126, 38, 37)",
+      },
       margin: {
         xxs: "2px",
         sm: "8px",
@@ -47,8 +50,8 @@ module.exports = {
       },
       padding: {
         xxs: "2px",
-        sm: "8px",
         xs: "4px",
+        sm: "8px",
         base: "16px",
         lg: "24px",
         xl: "32px",

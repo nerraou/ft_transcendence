@@ -1,31 +1,125 @@
-import BarStatus from "@components/atoms/BarStatus";
-import UserCheck from "@components/atoms/icons/outline/UserCheck";
-import User from "@components/atoms/user-header/User";
+import BarStatus from "@atoms/BarStatus";
+import DeviceGamePad from "@icons/outline/DeviceGamePad";
+import Email from "@icons/outline/Email";
+import Pencil from "@icons/outline/Pencil";
+import Reflect from "@icons/outline/Reflect";
+import UserIcon from "@icons/outline/User";
+import UserBlock from "@icons/outline/UserBlock";
+import UserMinus from "@icons/outline/UserMinus";
+import UserPlus from "@icons/outline/UserPlus";
+import User from "@atoms/user-header/User";
+import { Popover, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
-function UserHeader() {
+interface UserHeaderProps {
+  fullname: string;
+  username: string;
+  image: string;
+  UserStatus: "online" | "offline";
+  isProfileOwner: boolean;
+  isFriend: boolean;
+}
+interface UserHeaderActionsProps {
+  isProfileOwner: boolean;
+  isFriend: boolean;
+}
+
+interface UserPopoverProps {
+  isFriend: boolean;
+}
+
+function UserPopover(props: UserPopoverProps) {
+  let action = "Add";
+
+  if (props.isFriend) {
+    action = "Remove";
+  }
   return (
-    <div className="box-border h-80 rounded-xl border-4 border-light-fg-primary bg-light-fg-link">
+    <Popover className="relative">
+      <Popover.Button className="outline-none">
+        <UserIcon
+          color="stroke-light-fg-link"
+          hover="hover:bg-light-fg-tertiary"
+          round="rounded-sm"
+        />
+      </Popover.Button>
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 translate-y-1"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 translate-y-1"
+      >
+        <Popover.Panel className="absolute">
+          <div className="flex flex-col bg-light-fg-tertiary p-sm rounded-base">
+            <div className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm">
+              {!props.isFriend && <UserPlus color="stroke-light-fg-link" />}
+              {props.isFriend && <UserMinus color="stroke-light-fg-link" />}
+              <label className="text-sm text-light-fg-primary ml-sm">
+                {action}
+              </label>
+            </div>
+            <div className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm">
+              <UserBlock color="stroke-light-fg-link" />
+              <label className="text-sm text-light-fg-primary ml-sm">
+                Block
+              </label>
+            </div>
+          </div>
+        </Popover.Panel>
+      </Transition>
+    </Popover>
+  );
+}
+
+function UserHeaderActions(props: UserHeaderActionsProps) {
+  if (props.isProfileOwner) {
+    return <Pencil color="stroke-light-fg-link" />;
+  } else {
+    return (
+      <div className="flex gap-1">
+        <DeviceGamePad
+          color="stroke-light-fg-link"
+          hover="hover:bg-light-fg-tertiary"
+          round="rounded-sm"
+          animated
+        />
+        <Email
+          color="stroke-light-fg-link"
+          hover="hover:bg-light-fg-tertiary"
+          round="rounded-sm"
+        />
+        <UserPopover isFriend={props.isFriend} />
+      </div>
+    );
+  }
+}
+
+function UserHeader(props: UserHeaderProps) {
+  return (
+    <div className="box-border rounded-xl border-4 border-light-fg-primary bg-light-fg-link shadow-xl">
       <BarStatus
         width="w-2/3"
         reverse={false}
         marginX="mx-12"
         marginY="my-base"
+        status={props.UserStatus}
       />
-      <div className="relative flex justify-between h-56 mb-xxl mt-sm mx-12 pt-xl px-xl bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <label className="animate-ping text-xl text-light-bg-primary">
-            Playing...
-          </label>
+      <div className="relative flex justify-between h-60 mb-xxl mt-sm mx-12 pt-xl px-xl bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
+        <div className="absolute right-0 bottom-0">
+          <Reflect />
         </div>
-
         <User
-          fullName="Nouhayla Erraou"
-          username="totoro"
-          image="/totoro.jpeg"
+          fullName={props.fullname}
+          username={props.username}
+          image={props.image}
         />
-        <div className="flex">
-          <UserCheck color="stroke-light-fg-primary" />
-        </div>
+        <UserHeaderActions
+          isFriend={props.isFriend}
+          isProfileOwner={props.isProfileOwner}
+        />
       </div>
     </div>
   );

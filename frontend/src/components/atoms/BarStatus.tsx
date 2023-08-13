@@ -10,7 +10,6 @@ interface BarStatusProps {
 
 interface statusProps {
   color: string;
-  animation?: string;
 }
 
 function Status(props: statusProps) {
@@ -20,7 +19,7 @@ function Status(props: statusProps) {
       height="10"
       viewBox="0 0 42 10"
       fill="none"
-      className={clsx(props.color, props.animation)}
+      className={props.color}
     >
       <rect width="5" height="10" rx="2.5" transform="matrix(-1 0 0 1 5 0)" />
       <rect width="5" height="10" rx="2.5" transform="matrix(-1 0 0 1 14 0)" />
@@ -33,14 +32,11 @@ function Status(props: statusProps) {
 
 function BarStatus(props: BarStatusProps) {
   let color = "fill-light-fg-primary";
-  let animation;
 
   if (props.status == "offline") {
     color = "fill-light-fg-secondary";
-    animation = "animate-pulse";
   } else if (props.status == "online") {
     color = "fill-light-bg-primary";
-    animation = "animate-pulse";
   }
 
   return (
@@ -52,7 +48,7 @@ function BarStatus(props: BarStatusProps) {
       <div
         className={clsx("bg-light-fg-primary rounded-full h-3", props.width)}
       />
-      <Status color={color} animation={animation} />
+      <Status color={color} />
     </div>
   );
 }
