@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 dir_name=$(dirname $0)
 . "$dir_name/_/husky.sh"
 cd $(dirname $dir_name) && npx lint-staged
