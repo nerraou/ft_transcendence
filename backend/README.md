@@ -29,7 +29,7 @@ docker compose -f ./docker-compose.development.yml up database -d --build
 
 ### Run from host machine
 
-> :warning: **You must change database host in DATABASE_URL and DATABASE_HOST in the .env at ./backend directory to `localhost`**
+> :warning: **In ./backend/.env, change database host in DATABASE_URL to `localhost`**
 
 > :warning: **Change directory to ./backend**
 
@@ -54,7 +54,7 @@ npm run prisma:studio
 
 > :warning: **You must be at the root of the repository**
 
-> :warning: **You must change database host in DATABASE_URL and DATABASE_HOST in the .env at ./backend directory to `database`**
+> :warning: **In ./backend/.env, change database host in DATABASE_URL to `database`**
 
 ```bash
 docker compose -f ./docker-compose.development.yml up backend database -d --build
