@@ -5,7 +5,7 @@ CREATE TABLE "users" (
     "email" VARCHAR(255) NOT NULL,
     "first_name" VARCHAR(64),
     "last_name" VARCHAR(64),
-    "password" VARCHAR(72) NOT NULL,
+    "password" VARCHAR(72),
     "avatar_path" VARCHAR(255) NOT NULL,
     "forty_two_account_id" VARCHAR(255),
     "google_account_id" VARCHAR(255),

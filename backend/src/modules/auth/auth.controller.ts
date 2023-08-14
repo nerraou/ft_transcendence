@@ -4,9 +4,12 @@ import {
   Body,
   HttpCode,
   NotFoundException,
+  UseGuards,
+  Request,
 } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import { ConfigService } from "@nestjs/config";
+import { User } from "@prisma/client";
 
 import { AppEnv } from "@config/env-configuration";
 
@@ -14,6 +17,7 @@ import { AuthService } from "./auth.service";
 import { SignUpDto } from "./dto/sign-up.dto";
 import EmailExistsPipe from "./pipes/email-exists.pipe";
 import ConfirmEmailTokenDto from "./dto/confirm-email-token.dto";
+import { LocalAuthGuard } from "./guards/local-auth.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -23,7 +27,14 @@ export class AuthController {
     private readonly configService: ConfigService<AppEnv>,
   ) {}
 
-  @Post("/sign-up")
+  @Post("sign-in")
+  @UseGuards(LocalAuthGuard)
+  @HttpCode(200)
+  async sognIn(@Request() req: Request & { user: User }) {
+    return this.authService.signIn(req.user);
+  }
+
+  @Post("sign-up")
   async signUp(@Body(EmailExistsPipe) signUpDto: SignUpDto) {
     const { verifyEmailToken } = await this.authService.signUp(signUpDto);
 
@@ -47,7 +58,7 @@ export class AuthController {
     };
   }
 
-  @Post("/confirm")
+  @Post("confirm")
   @HttpCode(200)
   async confirmEmail(@Body() confirmEmailTokenDto: ConfirmEmailTokenDto) {
     try {

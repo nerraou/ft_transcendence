@@ -4,6 +4,7 @@ import { mkdir } from "fs/promises";
 export interface AppEnv {
   appHostName: string;
   assetsPath: string;
+  jwtSecret: string;
 }
 
 export default async function envConfigFactory(): Promise<AppEnv> {
@@ -15,6 +16,7 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     "SMTP_PORT",
     "SMTP_USER",
     "SMTP_PASSWORD",
+    "JWT_SECRET",
   ];
 
   requiredEnvVariables.forEach((variable) => {
@@ -31,5 +33,6 @@ export default async function envConfigFactory(): Promise<AppEnv> {
   return {
     appHostName: process.env.APP_HOSTNAME,
     assetsPath,
+    jwtSecret: process.env.JWT_SECRET,
   };
 }
