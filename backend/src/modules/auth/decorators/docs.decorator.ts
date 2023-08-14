@@ -14,8 +14,11 @@ export function SignInApiDocumentation() {
     ApiTags("Authentication"),
     ApiBody({
       description: "sign in",
-      type: "object",
       schema: {
+        properties: {
+          email: { type: "string" },
+          password: { type: "string" },
+        },
         example: {
           email: "jdoe@example.com",
           password: "some-password",
@@ -46,9 +49,12 @@ export function SignUpApiDocumentation() {
   return applyDecorators(
     ApiTags("Authentication"),
     ApiBody({
-      description: "sign un",
-      type: "object",
+      description: "sign up",
       schema: {
+        properties: {
+          email: { type: "string" },
+          password: { type: "string" },
+        },
         example: {
           email: "jdoe@example.com",
           password: "some-password",
@@ -80,9 +86,11 @@ export function ConfirmApiDocumentation() {
   return applyDecorators(
     ApiTags("Authentication"),
     ApiBody({
-      description: "sign un",
-      type: "object",
+      description: "Confirm email",
       schema: {
+        properties: {
+          token: { type: "string" },
+        },
         example: {
           token: "126401d9-cd58-42a1-894f-94ac1fd7255e",
         },
