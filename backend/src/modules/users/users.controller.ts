@@ -2,12 +2,14 @@ import { Controller, Get, Request, UseGuards } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User } from "@prisma/client";
+import { MeApiDocumentation } from "./decorators/docs.decorator";
 
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get("/me")
+  @MeApiDocumentation()
   @UseGuards(JwtAuthGuard)
   profile(@Request() req: Request & { user: User }) {
     return {

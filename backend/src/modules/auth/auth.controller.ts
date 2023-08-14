@@ -18,6 +18,11 @@ import { SignUpDto } from "./dto/sign-up.dto";
 import EmailExistsPipe from "./pipes/email-exists.pipe";
 import ConfirmEmailTokenDto from "./dto/confirm-email-token.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
+import {
+  ConfirmApiDocumentation,
+  SignInApiDocumentation,
+  SignUpApiDocumentation,
+} from "./decorators/docs.decorator";
 
 @Controller("auth")
 export class AuthController {
@@ -28,13 +33,15 @@ export class AuthController {
   ) {}
 
   @Post("sign-in")
+  @SignInApiDocumentation()
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
-  async sognIn(@Request() req: Request & { user: User }) {
+  async signIn(@Request() req: Request & { user: User }) {
     return this.authService.signIn(req.user);
   }
 
   @Post("sign-up")
+  @SignUpApiDocumentation()
   async signUp(@Body(EmailExistsPipe) signUpDto: SignUpDto) {
     const { verifyEmailToken } = await this.authService.signUp(signUpDto);
 
@@ -59,6 +66,7 @@ export class AuthController {
   }
 
   @Post("confirm")
+  @ConfirmApiDocumentation()
   @HttpCode(200)
   async confirmEmail(@Body() confirmEmailTokenDto: ConfirmEmailTokenDto) {
     try {
