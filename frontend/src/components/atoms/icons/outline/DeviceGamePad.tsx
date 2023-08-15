@@ -1,14 +1,20 @@
+import clsx from "clsx";
 import { MouseEvent } from "react";
 
 interface EmailProps {
   color: string;
+  hover?: string;
+  round?: string;
+  animated?: boolean;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function DeviceGamePad(props: EmailProps) {
   return (
     <svg
-      className={props.color}
+      className={clsx(props.color, props.hover, props.round, {
+        "animate-bounce": props.animated,
+      })}
       onClick={props.onClick}
       width="32"
       height="32"

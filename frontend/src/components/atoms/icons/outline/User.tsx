@@ -1,14 +1,15 @@
 import clsx from "clsx";
 import { MouseEvent } from "react";
+0;
 
-interface EmailProps {
+interface UserProps {
   color: string;
   hover?: string;
   round?: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function Email(props: EmailProps) {
+function User(props: UserProps) {
   return (
     <svg
       className={clsx(props.color, props.hover, props.round)}
@@ -21,10 +22,11 @@ function Email(props: EmailProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
-      <path d="M3 7l9 6l9 -6" />
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+      <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
     </svg>
   );
 }
-export default Email;
+
+export default User;

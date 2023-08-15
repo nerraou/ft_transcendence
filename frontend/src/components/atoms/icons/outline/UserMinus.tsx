@@ -10,8 +10,8 @@ function UserMinus(props: UserMinusProps) {
     <svg
       className={props.color}
       onClick={props.onClick}
-      width="32"
-      height="32"
+      width="22"
+      height="22"
       viewBox="0 0 24 24"
       strokeWidth="2"
       stroke="#2c3e50"

@@ -33,6 +33,23 @@ module.exports = {
       xxl: "64px",
     },
     extend: {
+      animation: {
+        "ping-pong":
+          "ping-pong 1.5s cubic-bezier(0.17, 0.67, 0.88, 0.22) infinite",
+      },
+      keyframes: {
+        "ping-pong": {
+          "0%,100%": {
+            left: "5px",
+          },
+          "50%": {
+            left: "calc(100% - 10px)",
+          },
+        },
+      },
+      boxShadow: {
+        xl: "0 8px 8px 0 rgb(126, 38, 37)",
+      },
       margin: {
         xxs: "2px",
         sm: "8px",
@@ -47,8 +64,8 @@ module.exports = {
       },
       padding: {
         xxs: "2px",
-        sm: "8px",
         xs: "4px",
+        sm: "8px",
         base: "16px",
         lg: "24px",
         xl: "32px",
