@@ -14,5 +14,6 @@ type Story = StoryObj<typeof DeviceGamePad>;
 export const Default: Story = {
   args: {
     color: "stroke-light-fg-primary ",
+    animated: false,
   },
 };
