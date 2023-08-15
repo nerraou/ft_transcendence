@@ -11,17 +11,20 @@ import User from "@atoms/user-header/User";
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
+export type UserStatus = "online" | "offline" | "in-game";
+
 interface UserHeaderProps {
   fullname: string;
   username: string;
   image: string;
-  UserStatus: "online" | "offline";
+  userStatus: UserStatus;
   isProfileOwner: boolean;
   isFriend: boolean;
 }
 interface UserHeaderActionsProps {
   isProfileOwner: boolean;
   isFriend: boolean;
+  status: UserStatus;
 }
 
 interface UserPopoverProps {
@@ -34,6 +37,7 @@ function UserPopover(props: UserPopoverProps) {
   if (props.isFriend) {
     action = "Remove";
   }
+
   return (
     <Popover className="relative">
       <Popover.Button className="outline-none">
@@ -84,7 +88,7 @@ function UserHeaderActions(props: UserHeaderActionsProps) {
           color="stroke-light-fg-link"
           hover="hover:bg-light-fg-tertiary"
           round="rounded-sm"
-          animated
+          animated={props.status == "online"}
         />
         <Email
           color="stroke-light-fg-link"
@@ -105,7 +109,7 @@ function UserHeader(props: UserHeaderProps) {
         reverse={false}
         marginX="mx-12"
         marginY="my-base"
-        status={props.UserStatus}
+        status={props.userStatus}
       />
       <div className="relative flex justify-between h-60 mb-xxl mt-sm mx-12 pt-xl px-xl bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
         <div className="absolute right-0 bottom-0">
@@ -119,6 +123,7 @@ function UserHeader(props: UserHeaderProps) {
         <UserHeaderActions
           isFriend={props.isFriend}
           isProfileOwner={props.isProfileOwner}
+          status={props.userStatus}
         />
       </div>
     </div>
