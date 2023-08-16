@@ -1,14 +1,10 @@
-import { AppEnv } from "@config/env-configuration";
 import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PrismaService } from "@prisma/prisma.service";
+import { PrismaService } from "@common/services/prisma.service";
 
 @Injectable()
 export class AppService {
-  constructor(
-    private readonly configService: ConfigService<AppEnv>,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
+
   getHello(): { message: string } {
     return { message: "Hello World!" };
   }
