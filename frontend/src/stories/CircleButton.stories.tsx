@@ -1,5 +1,5 @@
 import CircleButton from "@atoms/CircleButton";
-import Save from "@components/atoms/icons/outline/Save";
+import Icon42 from "@icons/outline/Icon42";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof CircleButton> = {
@@ -14,6 +14,7 @@ type Story = StoryObj<typeof CircleButton>;
 
 export const Default: Story = {
   args: {
-    icon: <Save color="stroke-light-fg-tertiary" />,
+    icon: <Icon42 />,
+    color: "bg-dark-bg-primary",
   },
 };
