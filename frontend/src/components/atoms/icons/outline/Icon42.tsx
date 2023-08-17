@@ -7,7 +7,7 @@ function Icon42() {
       viewBox="0 0 20 15"
       fill="none"
     >
-      <g clip-path="url(#clip0_970_1836)">
+      <g>
         <path
           d="M0 10.3488H7.36919V14.0407H11.0465V7.36918H3.69186L11.0465 0H7.36919L0 7.36918V10.3488Z"
           fill="#FCF9E8"
@@ -22,11 +22,6 @@ function Icon42() {
           fill="#FCF9E8"
         />
       </g>
-      <defs>
-        <clipPath id="clip0_970_1836">
-          <rect width="20" height="14.0407" fill="white" />
-        </clipPath>
-      </defs>
     </svg>
   );
 }

@@ -1,4 +1,4 @@
-function Gmail() {
+function Google() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -7,7 +7,7 @@ function Gmail() {
       viewBox="0 0 20 22"
       fill="none"
     >
-      <g clip-path="url(#clip0_970_1849)">
+      <g>
         <path
           d="M10.2041 9.14453V13.0963H15.6958C15.4546 14.3672 14.731 15.4433 13.6456 16.1669L16.9573 18.7365C18.8868 16.9554 20 14.3395 20 11.2318C20 10.5083 19.9351 9.81249 19.8145 9.14464L10.2041 9.14453Z"
           fill="#4285F4"
@@ -25,18 +25,8 @@ function Gmail() {
           fill="#EA4335"
         />
       </g>
-      <defs>
-        <clipPath id="clip0_970_1849">
-          <rect
-            width="20"
-            height="20.4082"
-            fill="white"
-            transform="translate(0 0.795898)"
-          />
-        </clipPath>
-      </defs>
     </svg>
   );
 }
 
-export default Gmail;
+export default Google;
