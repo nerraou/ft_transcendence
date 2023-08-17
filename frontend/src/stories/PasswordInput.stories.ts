@@ -13,7 +13,7 @@ type Story = StoryObj<typeof PasswordInput>;
 
 export const Default: Story = {
   args: {
-	borderColor: "border-border-dark-fg-primary",
-	value: "Text input",
+    borderColor: "border-border-dark-fg-primary",
+    value: "Text input",
   },
 };
