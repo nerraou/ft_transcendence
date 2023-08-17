@@ -1,11 +1,11 @@
 import { MouseEvent } from "react";
 
-interface ResetoreProps {
+interface RestoreProps {
   color: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function Resetore(props: ResetoreProps) {
+function Restore(props: RestoreProps) {
   return (
     <svg
       className={props.color}
@@ -26,4 +26,4 @@ function Resetore(props: ResetoreProps) {
   );
 }
 
-export default Resetore;
+export default Restore;

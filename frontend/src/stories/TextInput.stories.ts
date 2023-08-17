@@ -13,8 +13,8 @@ type Story = StoryObj<typeof TextInput>;
 
 export const Default: Story = {
   args: {
-	borderColor: "border-border-dark-fg-primary",
-	value: "",
-	placeholder: "name"
+    borderColor: "border-border-dark-fg-primary",
+    value: "",
+    placeholder: "name",
   },
 };
