@@ -14,6 +14,5 @@ type Story = StoryObj<typeof ButtonContainer>;
 export const Default: Story = {
   args: {
     backgroundColor: "bg-light-pressed",
-    borderColor: " border-light-fg-primary",
   },
 };

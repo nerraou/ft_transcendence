@@ -14,6 +14,5 @@ type Story = StoryObj<typeof ButtonHistory>;
 export const Default: Story = {
   args: {
     backgroundColor: "bg-light-bg-secondary",
-    borderColor: " border-light-fg-primary",
   },
 };

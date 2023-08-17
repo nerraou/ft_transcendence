@@ -1,29 +1,20 @@
-import clsx from "clsx";
 import ButtonContainer from "./ButtonContainer";
 
 interface ButtonHistoryProps {
   backgroundColor: string;
-  borderColor: string;
-  textColor: string;
 }
 
 function History() {
   return (
-    <button
-      className={clsx(
-        "w-20 h-20 rounded-full bg-light-fg-link border-4 border-light-bg-tertiary text-xl",
-      )}
-    >
-      H
+    <button className="w-20 h-20 rounded-full bg-light-fg-link border-4 border-light-bg-tertiary ">
+      <label className="text-xl text-light-fg-primary drop-shadow-sm">H</label>
     </button>
   );
 }
+
 function ButtonHistory(props: ButtonHistoryProps) {
   return (
-    <ButtonContainer
-      borderColor={props.borderColor}
-      backgroundColor={props.backgroundColor}
-    >
+    <ButtonContainer backgroundColor={props.backgroundColor}>
       <History />
     </ButtonContainer>
   );
