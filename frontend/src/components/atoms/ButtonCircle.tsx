@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import { MouseEvent } from "react";
 
-interface CircleButtonProps {
+interface ButtonCircleProps {
   icon: React.ReactNode;
   color: string;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
-function CircleButton(props: CircleButtonProps) {
+function ButtonCircle(props: ButtonCircleProps) {
   return (
     <div className="relative w-14 h-14 rounded-full bg-light-fg-tertiary">
       <button
@@ -22,4 +22,4 @@ function CircleButton(props: CircleButtonProps) {
     </div>
   );
 }
-export default CircleButton;
+export default ButtonCircle;
