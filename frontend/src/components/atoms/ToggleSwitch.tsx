@@ -13,10 +13,10 @@ function ToggleSwitch(props: ToggleSwitchProps) {
       onChange={props.onChange}
       className={clsx(
         {
-          "bg-light-bg-primary": props.checked,
-          "bg-light-fg-primary": !props.checked,
+          "bg-light-pressed": props.checked,
+          "bg-light-bg-tertiary": !props.checked,
         },
-        "relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75",
+        "relative inline-flex p-1 w-20 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75",
       )}
     >
       <span className="sr-only">Use setting</span>
@@ -27,7 +27,11 @@ function ToggleSwitch(props: ToggleSwitchProps) {
             "translate-x-9": props.checked,
             "translate-x-0": !props.checked,
           },
-          "pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-light-fg-secondary shadow-lg ring-0 transition duration-200 ease-in-out",
+          {
+            "bg-light-pressed": !props.checked,
+            "bg-light-bg-tertiary": props.checked,
+          },
+          "pointer-events-none inline-block h-9 w-9 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out",
         )}
       />
     </Switch>
