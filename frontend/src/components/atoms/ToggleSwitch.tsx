@@ -19,7 +19,6 @@ function ToggleSwitch(props: ToggleSwitchProps) {
         "relative inline-flex p-1 w-20 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75",
       )}
     >
-      <span className="sr-only">Use setting</span>
       <span
         aria-hidden="true"
         className={clsx(
