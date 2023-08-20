@@ -103,7 +103,7 @@ function UserHeaderActions(props: UserHeaderActionsProps) {
 
 function UserHeader(props: UserHeaderProps) {
   return (
-    <div className="box-border rounded-xl border-4 border-light-fg-primary bg-light-fg-link dark:bg-dark-bg-tertiary shadow-lightXl dark:shadow-darckXl">
+    <div className="box-border rounded-xl border-4 border-light-fg-primary bg-light-fg-link dark:bg-dark-bg-tertiary shadow-light-xl dark:shadow-dark-xl">
       <BarStatus status={props.userStatus} />
       <div className="relative flex justify-between h-60 mb-xxl mt-sm mx-12 pt-xl px-xl bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
         <div className="absolute right-0 bottom-0">
