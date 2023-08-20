@@ -12,7 +12,5 @@ export default meta;
 type Story = StoryObj<typeof EmptyStatePlaceholder>;
 
 export const Default: Story = {
-  args: {
-    color: "fill-light-useless",
-  },
+  args: {},
 };

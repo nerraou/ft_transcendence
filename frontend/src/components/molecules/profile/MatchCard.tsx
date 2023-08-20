@@ -1,5 +1,5 @@
-import Player from "@components/atoms/match-card/Player";
-import { PlayerProps } from "@components/atoms/match-card/Player";
+import Player from "@atoms/Player";
+import { PlayerProps } from "@atoms/Player";
 
 interface MatchCardProps {
   player1: PlayerProps;
