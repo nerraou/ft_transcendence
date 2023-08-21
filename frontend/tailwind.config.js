@@ -48,7 +48,8 @@ module.exports = {
         },
       },
       boxShadow: {
-        xl: "0 8px 8px 0 rgb(126, 38, 37)",
+        "light-xl": "0 8px 8px 0 rgb(126, 38, 37)",
+        "dark-xl": "0 8px 8px 0 #192525",
       },
       dropShadow: {
         sm: "0 4px 2px rgb(126, 38, 37)",

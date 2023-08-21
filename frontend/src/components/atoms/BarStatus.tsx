@@ -1,12 +1,7 @@
-import clsx from "clsx";
 import { UserStatus } from "@molecules/profile/UserHeader";
 
 interface BarStatusProps {
-  width: string;
   status?: UserStatus;
-  reverse?: boolean;
-  marginY?: string;
-  marginX?: string;
 }
 
 interface StatusProps {
@@ -15,13 +10,7 @@ interface StatusProps {
 
 function Status(props: StatusProps) {
   return (
-    <svg
-      width="42"
-      height="10"
-      viewBox="0 0 42 10"
-      fill="none"
-      className={props.color}
-    >
+    <svg width="42" height="10" viewBox="0 0 42 10" className={props.color}>
       <rect width="5" height="10" rx="2.5" transform="matrix(-1 0 0 1 5 0)" />
       <rect width="5" height="10" rx="2.5" transform="matrix(-1 0 0 1 14 0)" />
       <rect width="5" height="10" rx="2.5" transform="matrix(-1 0 0 1 23 0)" />
@@ -51,14 +40,8 @@ function BarStatus(props: BarStatusProps) {
   }
 
   return (
-    <div
-      className={clsx("flex justify-between", props.marginX, props.marginY, {
-        "flex-row-reverse": props.reverse,
-      })}
-    >
-      <div
-        className={clsx("bg-light-fg-primary rounded-full h-3", props.width)}
-      />
+    <div className="flex justify-between mx-12 my-base">
+      <div className="bg-light-fg-primary rounded-full h-3 w-2/3" />
       {props.status != "in-game" && <Status color={color} />}
 
       {props.status == "in-game" && <InGameStatus />}
