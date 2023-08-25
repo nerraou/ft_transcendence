@@ -12,5 +12,7 @@ export default meta;
 type Story = StoryObj<typeof Bar>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    width: "w-4/5",
+  },
 };

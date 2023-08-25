@@ -6,6 +6,8 @@ import EyeOff from "./icons/outline/EyeOff";
 interface PasswordInputProps {
   value: string;
   borderColor: string;
+  iconColor: string;
+  textColor: string;
   placeholder: string;
   width?: string;
   height?: "base" | "large";
@@ -32,6 +34,7 @@ function PasswordInput(props: PasswordInputProps) {
     <div
       className={clsx(
         props.borderColor,
+        props.textColor,
         width,
         height,
         "border-2 rounded-full bg-light-bg-tertiary outline-none focus-within:border-dark-useless",
@@ -48,14 +51,14 @@ function PasswordInput(props: PasswordInputProps) {
 
       {props.isPasswordVisible && (
         <Eye
-          color="stroke-dark-fg-primary"
+          color={props.iconColor}
           onClick={props.onPasswordVisibilityChange}
         />
       )}
 
       {!props.isPasswordVisible && (
         <EyeOff
-          color="stroke-dark-fg-primary"
+          color={props.iconColor}
           onClick={props.onPasswordVisibilityChange}
         />
       )}

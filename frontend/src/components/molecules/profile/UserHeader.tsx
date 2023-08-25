@@ -58,7 +58,7 @@ function UserPopover(props: UserPopoverProps) {
       >
         <Popover.Panel className="absolute">
           <div className="flex flex-col bg-light-fg-tertiary p-sm rounded-base">
-            <div className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm">
+            <div className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm">
               {!props.isFriend && <UserPlus color="stroke-light-fg-link" />}
               {props.isFriend && <UserMinus color="stroke-light-fg-link" />}
               <label className="text-sm text-light-fg-primary ml-sm">

@@ -1,3 +1,11 @@
+import clsx from "clsx";
+
+interface BarProps {
+  width: string;
+  margin?: string;
+  reverse?: boolean;
+}
+
 function BarIcon() {
   return (
     <svg
@@ -15,11 +23,24 @@ function BarIcon() {
   );
 }
 
-function Bar() {
+function Bar(props: BarProps) {
   return (
-    <div className="flex justify-between">
+    <div
+      className={clsx(
+        "flex justify-between",
+        {
+          "flex-row-reverse": props.reverse,
+        },
+        props.margin,
+      )}
+    >
       <BarIcon />
-      <div className="bg-light-fg-primary dark:bg-dark-fg-primary rounded-full h-3 w-4/5" />
+      <div
+        className={clsx(
+          "bg-light-fg-primary dark:bg-dark-fg-primary rounded-full h-3",
+          props.width,
+        )}
+      />
     </div>
   );
 }

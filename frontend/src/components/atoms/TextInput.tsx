@@ -5,6 +5,7 @@ interface TextInputProps {
   value: string;
   borderColor: string;
   placeholder: string;
+  textColor: string;
   height?: "base" | "large";
   width?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -26,6 +27,7 @@ function TextInput(props: TextInputProps) {
       value={props.value}
       className={clsx(
         props.borderColor,
+        props.textColor,
         width,
         height,
         "border-2 rounded-full bg-light-bg-tertiary outline-none focus:border-dark-useless px-5",

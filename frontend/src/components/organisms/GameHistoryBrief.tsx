@@ -51,7 +51,7 @@ function GameHistoryBrief(props: GameHistoryBriefProps) {
   return (
     <div>
       {!emptyHistory && <GameHistoryCards {...props} />}
-      {emptyHistory && <EmptyStatePlaceholder color="fill-light-useless" />}
+      {emptyHistory && <EmptyStatePlaceholder />}
     </div>
   );
 }
