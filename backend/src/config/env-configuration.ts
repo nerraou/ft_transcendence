@@ -1,10 +1,16 @@
 import { resolve as resolvePath } from "path";
 import { mkdir } from "fs/promises";
 
+export interface RedisEnv {
+  host: string;
+  port: number;
+}
+
 export interface AppEnv {
   appHostName: string;
   assetsPath: string;
   jwtSecret: string;
+  redis: RedisEnv;
 }
 
 export default async function envConfigFactory(): Promise<AppEnv> {
@@ -17,6 +23,8 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     "SMTP_USER",
     "SMTP_PASSWORD",
     "JWT_SECRET",
+    "REDIS_HOST",
+    "REDIS_PORT",
   ];
 
   requiredEnvVariables.forEach((variable) => {
@@ -34,5 +42,9 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     appHostName: process.env.APP_HOSTNAME,
     assetsPath,
     jwtSecret: process.env.JWT_SECRET,
+    redis: {
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT, 10),
+    },
   };
 }

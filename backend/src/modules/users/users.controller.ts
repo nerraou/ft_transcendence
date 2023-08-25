@@ -1,8 +1,9 @@
-import { Controller, Get, Request, UseGuards } from "@nestjs/common";
+import { Controller, Get, UseGuards } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
-import { User } from "@prisma/client";
+import { User as UserEntity } from "@prisma/client";
 import { MeApiDocumentation } from "./decorators/docs.decorator";
+import { User } from "./decorators/user.decorators";
 
 @Controller("users")
 export class UsersController {
@@ -11,17 +12,17 @@ export class UsersController {
   @Get("/me")
   @MeApiDocumentation()
   @UseGuards(JwtAuthGuard)
-  profile(@Request() req: Request & { user: User }) {
+  profile(@User() user: UserEntity) {
     return {
-      id: req.user.id,
-      username: req.user.username,
-      email: req.user.email,
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      avatarPath: req.user.avatarPath,
-      is2faEnabled: req.user.is2faEnabled,
-      isEmailVerified: req.user.isEmailVerified,
-      createdAt: req.user.createdAt.getTime(),
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarPath: user.avatarPath,
+      is2faEnabled: user.is2faEnabled,
+      isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
     };
   }
 }
