@@ -5,9 +5,10 @@ import {
   OnGatewayConnection,
   ConnectedSocket,
   OnGatewayDisconnect,
+  WebSocketServer,
 } from "@nestjs/websockets";
 import { UseGuards } from "@nestjs/common";
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { User as UserEntity } from "@prisma/client";
 
 import { User } from "@modules/users/decorators/user.decorators";
@@ -17,6 +18,8 @@ import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
 
 @WebSocketGateway()
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer() server: Server;
+
   constructor(private readonly eventsService: EventsService) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -26,7 +29,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
-    this.eventsService.userDisonnected(client.id);
+    this.eventsService.userDisonnected(client);
 
     // TODO: broadcast online status using client.broadcast.emit()
   }

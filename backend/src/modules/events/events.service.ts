@@ -18,22 +18,34 @@ export class EventsService {
   ) {}
 
   userConnected(client: Socket) {
-    const jwtToken = ExtractJwt.fromAuthHeaderAsBearerToken()(
-      client.request as any,
-    );
+    const payload = this.verifyJwt(client.request);
 
-    if (!jwtToken) {
+    if (!payload) {
       throw new WsException("Unauthorized");
     }
 
-    const payload = this.jwtService.verify<JwtPayload>(jwtToken, {
-      secret: this.configService.get("jwtSecret"),
-    });
-
-    return this.redisService.set(client.id, payload.sub);
+    return this.redisService.set(payload.sub.toString(), client.id);
   }
 
-  userDisonnected(socketId: string) {
-    return this.redisService.del(socketId);
+  userDisonnected(client: Socket) {
+    const payload = this.verifyJwt(client.request);
+
+    if (!payload) {
+      throw new WsException("Unauthorized");
+    }
+
+    return this.redisService.del(payload.sub.toString());
+  }
+
+  private verifyJwt(request: any): JwtPayload | undefined {
+    const jwtToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
+
+    if (jwtToken) {
+      const payload = this.jwtService.verify<JwtPayload>(jwtToken, {
+        secret: this.configService.get("jwtSecret"),
+      });
+
+      return payload;
+    }
   }
 }

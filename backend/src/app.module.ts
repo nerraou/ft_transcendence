@@ -9,6 +9,7 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 import { resolve as resolvePath } from "path";
 
 import { EventsModule } from "./modules/events/events.module";
+import { ContactsModule } from "./modules/contacts/contacts.module";
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { EventsModule } from "./modules/events/events.module";
         },
       },
     }),
+    ContactsModule,
   ],
   controllers: [AppController],
 })
