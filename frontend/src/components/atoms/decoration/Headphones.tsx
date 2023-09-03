@@ -2,6 +2,7 @@ import clsx from "clsx";
 
 interface HeadphonesProps {
   reverse?: boolean;
+  position?: string;
 }
 
 function Headphones(props: HeadphonesProps) {
@@ -12,7 +13,7 @@ function Headphones(props: HeadphonesProps) {
       height="21"
       viewBox="0 0 130 21"
       fill="none"
-      className={clsx({ "rotate-180": props.reverse })}
+      className={clsx(props.position, { "rotate-180": props.reverse })}
     >
       <rect
         x="118"
