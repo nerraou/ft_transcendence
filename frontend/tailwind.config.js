@@ -84,7 +84,14 @@ module.exports = {
         lg: "16px",
         xl: "32px",
         xxl: "64px",
-        "2xl": "128px",
+        "2xl": "96px",
+        "3xl": "128px",
+      },
+      backgroundImage: {
+        "light-layout":
+          "url('~public/decoration/light-speaker.svg'), url('~public/decoration/light-headphones.svg'), url('~public/decoration/left-bottom-rounding.svg')",
+        "dark-layout":
+          "url('~public/decoration/dark-speaker.svg'), url('~public/decoration/dark-headphones.svg'), url('~public/decoration/left-bottom-rounding.svg')",
       },
     },
   },
