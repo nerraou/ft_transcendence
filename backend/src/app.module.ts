@@ -1,19 +1,21 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "@modules/auth/auth.module";
 import { UsersModule } from "@modules/users/users.module";
 import envConfigFactory from "@config/env-configuration";
-import { PrismaService } from "@common/services/prisma.service";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import { resolve as resolvePath } from "path";
+
+import { EventsModule } from "./modules/events/events.module";
+import { ContactsModule } from "./modules/contacts/contacts.module";
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
+    EventsModule,
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,
@@ -39,8 +41,8 @@ import { resolve as resolvePath } from "path";
         },
       },
     }),
+    ContactsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
 })
 export class AppModule {}

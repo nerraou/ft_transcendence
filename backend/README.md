@@ -30,6 +30,7 @@ docker compose -f ./docker-compose.development.yml up database -d --build
 ### Run from host machine
 
 > :warning: **In ./backend/.env, change database host in DATABASE_URL to `localhost`**
+> :warning: **In ./backend/.env, change redis host to `localhost`**
 
 > :warning: **Change directory to ./backend**
 
@@ -55,9 +56,10 @@ npm run prisma:studio
 > :warning: **You must be at the root of the repository**
 
 > :warning: **In ./backend/.env, change database host in DATABASE_URL to `database`**
+> :warning: **In ./backend/.env, change redis host to `redis`**
 
 ```bash
-docker compose -f ./docker-compose.development.yml up backend database -d --build
+docker compose -f ./docker-compose.development.yml up backend database redis -d --build
 
 # run prisma studio
 docker compose -f ./docker-compose.development.yml exec backend sh

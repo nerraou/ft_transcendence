@@ -23,8 +23,31 @@ model User {
   is2faEnabled      Boolean  @default(false) @map("is_2fa_enabled")
   verifyEmailToken  String?  @unique() @map("verify_email_token") @db.VarChar(255)
   isEmailVerified   Boolean  @default(false) @map("is_email_verified")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  followedBy Contact[] @relation("following")
+  following  Contact[] @relation("follower")
 
   @@map("users")
+}
+
+model Contact {
+  id          Int           @id @default(autoincrement()) @map("id")
+  followerId  Int
+  followingId Int
+  status      ContactStatus @default(PENDING)
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamp()
+
+  follower  User @relation("follower", fields: [followerId], references: [id])
+  following User @relation("following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@map("contacts")
+}
+
+enum ContactStatus {
+  ACCEPTED
+  PENDING
 }

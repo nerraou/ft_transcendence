@@ -1,10 +1,18 @@
 import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { HttpStatus, ValidationPipe } from "@nestjs/common";
 
+import { RedisIoAdapter } from "@modules/events/adapters/redis-io-adapter";
+
+import { AppModule } from "./app.module";
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+
+  app.useWebSocketAdapter(redisIoAdapter);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -14,8 +22,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle("Pong")
-    .setDescription("ft_transcendence API")
+    .setTitle("Pong Boy")
+    .setDescription("Pong Boy API")
     .setVersion("1.0")
     .addBearerAuth()
     .build();
@@ -25,4 +33,5 @@ async function bootstrap() {
 
   await app.listen(5000);
 }
+
 bootstrap();
