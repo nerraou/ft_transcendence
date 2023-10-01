@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "npm": ">=9.5.0",
-    "node": ">=18.16.0",
+    "npm": "^9",
+    "node": "^18",
     "yarn": "please use npm",
     "pnpm": "please use npm"
   },
