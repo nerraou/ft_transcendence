@@ -9,6 +9,7 @@ interface InputSearchProps {
   textColor: string;
   width?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
 }
 
 const InputSearch = (props: InputSearchProps) => {
@@ -33,7 +34,7 @@ const InputSearch = (props: InputSearchProps) => {
       />
       <button
         className="absolute top-1/2 right-3 transform -translate-y-1/2"
-        onClick={() => props.onChange({ target: { value: "" } } as any)}
+        onClick={props.onClear}
       >
         <X className="text-light-fg-primary dark:text-dark-fg-primary" />
       </button>
