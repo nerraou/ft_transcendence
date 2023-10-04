@@ -15,5 +15,6 @@ export const Default: Story = {
   args: {
     fullname: "Nouhayla Erraou",
     username: "totoro",
+    level: 6,
   },
 };

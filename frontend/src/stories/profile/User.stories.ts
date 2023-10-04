@@ -1,8 +1,8 @@
-import User from "@atoms/user-header/User";
+import User from "@atoms/UserCard";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof User> = {
-  title: "user-header/User",
+  title: "profile/User",
   component: User,
   tags: ["autodocs"],
 };

@@ -7,7 +7,7 @@ import UserIcon from "@icons/outline/User";
 import UserBlock from "@icons/outline/UserBlock";
 import UserMinus from "@icons/outline/UserMinus";
 import UserPlus from "@icons/outline/UserPlus";
-import User from "@atoms/user-header/User";
+import User from "@atoms/UserCard";
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
@@ -16,6 +16,7 @@ export type UserStatus = "online" | "offline" | "in-game";
 interface UserHeaderProps {
   fullname: string;
   username: string;
+  level: number;
   image: string;
   userStatus: UserStatus;
   isProfileOwner: boolean;
@@ -109,11 +110,16 @@ function UserHeader(props: UserHeaderProps) {
         <div className="absolute right-0 bottom-0">
           <Reflect />
         </div>
-        <User
-          fullName={props.fullname}
-          username={props.username}
-          image={props.image}
-        />
+        <div className="flex flex-col">
+          <User
+            fullName={props.fullname}
+            username={props.username}
+            image={props.image}
+          />
+          <label className="text-light-fg-link text-xxl leading-none">
+            #{props.level}
+          </label>
+        </div>
         <UserHeaderActions
           isFriend={props.isFriend}
           isProfileOwner={props.isProfileOwner}
