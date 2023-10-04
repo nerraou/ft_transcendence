@@ -25,6 +25,7 @@
     "commitlint": "commitlint --edit",
     "prepare": "cd .. && husky install ./backend/.husky",
     "prisma:generate": "prisma generate",
+    "prisma:migrate:prod": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:migrate:dev": "prisma migrate dev"
   },

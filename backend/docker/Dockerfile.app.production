@@ -1,0 +1,26 @@
+FROM node:18-alpine
+
+RUN apk add --no-cache build-base \
+    cairo-dev cairo cairo-tools \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev
+
+RUN mkdir /home/node/app
+
+WORKDIR /home/node/app
+
+COPY ./package.json ./package-lock.json ./
+
+RUN ["npm", "ci"]
+
+COPY ./ ./
+
+RUN [ "npm", "run", "prisma:generate" ]
+
+RUN [ "npm", "run", "build" ]
+
+ENV NODE_ENV="production"
+
+CMD sh ./docker/tools/wait-for-it.sh && npm run start:prod

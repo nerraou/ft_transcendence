@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./docker/Dockerfile.app.production
+    env_file:
+      - ./frontend/.env.local
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./docker/Dockerfile.app.production
+    env_file:
+      - ./backend/.env
+    ports:
+      - ${BACKEND_PORT}:5000
+      - ${BACKEND_PRISMA_PORT}:5555
+    depends_on:
+      - database
+
+  database:
+    image: postgres:15
+    restart: always
+    volumes:
+      - ./pg-data:/var/lib/postgresql/data
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+  
+  redis:
+    image: redis:7.2
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
