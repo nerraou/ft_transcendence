@@ -1,4 +1,8 @@
-function X({ className }: { className?: string }) {
+interface XProps {
+  className?: string;
+}
+
+function X({ className }: XProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
