@@ -10,7 +10,7 @@ services:
     env_file:
       - ./frontend/.env.local
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - ${FRONTEND_PORT}:3000
       - ${FRONTEND_STORYBOOK_PORT}:6006
 
   backend:
@@ -42,4 +42,4 @@ services:
   redis:
     image: redis:7.2
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - ${REDIS_PORT}:6379
