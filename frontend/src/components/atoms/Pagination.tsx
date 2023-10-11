@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@hooks/useMediaQuery";
 
@@ -6,17 +7,22 @@ type PaginationButtonProps = {
   content: string;
   active: boolean;
   disabled?: boolean;
+  slider?: boolean;
 };
 
 const PaginationButton = (props: PaginationButtonProps) => {
-  const { onClick, content, active, disabled } = props;
+  const { onClick, content, active, disabled, slider } = props;
   return (
     <button
       onClick={() => onClick(content)}
-      className={`px-4 py-2 ${
-        active
-          ? "bg-light-bg-primary text-light-fg-primary"
-          : "bg-light-bg-tertiary text-light-fg-secondary"
+      className={`drop-shadow-lg w-8 h-8 flex items-center justify-center
+      ${content.length > 2 ? "text-sm" : ""}
+      ${
+        slider
+          ? "bg-light-bg-tertiary text-light-fg-primary dark:text-dark-fg-primary"
+          : active
+          ? "bg-light-bg-primary text-light-fg-tertiary dark:bg-dark-fg-link"
+          : "bg-light-bg-tertiary text-light-fg-link"
       } rounded-full`}
       disabled={disabled}
     >
@@ -26,7 +32,6 @@ const PaginationButton = (props: PaginationButtonProps) => {
 };
 
 type PaginationInfos = {
-  value: number;
   size: number;
   total: number;
   step: number;
@@ -34,34 +39,36 @@ type PaginationInfos = {
 };
 
 type PaginationProps = {
-  defaultPage?: number;
+  page?: number;
   total: number;
+  onChange?: (value: number) => void;
 };
 
 const Pagination = (props: PaginationProps) => {
-  const { defaultPage, total } = props;
-  const isSmallScreen = useMediaQuery("(max-width: 640px)");
-  const isTinyScreen = useMediaQuery("(max-width: 480px)");
+  const { page, total } = props;
+  const isSmallScreen = useMediaQuery("(max-width: 480px)");
+  const isTinyScreen = useMediaQuery("(max-width: 320px)");
   const [paginatinInfos, setPaginationInfos] = useState<PaginationInfos>({
-    value: defaultPage || 1,
     size: 3,
     total: total,
     step: 1,
-    start:
-      defaultPage && defaultPage <= total
-        ? Math.max(1, Math.min(defaultPage - 1, total - 1))
-        : 1,
+    start: 1,
   });
 
   useEffect(() => {
-    setPaginationInfos({
-      ...paginatinInfos,
+    setPaginationInfos((prev) => ({
+      ...prev,
       size: isTinyScreen ? 1 : isSmallScreen ? 2 : 3,
       step: isTinyScreen ? 1 : isSmallScreen ? 2 : 3,
-    });
-  }, [isTinyScreen, isSmallScreen]);
+      start: isTinyScreen
+        ? prev.start
+        : isSmallScreen
+        ? Math.max(1, Math.min(prev.start, total - 1))
+        : Math.max(1, Math.min(prev.start, total - 2)),
+    }));
+  }, [isTinyScreen, isSmallScreen, total]);
 
-  const handleNext = (_: any) => {
+  const handleNext = () => {
     setPaginationInfos({
       ...paginatinInfos,
       start: Math.min(
@@ -71,7 +78,7 @@ const Pagination = (props: PaginationProps) => {
     });
   };
 
-  const handlePrev = (_: any) => {
+  const handlePrev = () => {
     setPaginationInfos({
       ...paginatinInfos,
       start: Math.max(paginatinInfos.start - paginatinInfos.step, 1),
@@ -79,10 +86,9 @@ const Pagination = (props: PaginationProps) => {
   };
 
   const handleClicked = (value: string) => {
-    setPaginationInfos({
-      ...paginatinInfos,
-      value: parseInt(value),
-    });
+    if (props.onChange) {
+      props.onChange(parseInt(value));
+    }
   };
 
   return (
@@ -92,14 +98,16 @@ const Pagination = (props: PaginationProps) => {
         content="<"
         active={false}
         disabled={paginatinInfos.start === 1}
+        slider={true}
       />
       {Array.from(Array(Math.min(paginatinInfos.size, total)).keys()).map(
         (i) => {
           return (
             <PaginationButton
+              key={i}
               onClick={handleClicked}
               content={`${i + paginatinInfos.start}`}
-              active={i + paginatinInfos.start === paginatinInfos.value}
+              active={i + paginatinInfos.start === page}
             />
           );
         },
@@ -112,6 +120,7 @@ const Pagination = (props: PaginationProps) => {
           paginatinInfos.start + paginatinInfos.size - 1 ===
           paginatinInfos.total
         }
+        slider={true}
       />
     </div>
   );
