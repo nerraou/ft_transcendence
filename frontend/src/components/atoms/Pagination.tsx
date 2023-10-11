@@ -16,7 +16,7 @@ const PaginationButton = (props: PaginationButtonProps) => {
     <button
       onClick={() => onClick(content)}
       className={`drop-shadow-lg w-8 h-8 flex items-center justify-center
-      ${content.length > 2 ? "text-sm" : ""}
+      ${content.length > 2 ? "text-sm" : "text-md"}
       ${
         slider
           ? "bg-light-bg-tertiary text-light-fg-primary dark:text-dark-fg-primary"
