@@ -4,23 +4,20 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: ./docker/Dockerfile.app.development
-    volumes:
-      - ./frontend:/home/node/app
+      dockerfile: ./docker/Dockerfile.app.production
     env_file:
       - ./frontend/.env.local
     ports:
       - ${FRONTEND_PORT}:3000
-      - ${FRONTEND_STORYBOOK_PORT}:6006
 
   backend:
     build:
       context: ./backend
-      dockerfile: ./docker/Dockerfile.app.development
-    volumes:
-      - ./backend:/home/node/app
+      dockerfile: ./docker/Dockerfile.app.production
     env_file:
       - ./backend/.env
+    volumes:
+      - backend_assets:/home/node/app/assets
     ports:
       - ${BACKEND_PORT}:5000
       - ${BACKEND_PRISMA_PORT}:5555
@@ -31,7 +28,7 @@ services:
     image: postgres:15
     restart: always
     volumes:
-      - ./pg-data:/var/lib/postgresql/data
+      - database_data:/var/lib/postgresql/data
     ports:
       - ${DATABASE_PORT}:${DATABASE_PORT}
     environment:
@@ -43,3 +40,7 @@ services:
     image: redis:7.2
     ports:
       - ${REDIS_PORT}:6379
+
+volumes:
+  backend_assets:
+  database_data:
