@@ -10,6 +10,16 @@ type PaginationButtonProps = {
   slider?: boolean;
 };
 
+const getStyle = (active: boolean, slider?: boolean) => {
+  if (slider) {
+    return `bg-light-bg-tertiary text-light-fg-primary dark:text-dark-fg-primary`;
+  } else if (active) {
+    return `bg-light-bg-primary text-light-fg-tertiary dark:bg-dark-fg-link`;
+  } else {
+    return `bg-light-bg-tertiary text-light-fg-link`;
+  }
+}
+
 const PaginationButton = (props: PaginationButtonProps) => {
   const { onClick, content, active, disabled, slider } = props;
   return (
