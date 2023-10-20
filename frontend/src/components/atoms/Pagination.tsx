@@ -39,9 +39,9 @@ type PaginationInfos = {
 };
 
 type PaginationProps = {
-  page?: number;
+  page: number;
   total: number;
-  onChange?: (value: number) => void;
+  onChange: (value: number) => void;
 };
 
 const Pagination = (props: PaginationProps) => {
@@ -55,17 +55,33 @@ const Pagination = (props: PaginationProps) => {
     start: 1,
   });
 
+  const getPaginationInfos = (preg: PaginationInfos) => {
+    if (isTinyScreen) {
+      return {
+        ...preg,
+        size: 1,
+        step: 1,
+        start: preg.start,
+      };
+    } else if (isSmallScreen) {
+      return {
+        ...preg,
+        size: 2,
+        step: 2,
+        start: Math.max(1, Math.min(preg.start, total - 1)),
+      };
+    } else {
+      return {
+        ...preg,
+        size: 3,
+        step: 3,
+        start: Math.max(1, Math.min(preg.start, total - 2)),
+      };
+    }
+  };
+
   useEffect(() => {
-    setPaginationInfos((prev) => ({
-      ...prev,
-      size: isTinyScreen ? 1 : isSmallScreen ? 2 : 3,
-      step: isTinyScreen ? 1 : isSmallScreen ? 2 : 3,
-      start: isTinyScreen
-        ? prev.start
-        : isSmallScreen
-        ? Math.max(1, Math.min(prev.start, total - 1))
-        : Math.max(1, Math.min(prev.start, total - 2)),
-    }));
+    setPaginationInfos((prev) => getPaginationInfos(prev));
   }, [isTinyScreen, isSmallScreen, total]);
 
   const handleNext = () => {
@@ -86,9 +102,7 @@ const Pagination = (props: PaginationProps) => {
   };
 
   const handleClicked = (value: string) => {
-    if (props.onChange) {
-      props.onChange(parseInt(value));
-    }
+    props.onChange(parseInt(value));
   };
 
   return (
