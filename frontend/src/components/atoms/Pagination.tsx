@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@hooks/useMediaQuery";
+import clsx from "clsx";
 
 type PaginationButtonProps = {
   onClick: (value: string) => void;
@@ -18,22 +19,19 @@ const getStyle = (active: boolean, slider?: boolean) => {
   } else {
     return `bg-light-bg-tertiary text-light-fg-link`;
   }
-}
+};
 
 const PaginationButton = (props: PaginationButtonProps) => {
   const { onClick, content, active, disabled, slider } = props;
   return (
     <button
       onClick={() => onClick(content)}
-      className={`drop-shadow-lg w-8 h-8 flex items-center justify-center
-      ${content.length > 2 ? "text-sm" : "text-md"}
-      ${
-        slider
-          ? "bg-light-bg-tertiary text-light-fg-primary dark:text-dark-fg-primary"
-          : active
-          ? "bg-light-bg-primary text-light-fg-tertiary dark:bg-dark-fg-link"
-          : "bg-light-bg-tertiary text-light-fg-link"
-      } rounded-full`}
+      className={clsx(
+        "drop-shadow-lg w-8 h-8 flex items-center justify-center",
+        content.length > 2 ? "text-sm" : "text-md",
+        getStyle(active, slider),
+        "rounded-full",
+      )}
       disabled={disabled}
     >
       {content}
