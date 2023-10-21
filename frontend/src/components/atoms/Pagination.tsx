@@ -2,13 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@hooks/useMediaQuery";
 import clsx from "clsx";
+import ChevronLeft from "./icons/outline/ChevronLeft";
+import ChevronRight from "./icons/outline/ChevronRight";
 
 type PaginationButtonProps = {
   onClick: (value: string) => void;
-  content: string;
+  content?: string;
   active: boolean;
   disabled?: boolean;
   slider?: boolean;
+  icon?: React.ReactNode;
 };
 
 const getStyle = (active: boolean, slider?: boolean) => {
@@ -22,19 +25,21 @@ const getStyle = (active: boolean, slider?: boolean) => {
 };
 
 const PaginationButton = (props: PaginationButtonProps) => {
-  const { onClick, content, active, disabled, slider } = props;
+  const { onClick, content, active, disabled, slider, icon } = props;
+
   return (
     <button
-      onClick={() => onClick(content)}
+      onClick={() => onClick(content || "")}
       className={clsx(
-        "drop-shadow-lg w-8 h-8 flex items-center justify-center",
-        content.length > 2 ? "text-sm" : "text-md",
+        "drop-shadow-light-fg-primary dark:drop-shadow-dark-fg-primary",
+        "w-[50px] h-[50px] flex items-center justify-center",
+        content && content.length > 4 ? "text-sm" : "text-md",
         getStyle(active, slider),
         "rounded-full",
       )}
       disabled={disabled}
     >
-      {content}
+      {icon || content}
     </button>
   );
 };
@@ -55,7 +60,7 @@ type PaginationProps = {
 const Pagination = (props: PaginationProps) => {
   const { page, total } = props;
   const isSmallScreen = useMediaQuery("(max-width: 480px)");
-  const isTinyScreen = useMediaQuery("(max-width: 320px)");
+  const isTinyScreen = useMediaQuery("(max-width: 380px)");
   const [paginatinInfos, setPaginationInfos] = useState<PaginationInfos>({
     size: 3,
     total: total,
@@ -114,9 +119,10 @@ const Pagination = (props: PaginationProps) => {
   };
 
   return (
-    <div className="flex items-center justify-center space-x-2">
+    <div className="flex items-center justify-center space-x-5">
       <PaginationButton
         onClick={handlePrev}
+        icon={<ChevronLeft className="w-5 h-5" />}
         content="<"
         active={false}
         disabled={paginatinInfos.start === 1}
@@ -136,6 +142,7 @@ const Pagination = (props: PaginationProps) => {
       )}
       <PaginationButton
         onClick={handleNext}
+        icon={<ChevronRight className="w-5 h-5" />}
         content=">"
         active={false}
         disabled={

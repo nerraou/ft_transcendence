@@ -53,6 +53,8 @@ module.exports = {
       },
       dropShadow: {
         sm: "0 4px 2px rgb(126, 38, 37)",
+        "light-fg-primary": "0 1px 4px #7E2625",
+        "dark-fg-primary": "0 1px 4px #192525",
       },
       margin: {
         xxs: "2px",
