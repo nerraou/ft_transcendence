@@ -2,7 +2,7 @@ import Pagination from "@components/atoms/Pagination";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof Pagination> = {
-  title: "Components/atoms/Pagination",
+  title: "Pagination/Pagination",
   component: Pagination,
   tags: ["autodcs"],
 };
