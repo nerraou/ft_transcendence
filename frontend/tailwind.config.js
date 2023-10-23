@@ -50,6 +50,7 @@ module.exports = {
       boxShadow: {
         "light-xl": "0 8px 8px 0 rgb(126, 38, 37)",
         "dark-xl": "0 8px 8px 0 #192525",
+        "light-lg": "0 4px 4px 0 rgba(0, 0, 0, 0.25)",
       },
       dropShadow: {
         sm: "0 4px 2px rgb(126, 38, 37)",
