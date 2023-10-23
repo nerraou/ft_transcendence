@@ -15,10 +15,6 @@ export const Default: Story = {
   args: {
     achievements: [
       "CleanSheet",
-      "Clean",
-      "Clea",
-      "Cle",
-      "Cl",
       "FirstWin",
       "FiveWins",
       "OneHundredWins",

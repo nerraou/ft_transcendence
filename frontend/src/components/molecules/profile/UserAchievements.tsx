@@ -15,10 +15,6 @@ interface UserAchievementsProps {
 
 const achievements: Record<string, any> = {
   CleanSheet: <CleanSheet />,
-  Clean: <CleanSheet />,
-  Clea: <CleanSheet />,
-  Cle: <CleanSheet />,
-  Cl: <CleanSheet />,
   FirstWin: <FirstWin />,
   FirstRanked: <FirstRanked />,
   SecondRanked: <SecondRanked />,
@@ -29,33 +25,30 @@ const achievements: Record<string, any> = {
 };
 
 function UserAchievements(props: UserAchievementsProps) {
-  const [sliderRef] = useKeenSlider(
-    {
-      slides: {
-        perView: 9,
-      },
-      breakpoints: {
-        "(max-width: 500px)": {
-          loop: true,
-          slides: {
-            perView: 5,
-          },
+  const [sliderRef] = useKeenSlider({
+    slides: {
+      perView: 9,
+    },
+    breakpoints: {
+      "(max-width: 500px)": {
+        slides: {
+          perView: 3,
         },
       },
     },
-    [
-      // add plugins here
-    ],
-  );
+  });
 
   return (
     <div
       ref={sliderRef}
-      className="keen-slider flex items-center bg-light-bg-tertiary border border-light-fg-link rounded-full px-4"
+      className="keen-slider flex items-center bg-light-bg-tertiary border border-light-fg-link rounded-full px-4 overflow-visible"
     >
       {props.achievements.map((achievement, index) => {
         return (
-          <div key={index} className="keen-slider__slide">
+          <div
+            key={index}
+            className="keen-slider__slide flex justify-center overflow-visible"
+          >
             {achievements[achievement]}
           </div>
         );
