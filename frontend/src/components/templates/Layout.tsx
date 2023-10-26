@@ -28,7 +28,7 @@ export default function Layout(props: LayoutProps) {
         <section
           className={clsx(
             "flex-grow pb-10 bg-light-bg-primary dark:bg-dark-bg-primary",
-            "relative h-full overflow-auto rounded-b-2xl border-t-4 border-l-4 border-light-fg-tertiary",
+            "relative h-full rounded-b-2xl border-t-4 border-l-4 border-light-fg-tertiary",
             "bg-[position:right_bottom_,_center_bottom,_left_-4px_bottom] bg-no-repeat",
             "bg-light-layout dark:bg-dark-layout",
           )}
