@@ -1,3 +1,5 @@
+"use client";
+
 import PasswordInput from "@components/atoms/PasswordInput";
 import TextInput from "@components/atoms/TextInput";
 import Bar from "@components/atoms/decoration/Bar";

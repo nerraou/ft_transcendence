@@ -87,6 +87,9 @@ module.exports = {
         "2xl": "96px",
         "3xl": "128px",
       },
+      rotate: {
+        32: "32deg",
+      },
       backgroundImage: {
         "light-layout":
           "url('~public/decoration/light-speaker.svg'), url('~public/decoration/light-headphones.svg'), url('~public/decoration/left-bottom-rounding.svg')",
