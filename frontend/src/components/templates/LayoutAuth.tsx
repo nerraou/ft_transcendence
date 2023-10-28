@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import { ReactNode } from "react";
 
-interface LayoutProps {
+interface LayoutAuthProps {
   children: ReactNode | ReactNode[];
 }
 
-function LayoutAuth(props: LayoutProps) {
+function LayoutAuth(props: LayoutAuthProps) {
   return (
     <main className="relative flex min-h-screen p-4 bg-light-bg-tertiary dark:bg-dark-bg-primary">
       <section
