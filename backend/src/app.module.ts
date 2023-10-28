@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "@modules/auth/auth.module";
@@ -10,12 +10,14 @@ import { resolve as resolvePath } from "path";
 
 import { EventsModule } from "./modules/events/events.module";
 import { ContactsModule } from "./modules/contacts/contacts.module";
+import { MessagesModule } from "./modules/messages/messages.module";
 
 @Module({
   imports: [
+    MessagesModule,
     UsersModule,
     AuthModule,
-    EventsModule,
+    forwardRef(() => EventsModule),
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,

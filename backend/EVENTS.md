@@ -27,3 +27,20 @@ Event
   - username: user2 username
   - firstName: user2 first name
   - lastName: user2 last name
+
+Event
+
+- name: `message`
+- actors: user1, user2
+- sender: user1
+- receiver: user2
+- payload:
+  - message:
+    - id
+    - text
+  - sender
+    - id: user1 id
+    - avatarPath: user1 avatar path
+    - username: user1 username
+    - firstName: user1 first name
+    - lastName: user1 last name

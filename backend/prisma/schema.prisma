@@ -28,6 +28,8 @@ model User {
 
   followedBy Contact[] @relation("following")
   following  Contact[] @relation("follower")
+  sent       Message[] @relation("sent")
+  received   Message[] @relation("received")
 
   @@map("users")
 }
@@ -45,6 +47,21 @@ model Contact {
 
   @@unique([followerId, followingId])
   @@map("contacts")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement()) @map("id")
+  senderId   Int      @map("sender_id")
+  receiverId Int      @map("receiver_id")
+  isRead     Boolean  @default(false) @map("is_read")
+  text       String   @map("text")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  sender   User @relation("sent", fields: [senderId], references: [id])
+  receiver User @relation("received", fields: [receiverId], references: [id])
+
+  @@map("messages")
 }
 
 enum ContactStatus {
