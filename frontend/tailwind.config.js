@@ -2,6 +2,14 @@
 module.exports = {
   darkMode: "class",
   theme: {
+    // work with max-width breakpoints instead of min-width: desktop first
+    screens: {
+      "2xl": { max: "1535px" },
+      xl: { max: "1279px" },
+      lg: { max: "1023px" },
+      md: { max: "767px" },
+      sm: { max: "639px" },
+    },
     colors: {
       "light-bg-primary": "#F4C127",
       "light-bg-secondary": "#EF9935",
@@ -49,7 +57,7 @@ module.exports = {
       },
       boxShadow: {
         "light-xl": "0 8px 8px 0 rgb(126, 38, 37)",
-        "dark-xl": "0 8px 8px 0 #192525",
+        "dark-xl": "0 8px 8px 0 rgb(25, 37, 37)",
       },
       dropShadow: {
         sm: "0 4px 2px rgb(126, 38, 37)",
@@ -87,11 +95,18 @@ module.exports = {
         "2xl": "96px",
         "3xl": "128px",
       },
+      rotate: {
+        32: "32deg",
+      },
       backgroundImage: {
         "light-layout":
           "url('~public/decoration/light-speaker.svg'), url('~public/decoration/light-headphones.svg'), url('~public/decoration/left-bottom-rounding.svg')",
         "dark-layout":
           "url('~public/decoration/dark-speaker.svg'), url('~public/decoration/dark-headphones.svg'), url('~public/decoration/left-bottom-rounding.svg')",
+        "light-layout-auth":
+          "url('~public/decoration/light-speaker.svg'), url('~public/decoration/light-headphones-auth.svg')",
+        "dark-layout-auth":
+          "url('~public/decoration/dark-speaker.svg'), url('~public/decoration/dark-headphones-auth.svg')",
       },
     },
   },
