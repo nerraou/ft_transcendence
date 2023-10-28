@@ -29,7 +29,7 @@ export class AuthService {
       width: 128,
     });
     const filename = `${uuidV4()}.png`;
-    const avatarPath = `${this.configService.get("assetsPath")}/${filename}`;
+    const avatarPath = `${this.configService.get("imagesPath")}/${filename}`;
 
     await writeFile(avatarPath, avatarBuffer);
 
