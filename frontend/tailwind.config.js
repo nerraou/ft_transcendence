@@ -2,12 +2,12 @@
 module.exports = {
   darkMode: "class",
   theme: {
-    // work with max-width breakpoints instead of min-width: desktop first
+    // work with Fixed-range breakpoints instead of min-width: desktop first
     screens: {
-      "2xl": { max: "1535px" },
-      xl: { max: "1279px" },
-      lg: { max: "1023px" },
-      md: { max: "767px" },
+      "2xl": { min: "1280px", max: "1536px" },
+      xl: { min: "1025px", max: "1279px" },
+      lg: { min: "770px", max: "1024px" },
+      md: { min: "640px", max: "768px" },
       sm: { max: "639px" },
     },
     colors: {

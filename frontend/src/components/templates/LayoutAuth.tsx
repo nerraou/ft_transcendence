@@ -10,7 +10,7 @@ function LayoutAuth(props: LayoutAuthProps) {
     <main className="relative flex min-h-screen p-4 bg-light-bg-tertiary dark:bg-dark-bg-primary">
       <section
         className={clsx(
-          "relative w-full flex-1 flex flex-col mx-auto border-4 rounded-b-2xl",
+          "relative container flex-1 flex flex-col mx-auto border-4 rounded-b-2xl",
           "border-light-fg-primary dark:border-dark-fg-primary",
         )}
       >
