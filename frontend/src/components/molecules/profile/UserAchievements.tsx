@@ -8,12 +8,13 @@ import LastRanked from "@atoms/achievements/LastRanked";
 import FiveWins from "@components/atoms/achievements/FiveWins";
 import SecondRanked from "@components/atoms/achievements/SecondRanked";
 import ThirdRanked from "@components/atoms/achievements/ThirdRanked";
+import { ReactNode } from "react";
 
 interface UserAchievementsProps {
   achievements: string[];
 }
 
-const achievements: Record<string, any> = {
+const achievements: Record<string, ReactNode> = {
   CleanSheet: <CleanSheet />,
   FirstWin: <FirstWin />,
   FirstRanked: <FirstRanked />,

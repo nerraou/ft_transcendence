@@ -1,4 +1,4 @@
-import FiftyWins from "@components/atoms/achievements/ FiftyWins";
+import FiftyWins from "@components/atoms/achievements/FiftyWins";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof FiftyWins> = {
