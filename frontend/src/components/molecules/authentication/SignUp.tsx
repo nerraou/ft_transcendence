@@ -15,7 +15,7 @@ function SignUpForm() {
     return;
   }
   return (
-    <form className="m-6 flex flex-col items-center">
+    <form className="m-6 flex flex-col w-full items-center">
       <div className="grid grid-rows-2 gap-4">
         <TextInput
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
@@ -46,7 +46,7 @@ function SignUpForm() {
           Sign In
         </Link>
       </label>
-      <div className="flex m-6 w-full h-36 justify-between items-center sm:flex-col">
+      <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
         <Button text="Sign Up" />
         <ButtonOAuth />
       </div>
