@@ -1,3 +1,5 @@
+"use client";
+
 import Status from "@atoms/Status";
 import DeviceGamePad from "@icons/outline/DeviceGamePad";
 import Email from "@icons/outline/Email";
@@ -84,12 +86,12 @@ function FriendCard(props: FriendCardProps) {
   return (
     <div className="box-border rounded-xl border-4 border-light-fg-primary bg-light-fg-link dark:bg-dark-bg-tertiary shadow-light-l dark:shadow-dark-l">
       <div className="flex justify-between items-center mx-7">
-        <label className="text-light-fg-primary text-xl leading-none">
+        <label className="text-light-fg-tertiary text-xl leading-none">
           #{props.level}
         </label>
         <Status status={props.userStatus} />
       </div>
-      <div className="mb-lg mx-xl p-xl pb-4 bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
+      <div className="mb-lg mx-xl p-xl sm:px-2 lg:px-sm pb-4 bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
         <div className="flex justify-start">
           <User
             fullName={props.fullname}
