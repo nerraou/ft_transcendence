@@ -7,7 +7,7 @@ module.exports = {
       "2xl": { min: "1280px", max: "1536px" },
       xl: { min: "1025px", max: "1279px" },
       lg: { min: "770px", max: "1024px" },
-      md: { min: "640px", max: "768px" },
+      md: { min: "640px", max: "769px" },
       sm: { max: "639px" },
     },
     colors: {
