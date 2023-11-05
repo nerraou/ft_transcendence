@@ -11,7 +11,7 @@ const ChannelImage = (props: ChannelImageProps) => {
       alt="channel image"
       width="50"
       height="50"
-      className="rounded-lg custom-position object-cover w-16 h-16 rounded-lg"
+      className="custom-position object-cover w-16 h-16 rounded-lg"
     />
   );
 };
@@ -23,6 +23,7 @@ interface ChannelCardProps {
 }
 const ChannelCard = (props: ChannelCardProps) => {
   const defaultImage = "/default/users-group.png";
+
   return (
     <div className="flex gap-4 max-w-max bg-inherit">
       <ChannelImage image={props.channelImage ?? defaultImage} />
