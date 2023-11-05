@@ -21,7 +21,7 @@ export class EventsService {
     const payload = this.verifyJwt(client.request);
 
     if (!payload) {
-      throw new WsException("Unauthorized");
+      return client.disconnect();
     }
 
     return this.redisService.set(payload.sub.toString(), client.id);
@@ -41,11 +41,14 @@ export class EventsService {
     const jwtToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
 
     if (jwtToken) {
-      const payload = this.jwtService.verify<JwtPayload>(jwtToken, {
-        secret: this.configService.get("jwtSecret"),
-      });
-
-      return payload;
+      try {
+        const payload = this.jwtService.verify<JwtPayload>(jwtToken, {
+          secret: this.configService.get("jwtSecret"),
+        });
+        return payload;
+      } catch {
+        return undefined;
+      }
     }
   }
 }

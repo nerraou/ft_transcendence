@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 
 import { UsersModule } from "@modules/users/users.module";
@@ -10,6 +10,6 @@ import { EventsGateway } from "./events.gateway";
 @Module({
   providers: [EventsGateway, EventsService, JwtService],
   exports: [EventsGateway, EventsService],
-  imports: [UsersModule, RedisModule],
+  imports: [forwardRef(() => UsersModule), RedisModule],
 })
 export class EventsModule {}

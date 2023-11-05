@@ -1,24 +1,33 @@
-import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
+import { Module, forwardRef } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { AuthModule } from "@modules/auth/auth.module";
-import { UsersModule } from "@modules/users/users.module";
-import envConfigFactory from "@config/env-configuration";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
-import { resolve as resolvePath } from "path";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { resolve as resolvePath, join as joinPath } from "path";
 
-import { EventsModule } from "./modules/events/events.module";
-import { ContactsModule } from "./modules/contacts/contacts.module";
+import envConfigFactory from "@config/env-configuration";
+import { UsersModule } from "@modules/users/users.module";
+import { AuthModule } from "@modules/auth/auth.module";
+import { EventsModule } from "@modules/events/events.module";
+import { ContactsModule } from "@modules/contacts/contacts.module";
+import { MessagesModule } from "@modules/messages/messages.module";
+
+import { AppController } from "./app.controller";
 
 @Module({
   imports: [
+    MessagesModule,
     UsersModule,
     AuthModule,
-    EventsModule,
+    forwardRef(() => EventsModule),
+    ContactsModule,
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      serveRoot: "/assets",
+      rootPath: joinPath(__dirname, "..", "assets"),
     }),
     MailerModule.forRoot({
       transport: {
@@ -41,7 +50,6 @@ import { ContactsModule } from "./modules/contacts/contacts.module";
         },
       },
     }),
-    ContactsModule,
   ],
   controllers: [AppController],
 })
