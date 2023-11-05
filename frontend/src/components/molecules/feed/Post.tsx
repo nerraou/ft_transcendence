@@ -8,7 +8,11 @@ interface User {
   avatar?: string;
 }
 
-const UserCard = ({ user }: { user: User }) => {
+interface UserCardProps {
+  user: User;
+}
+
+const UserCard = ({ user }: UserCardProps) => {
   const defaultImage = "/default/user-circle.png";
 
   return (
@@ -25,14 +29,14 @@ const UserCard = ({ user }: { user: User }) => {
   );
 };
 
-interface LikeProps {
+interface LikeSectionProps {
   count: number;
   liked: boolean;
   onLike: (id: string) => void;
   postId: string;
 }
 
-const LikeSection = ({ count, liked, onLike, postId }: LikeProps) => {
+const LikeSection = ({ count, liked, onLike, postId }: LikeSectionProps) => {
   const formatCount = (formattedCount: number) => {
     if (formattedCount > 999) {
       return `${(formattedCount / 1000).toFixed(1)}k`;
