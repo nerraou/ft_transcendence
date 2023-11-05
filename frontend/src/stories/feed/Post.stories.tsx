@@ -1,5 +1,6 @@
-import Post from "@components/atoms/feed/Post";
+import Post from "@components/molecules/feed/Post";
 import { Meta, StoryObj } from "@storybook/react";
+import { action } from "@storybook/addon-actions";
 
 const meta: Meta<typeof Post> = {
   title: "Feed/Post",
@@ -24,7 +25,9 @@ export const Default: Story = {
       image: "/default/user-circle.png",
     },
     liked: false,
-    onLike: () => {},
+    onLike: () => {
+      action("onLike");
+    },
   },
 };
 
@@ -40,6 +43,8 @@ export const LikedNoImage: Story = {
       likes: 11,
     },
     liked: true,
-    onLike: () => {},
+    onLike: () => {
+      action("onLike");
+    },
   },
 };

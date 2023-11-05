@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import Like from "../icons/outline/Like";
-import LikeFilled from "../icons/outline/LikeFilled";
+import Like from "../../atoms/icons/outline/Like";
+import LikeFilled from "../../atoms/icons/outline/LikeFilled";
 
 interface User {
   name: string;
@@ -33,13 +33,13 @@ interface LikeProps {
 }
 
 const LikeSection = ({ count, liked, onLike, postId }: LikeProps) => {
-  const formatCount = (count: number) => {
-    if (count > 999) {
-      return `${(count / 1000).toFixed(1)}k`;
-    } else if (count > 999999) {
-      return `${(count / 1000000).toFixed(1)}M`;
+  const formatCount = (formattedCount: number) => {
+    if (formattedCount > 999) {
+      return `${(formattedCount / 1000).toFixed(1)}k`;
+    } else if (formattedCount > 999999) {
+      return `${(formattedCount / 1000000).toFixed(1)}M`;
     }
-    return count;
+    return formattedCount;
   };
 
   return (
