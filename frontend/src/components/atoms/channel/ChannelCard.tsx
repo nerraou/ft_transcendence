@@ -4,6 +4,7 @@ import React from "react";
 interface ChannelImageProps {
   image: string;
 }
+
 const ChannelImage = (props: ChannelImageProps) => {
   return (
     <Image
@@ -21,6 +22,7 @@ interface ChannelCardProps {
   chnnelMembers: number;
   channelImage?: string;
 }
+
 const ChannelCard = (props: ChannelCardProps) => {
   const defaultImage = "/default/users-group.png";
 
