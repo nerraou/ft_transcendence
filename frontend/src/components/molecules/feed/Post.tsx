@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import Like from "../../atoms/icons/outline/Like";
-import LikeFilled from "../../atoms/icons/outline/LikeFilled";
+import Like from "@icons/outline/Like";
+import LikeFilled from "@icons/outline/LikeFilled";
 
 interface User {
   name: string;
