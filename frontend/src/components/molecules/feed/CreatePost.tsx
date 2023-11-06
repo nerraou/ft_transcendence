@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { useRef, useState } from "react";
-import Send from "../../atoms/icons/outline/Send";
-import Photo from "../../atoms/icons/outline/Photo";
+import Send from "@icons/outline/Send";
+import Photo from "@icons/outline/Photo";
 
 interface CreatePostProps {
   avatar?: string;
