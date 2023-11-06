@@ -1,6 +1,8 @@
 import { applyDecorators } from "@nestjs/common";
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConflictResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -23,6 +25,48 @@ export function MeApiDocumentation() {
           is2faEnabled: false,
           isEmailVerified: true,
           createdAt: 1692017290161,
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function UpdateProfileApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        properties: {
+          username: { type: "string" },
+          firstName: { type: "string" },
+          lastName: { type: "string" },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiConflictResponse({
+      description: "username conflict",
+      schema: {
+        example: {
+          message: "Conflict",
+          statusCode: 409,
         },
       },
     }),
