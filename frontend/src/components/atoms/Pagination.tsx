@@ -2,25 +2,25 @@
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@hooks/useMediaQuery";
 import clsx from "clsx";
-import ChevronLeft from "./icons/outline/ChevronLeft";
-import ChevronRight from "./icons/outline/ChevronRight";
+import ChevronLeft from "@icons/outline/ChevronLeft";
+import ChevronRight from "@icons/outline/ChevronRight";
 
-type PaginationButtonProps = {
+interface PaginationButtonProps {
   onClick: (value: string) => void;
   content?: string;
   active: boolean;
   disabled?: boolean;
   slider?: boolean;
   icon?: React.ReactNode;
-};
+}
 
 const getStyle = (active: boolean, slider?: boolean) => {
   if (slider) {
-    return `bg-light-bg-tertiary text-light-fg-primary dark:text-dark-fg-primary`;
+    return "bg-light-bg-tertiary text-light-fg-primary dark:text-dark-fg-primary";
   } else if (active) {
-    return `bg-light-bg-primary text-light-fg-tertiary dark:bg-dark-fg-link`;
+    return "bg-light-bg-primary text-light-fg-tertiary dark:bg-dark-fg-link";
   } else {
-    return `bg-light-bg-tertiary text-light-fg-link`;
+    return "bg-light-bg-tertiary text-light-fg-link";
   }
 };
 
@@ -33,9 +33,12 @@ const PaginationButton = (props: PaginationButtonProps) => {
       className={clsx(
         "drop-shadow-light-fg-primary dark:drop-shadow-dark-fg-primary",
         "w-[50px] h-[50px] flex items-center justify-center",
-        content && content.length > 4 ? "text-sm" : "text-md",
-        getStyle(active, slider),
         "rounded-full",
+        getStyle(active, slider),
+        {
+          "text-sm": content && content.length > 4,
+          "text-md": !content || content.length <= 4,
+        },
       )}
       disabled={disabled}
     >
@@ -44,18 +47,18 @@ const PaginationButton = (props: PaginationButtonProps) => {
   );
 };
 
-type PaginationInfos = {
+interface PaginationInfos {
   size: number;
   total: number;
   step: number;
   start: number;
-};
+}
 
-type PaginationProps = {
+interface PaginationProps {
   page: number;
   total: number;
   onChange: (value: number) => void;
-};
+}
 
 const Pagination = (props: PaginationProps) => {
   const { page, total } = props;
@@ -68,7 +71,12 @@ const Pagination = (props: PaginationProps) => {
     start: 1,
   });
 
-  const getPaginationInfos = (preg: PaginationInfos) => {
+  useEffect(() => {
+    setPaginationInfos((prev) => getPaginationInfos(prev));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTinyScreen, isSmallScreen, total]);
+
+  function getPaginationInfos(preg: PaginationInfos) {
     if (isTinyScreen) {
       return {
         ...preg,
@@ -91,11 +99,7 @@ const Pagination = (props: PaginationProps) => {
         start: Math.max(1, Math.min(preg.start, total - 2)),
       };
     }
-  };
-
-  useEffect(() => {
-    setPaginationInfos((prev) => getPaginationInfos(prev));
-  }, [isTinyScreen, isSmallScreen, total]);
+  }
 
   const handleNext = () => {
     setPaginationInfos({
