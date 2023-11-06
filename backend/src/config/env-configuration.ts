@@ -9,6 +9,7 @@ export interface RedisEnv {
 export interface AppEnv {
   appHostName: string;
   assetsPath: string;
+  imagesPath: string;
   jwtSecret: string;
   redis: RedisEnv;
 }
@@ -36,11 +37,14 @@ export default async function envConfigFactory(): Promise<AppEnv> {
   const assetsPath = resolvePath(process.env.ASSETS_PATH);
   process.env.ASSETS_PATH = assetsPath;
 
-  await mkdir(assetsPath, { recursive: true });
+  const imagesPath = `${assetsPath}/images`;
+
+  await mkdir(imagesPath, { recursive: true });
 
   return {
     appHostName: process.env.APP_HOSTNAME,
     assetsPath,
+    imagesPath,
     jwtSecret: process.env.JWT_SECRET,
     redis: {
       host: process.env.REDIS_HOST,

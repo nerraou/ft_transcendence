@@ -1,2 +1,8 @@
+# env
 .env
+
+# postgres
 /pg-data
+
+# temp
+/tmp

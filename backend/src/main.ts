@@ -18,6 +18,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      forbidNonWhitelisted: true,
     }),
   );
 

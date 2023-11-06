@@ -18,8 +18,10 @@ interface UserProps {
 function Username(props: UsernameProps) {
   return (
     <div className="flex flex-col">
-      <label className="text-light-fg-primary text-xl">{props.fullName}</label>
-      <label className="text-light-fg-secondary text-lg leading-none">
+      <label className="text-light-fg-primary text-xl sm:text-lg md:text-lg lg:text-lg">
+        {props.fullName}
+      </label>
+      <label className="text-light-fg-secondary text-lg leading-none sm:text-lg md:text-lg">
         {props.username}
       </label>
     </div>
@@ -28,19 +30,20 @@ function Username(props: UsernameProps) {
 
 function UserImage(props: UserImageProps) {
   return (
-    <Image
-      src={props.image}
-      alt="user image"
-      width="128"
-      height="128"
-      className="rounded-lg custom-position object-cover w-32 h-32"
-    />
+    <div className="relative shrink-0 w-32 h-32 md:w-24 md:h-24 sm:w-20 sm:h-20 lg:w-16 lg:h-16">
+      <Image
+        src={props.image}
+        alt="user image"
+        fill
+        className="rounded-lg object-cover appearance-none"
+      />
+    </div>
   );
 }
 
 function User(props: UserProps) {
   return (
-    <div className="flex gap-4 max-w-max bg-light-bg-tertiary">
+    <div className="flex sm:flex-col sm:items-center gap-4 sm:gap-0 sm:w-full bg-light-bg-tertiary">
       <UserImage image={props.image} />
       <Username username={props.username} fullName={props.fullName} />
     </div>
