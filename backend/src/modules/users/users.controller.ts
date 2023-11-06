@@ -1,19 +1,34 @@
-import { Body, Controller, Get, Patch, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Patch,
+  UseGuards,
+} from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
+
+import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
+import EmailExistsPipe from "@modules/auth/pipes/email-exists.pipe";
 
 import {
   MeApiDocumentation,
   UpdateProfileApiDocumentation,
+  UpdateEmailApiDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
-import { UpdateProfileDto } from "./dto/update-user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UsersService } from "./users.service";
 import UsernameExistsPipe from "./pipes/username-exists.pipe";
+import { UpdateEmailDto } from "./dto/update-email.dto";
+import { HashService } from "@common/services/hash.service";
 
 @Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly hashService: HashService,
+  ) {}
 
   @Get("/me")
   @MeApiDocumentation()
@@ -36,10 +51,33 @@ export class UsersController {
   @UpdateProfileApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async updateProfile(
-    @User() user: UserEntity,
+    @User("id") userId: number,
     @Body(UsernameExistsPipe) updateProfileDto: UpdateProfileDto,
   ) {
-    await this.usersService.updateProfile(user.id, updateProfileDto);
+    await this.usersService.updateProfile(userId, updateProfileDto);
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/email")
+  @UpdateEmailApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async updateEmail(
+    @User() user: UserEntity,
+    @Body(EmailExistsPipe) updateEmailDto: UpdateEmailDto,
+  ) {
+    const isPasswordsIdentical = await this.hashService.compare(
+      updateEmailDto.password,
+      user.password,
+    );
+
+    if (!isPasswordsIdentical) {
+      throw new ForbiddenException();
+    }
+
+    await this.usersService.updateEmail(user.id, updateEmailDto.email);
 
     return {
       message: "success",

@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 
 import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateProfileDto } from "./dto/update-user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 
 @Injectable()
 export class UsersService {
@@ -21,6 +21,17 @@ export class UsersService {
         id,
       },
       data: updateProfileDto,
+    });
+  }
+
+  updateEmail(id: number, email: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        email,
+      },
     });
   }
 

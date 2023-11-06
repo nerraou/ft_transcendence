@@ -3,6 +3,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
+  ApiForbiddenResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -67,6 +68,56 @@ export function UpdateProfileApiDocumentation() {
         example: {
           message: "Conflict",
           statusCode: 409,
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function UpdateEmailApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        properties: {
+          email: { type: "string" },
+          password: { type: "string" },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiConflictResponse({
+      description: "email conflict",
+      schema: {
+        example: {
+          message: "Conflict",
+          statusCode: 409,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
         },
       },
     }),
