@@ -3,6 +3,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
+  ApiForbiddenResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -67,6 +68,47 @@ export function UpdateProfileApiDocumentation() {
         example: {
           message: "Conflict",
           statusCode: 409,
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function UpdatePasswordApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        properties: {
+          currentPassword: { type: "string" },
+          newPassword: { type: "string" },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
         },
       },
     }),

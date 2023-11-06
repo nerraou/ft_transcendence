@@ -24,6 +24,17 @@ export class UsersService {
     });
   }
 
+  updatePassword(id: number, password: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password,
+      },
+    });
+  }
+
   confirmEmail(token: string) {
     return this.prisma.user.update({
       where: {
