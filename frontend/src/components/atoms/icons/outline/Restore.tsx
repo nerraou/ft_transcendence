@@ -1,22 +1,21 @@
 import { MouseEvent } from "react";
 
 interface RestoreProps {
-  color: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Restore(props: RestoreProps) {
   return (
     <svg
-      className={props.color}
       onClick={props.onClick}
+      className="stroke-light-fg-tertiary"
       width="20"
       height="20"
       viewBox="0 0 24 24"
-      stroke-width="2"
+      strokeWidth="2"
       fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <path d="M3.06 13a9 9 0 1 0 .49 -4.087"></path>

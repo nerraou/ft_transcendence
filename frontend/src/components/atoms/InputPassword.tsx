@@ -4,10 +4,9 @@ import Eye from "@icons/outline/Eye";
 import EyeOff from "./icons/outline/EyeOff";
 
 interface InputPasswordProps {
-  value: string;
+  value?: string;
   borderColor: string;
   iconColor: string;
-  textColor: string;
   placeholder: string;
   width?: string;
   height?: "base" | "large";
@@ -18,7 +17,7 @@ interface InputPasswordProps {
 
 function InputPassword(props: InputPasswordProps) {
   let height = "h-10";
-  const defaultWidth = "w-64";
+  const defaultWidth = "w-96";
   const width = props.width || defaultWidth;
   let type = "password";
 
@@ -34,11 +33,10 @@ function InputPassword(props: InputPasswordProps) {
     <div
       className={clsx(
         props.borderColor,
-        props.textColor,
         width,
         height,
         "border-2 rounded-full bg-light-bg-tertiary outline-none focus-within:border-dark-useless",
-        "flex justify-between items-center box-border px-5 overflow-hidden",
+        "flex justify-between items-center box-border px-5 overflow-hidden text-light-fg-primary",
       )}
     >
       <input
