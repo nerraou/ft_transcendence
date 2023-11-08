@@ -83,6 +83,47 @@ export function UpdateProfileApiDocumentation() {
   );
 }
 
+export function UpdatePasswordApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        properties: {
+          currentPassword: { type: "string" },
+          newPassword: { type: "string" },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
 export function UpdateEmailApiDocumentation() {
   return applyDecorators(
     ApiTags("Users"),
