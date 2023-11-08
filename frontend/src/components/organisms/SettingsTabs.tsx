@@ -5,7 +5,7 @@ import FormPassword from "@molecules/Settings/FormPassword";
 
 function SettingsTabs() {
   const tabListStyle =
-    "outline-none focus:bg-light-bg-tertiary rounded-xl w-52 text-light-fg-primary hover:bg-light-fg-tertiary/[0.40] text-left p-2 pl-8  dark:text-light-fg-tertiary dark:focus:text-light-fg-primary";
+    "outline-none focus:bg-light-bg-tertiary rounded-xl w-52 text-light-fg-primary hover:bg-light-fg-tertiary/[0.40] text-left p-2 pl-8 dark:text-light-fg-tertiary dark:focus:text-light-fg-primary";
   return (
     <div className="flex">
       <Tab.Group>

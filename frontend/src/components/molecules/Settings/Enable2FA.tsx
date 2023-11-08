@@ -7,7 +7,7 @@ interface Enable2FAProps {
 function Enable2FA(props: Enable2FAProps) {
   return (
     <div className="flex space-x-48">
-      <label className="text-light-fg-primary  dark:text-light-fg-tertiary">
+      <label className="text-light-fg-primary dark:text-light-fg-tertiary">
         Enable 2FA
       </label>
       <ToggleSwitch checked onChange={props.onChange} />

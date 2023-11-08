@@ -1,7 +1,7 @@
 import InputText from "@components/atoms/InputText";
 import { ChangeEvent } from "react";
 
-interface LablaInputTextProps {
+interface LableInputTextProps {
   labelValue: string;
   inputValue?: string;
   placeholder: string;
@@ -9,10 +9,10 @@ interface LablaInputTextProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LablaInputText(props: LablaInputTextProps) {
-  let borderColor = "border-light-fg-primary  dark:border-dark-fg-primary";
+function LableInputText(props: LableInputTextProps) {
+  let borderColor = "border-light-fg-primary dark:border-dark-fg-primary";
   if (props.error) {
-    borderColor = "border-dark-fg-secondary  dark:border-dark-fg-primary";
+    borderColor = "border-dark-fg-secondary dark:border-dark-fg-primary";
   }
   return (
     <div className="flex space-x-32">
@@ -33,4 +33,4 @@ function LablaInputText(props: LablaInputTextProps) {
   );
 }
 
-export default LablaInputText;
+export default LableInputText;

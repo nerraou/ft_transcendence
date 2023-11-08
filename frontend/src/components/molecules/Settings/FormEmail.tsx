@@ -1,11 +1,12 @@
 import ButtonsSaveRestore from "./ButtonsSaveRestore";
 import LableInputPassword from "./LableInputPassword";
-import LablaInputText from "./LableInputText";
+import LableInputText from "./LableInputText";
 
 function FormEmail() {
   function onChange() {
     return;
   }
+
   return (
     <form className="space-y-5">
       <LableInputPassword
@@ -14,7 +15,7 @@ function FormEmail() {
         error={false}
         onChange={onChange}
       />
-      <LablaInputText
+      <LableInputText
         labelValue="Email"
         placeholder="Email"
         error={false}

@@ -5,6 +5,7 @@ function FormPassword() {
   function onChange() {
     return;
   }
+
   return (
     <form className="space-y-5">
       <LableInputPassword

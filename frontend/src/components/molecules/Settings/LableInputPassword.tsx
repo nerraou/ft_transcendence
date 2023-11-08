@@ -1,7 +1,7 @@
 import InputPassword from "@components/atoms/InputPassword";
 import { ChangeEvent } from "react";
 
-interface LablaInputPasswordProps {
+interface LableInputPasswordProps {
   labelValue: string;
   inputValue?: string;
   placeholder: string;
@@ -9,7 +9,7 @@ interface LablaInputPasswordProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LableInputPassword(props: LablaInputPasswordProps) {
+function LableInputPassword(props: LableInputPasswordProps) {
   let borderColor = "border-light-fg-primary dark:border-dark-fg-primary ";
   let iconColor = "stroke-light-fg-primary dark:stroke-dark-fg-primary ";
   if (props.error) {
