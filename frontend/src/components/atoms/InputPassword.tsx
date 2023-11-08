@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Eye from "@icons/outline/Eye";
 import EyeOff from "./icons/outline/EyeOff";
 
-interface PasswordInputProps {
+interface InputPasswordProps {
   value: string;
   borderColor: string;
   iconColor: string;
@@ -16,7 +16,7 @@ interface PasswordInputProps {
   onPasswordVisibilityChange?: () => void;
 }
 
-function PasswordInput(props: PasswordInputProps) {
+function InputPassword(props: InputPasswordProps) {
   let height = "h-10";
   const defaultWidth = "w-64";
   const width = props.width || defaultWidth;
@@ -66,4 +66,4 @@ function PasswordInput(props: PasswordInputProps) {
   );
 }
 
-export default PasswordInput;
+export default InputPassword;
