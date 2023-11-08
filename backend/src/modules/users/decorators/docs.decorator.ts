@@ -3,6 +3,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConflictResponse,
+  ApiConsumes,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiTags,
@@ -159,6 +160,42 @@ export function UpdateEmailApiDocumentation() {
         example: {
           message: "Forbidden",
           statusCode: 403,
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function UpdateAvatarApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiConsumes("multipart/form-data"),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          image: {
+            type: "string",
+            format: "binary",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
         },
       },
     }),

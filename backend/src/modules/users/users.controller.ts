@@ -4,10 +4,16 @@ import {
   ForbiddenException,
   Get,
   Patch,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { User as UserEntity } from "@prisma/client";
+import { writeFile } from "fs/promises";
 
+import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import EmailExistsPipe from "@modules/auth/pipes/email-exists.pipe";
 
@@ -18,6 +24,7 @@ import {
   UpdateProfileApiDocumentation,
   UpdateEmailApiDocumentation,
   UpdatePasswordApiDocumentation,
+  UpdateAvatarApiDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -25,12 +32,14 @@ import { UsersService } from "./users.service";
 import UsernameExistsPipe from "./pipes/username-exists.pipe";
 import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
+import { FileSizeValidationPipe } from "./pipes/file-size-validation.pipe";
 
 @Controller("users")
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly hashService: HashService,
+    private readonly configService: ConfigService<AppEnv>,
   ) {}
 
   @Get("/me")
@@ -108,6 +117,25 @@ export class UsersController {
     );
 
     await this.usersService.updatePassword(user.id, newPassword);
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/avatar")
+  @UpdateAvatarApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor("image"))
+  async updateAvatar(
+    @User() user: UserEntity,
+    @UploadedFile(FileSizeValidationPipe) file: Express.Multer.File,
+  ) {
+    const avatarPath = `${this.configService.get("imagesPath")}/${
+      user.avatarPath
+    }`;
+
+    await writeFile(avatarPath, file.buffer);
 
     return {
       message: "success",
