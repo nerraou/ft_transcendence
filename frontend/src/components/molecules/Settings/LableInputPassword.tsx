@@ -10,8 +10,8 @@ interface LablaInputPasswordProps {
 }
 
 function LableInputPassword(props: LablaInputPasswordProps) {
-  let borderColor = "border-light-fg-primary";
-  let iconColor = "stroke-light-fg-primary";
+  let borderColor = "border-light-fg-primary dark:border-dark-fg-primary ";
+  let iconColor = "stroke-light-fg-primary dark:stroke-dark-fg-primary ";
   if (props.error) {
     borderColor = "border-dark-fg-secondary";
     iconColor = "stroke-light-fg-secondary";
@@ -19,7 +19,9 @@ function LableInputPassword(props: LablaInputPasswordProps) {
   return (
     <div className="flex space-x-32">
       <div className="w-36">
-        <label className="text-light-fg-primary">{props.labelValue}</label>
+        <label className="text-light-fg-primary dark:text-light-fg-tertiary">
+          {props.labelValue}
+        </label>
       </div>
       <InputPassword
         iconColor={iconColor}

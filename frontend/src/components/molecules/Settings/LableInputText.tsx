@@ -10,14 +10,16 @@ interface LablaInputTextProps {
 }
 
 function LablaInputText(props: LablaInputTextProps) {
-  let borderColor = "border-light-fg-primary";
+  let borderColor = "border-light-fg-primary  dark:border-dark-fg-primary";
   if (props.error) {
-    borderColor = "border-dark-fg-secondary";
+    borderColor = "border-dark-fg-secondary  dark:border-dark-fg-primary";
   }
   return (
     <div className="flex space-x-32">
       <div className="w-36">
-        <label className="text-light-fg-primary">{props.labelValue}</label>
+        <label className="text-light-fg-primary dark:text-light-fg-tertiary">
+          {props.labelValue}
+        </label>
       </div>
       <InputText
         value={props.inputValue}
