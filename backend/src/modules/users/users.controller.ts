@@ -6,20 +6,24 @@ import {
   Patch,
   UseGuards,
 } from "@nestjs/common";
-import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User as UserEntity } from "@prisma/client";
+
+import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
+import EmailExistsPipe from "@modules/auth/pipes/email-exists.pipe";
 
 import { HashService } from "@common/services/hash.service";
 
 import {
   MeApiDocumentation,
   UpdateProfileApiDocumentation,
+  UpdateEmailApiDocumentation,
   UpdatePasswordApiDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
-import { UpdateProfileDto } from "./dto/update-user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UsersService } from "./users.service";
 import UsernameExistsPipe from "./pipes/username-exists.pipe";
+import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 
 @Controller("users")
@@ -50,10 +54,33 @@ export class UsersController {
   @UpdateProfileApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async updateProfile(
-    @User() user: UserEntity,
+    @User("id") userId: number,
     @Body(UsernameExistsPipe) updateProfileDto: UpdateProfileDto,
   ) {
-    await this.usersService.updateProfile(user.id, updateProfileDto);
+    await this.usersService.updateProfile(userId, updateProfileDto);
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/email")
+  @UpdateEmailApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async updateEmail(
+    @User() user: UserEntity,
+    @Body(EmailExistsPipe) updateEmailDto: UpdateEmailDto,
+  ) {
+    const isPasswordsIdentical = await this.hashService.compare(
+      updateEmailDto.password,
+      user.password,
+    );
+
+    if (!isPasswordsIdentical) {
+      throw new ForbiddenException();
+    }
+
+    await this.usersService.updateEmail(user.id, updateEmailDto.email);
 
     return {
       message: "success",
@@ -63,7 +90,7 @@ export class UsersController {
   @Patch("/password")
   @UpdatePasswordApiDocumentation()
   @UseGuards(JwtAuthGuard)
-  async updateEmail(
+  async updatePassword(
     @User() user: UserEntity,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
