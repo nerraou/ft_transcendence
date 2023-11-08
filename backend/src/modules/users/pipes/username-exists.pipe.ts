@@ -2,7 +2,7 @@ import { ConflictException, Injectable, PipeTransform } from "@nestjs/common";
 
 import { UsersService } from "@modules/users/users.service";
 
-import { UpdateProfileDto } from "../dto/update-user.dto";
+import { UpdateProfileDto } from "../dto/update-profile.dto";
 
 @Injectable()
 export default class UsernameExistsPipe implements PipeTransform {
