@@ -12,7 +12,5 @@ export default meta;
 type Story = StoryObj<typeof Restore>;
 
 export const Default: Story = {
-  args: {
-    color: "stroke-light-fg-tertiary",
-  },
+  args: {},
 };

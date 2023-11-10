@@ -19,7 +19,6 @@ function SignInForm() {
       <div className="grid grid-rows-2 gap-4">
         <InputText
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          textColor="text-light-fg-primary dark:text-dark-fg-primary"
           placeholder="Email"
           height="large"
           width="w-80 sm:w-64"
@@ -29,7 +28,6 @@ function SignInForm() {
         <InputPassword
           height="large"
           width="w-80 sm:w-64"
-          textColor="text-light-fg-primary dark:text-dark-fg-primary"
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
           placeholder="Password"
