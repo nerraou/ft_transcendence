@@ -1,15 +1,15 @@
-import PasswordInput from "@atoms/PasswordInput";
+import InputPassword from "@atoms/InputPassword";
 import { Meta, StoryObj } from "@storybook/react";
 
-const meta: Meta<typeof PasswordInput> = {
-  title: "Input/PasswordInput",
-  component: PasswordInput,
+const meta: Meta<typeof InputPassword> = {
+  title: "Input/InputPassword",
+  component: InputPassword,
   tags: ["autodocs"],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof PasswordInput>;
+type Story = StoryObj<typeof InputPassword>;
 
 export const Default: Story = {
   args: {

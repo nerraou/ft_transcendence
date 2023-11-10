@@ -2,7 +2,7 @@ import InputSearch from "@components/atoms/InputSearch";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof InputSearch> = {
-  title: "Components/atoms/InputSearch",
+  title: "Input/InputSearch",
   component: InputSearch,
   tags: ["autodcs"],
 };

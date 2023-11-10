@@ -3,11 +3,10 @@ import clsx from "clsx";
 import Eye from "@icons/outline/Eye";
 import EyeOff from "./icons/outline/EyeOff";
 
-interface PasswordInputProps {
-  value: string;
+interface InputPasswordProps {
+  value?: string;
   borderColor: string;
   iconColor: string;
-  textColor: string;
   placeholder: string;
   width?: string;
   height?: "base" | "large";
@@ -16,9 +15,9 @@ interface PasswordInputProps {
   onPasswordVisibilityChange?: () => void;
 }
 
-function PasswordInput(props: PasswordInputProps) {
+function InputPassword(props: InputPasswordProps) {
   let height = "h-10";
-  const defaultWidth = "w-64";
+  const defaultWidth = "w-96";
   const width = props.width || defaultWidth;
   let type = "password";
 
@@ -34,11 +33,10 @@ function PasswordInput(props: PasswordInputProps) {
     <div
       className={clsx(
         props.borderColor,
-        props.textColor,
         width,
         height,
         "border-2 rounded-full bg-light-bg-tertiary outline-none focus-within:border-dark-useless",
-        "flex justify-between items-center box-border px-5 overflow-hidden",
+        "flex justify-between items-center box-border px-5 overflow-hidden text-light-fg-primary",
       )}
     >
       <input
@@ -66,4 +64,4 @@ function PasswordInput(props: PasswordInputProps) {
   );
 }
 
-export default PasswordInput;
+export default InputPassword;

@@ -1,15 +1,14 @@
 import { MouseEvent } from "react";
 
 interface SaveProps {
-  color: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Save(props: SaveProps) {
   return (
     <svg
-      className={props.color}
       onClick={props.onClick}
+      className="stroke-light-fg-tertiary"
       width="20"
       height="20"
       viewBox="0 0 24 24"

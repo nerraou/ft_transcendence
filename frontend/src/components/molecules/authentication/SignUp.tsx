@@ -1,11 +1,11 @@
 "use client";
 
-import PasswordInput from "@components/atoms/PasswordInput";
-import TextInput from "@components/atoms/TextInput";
-import Bar from "@components/atoms/decoration/Bar";
+import InputPassword from "@atoms/InputPassword";
+import InputText from "@atoms/InputText";
+import Bar from "@atoms/decoration/Bar";
 import Link from "next/link";
 import ButtonOAuth from "./ButtonOAuth";
-import Button from "@components/atoms/Button";
+import Button from "@atoms/Button";
 
 function SignUpForm() {
   function handlerInput() {
@@ -17,7 +17,7 @@ function SignUpForm() {
   return (
     <form className="m-6 flex flex-col w-full items-center">
       <div className="grid grid-rows-2 gap-4">
-        <TextInput
+        <InputText
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           textColor="text-light-fg-primary dark:text-dark-fg-primary"
           placeholder="Email"
@@ -26,7 +26,7 @@ function SignUpForm() {
           value="noha@gmail.com"
           onChange={handlerInput}
         />
-        <PasswordInput
+        <InputPassword
           height="large"
           width="w-80 sm:w-64"
           textColor="text-light-fg-primary dark:text-dark-fg-primary"

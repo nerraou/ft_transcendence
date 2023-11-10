@@ -1,17 +1,16 @@
 import { ChangeEvent } from "react";
 import clsx from "clsx";
 
-interface TextInputProps {
-  value: string;
+interface InputTextProps {
+  value?: string;
   borderColor: string;
   placeholder: string;
-  textColor: string;
   height?: "base" | "large";
   width?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function TextInput(props: TextInputProps) {
+function InputText(props: InputTextProps) {
   let height = "h-10";
   const defaultWidth = "w-64";
   const width = props.width || defaultWidth;
@@ -27,14 +26,13 @@ function TextInput(props: TextInputProps) {
       value={props.value}
       className={clsx(
         props.borderColor,
-        props.textColor,
         width,
         height,
-        "border-2 rounded-full bg-light-bg-tertiary outline-none focus:border-dark-useless px-5",
+        "border-2 rounded-full bg-light-bg-tertiary outline-none focus:border-dark-useless px-5 text-light-fg-primary",
       )}
       onChange={props.onChange}
     />
   );
 }
 
-export default TextInput;
+export default InputText;
