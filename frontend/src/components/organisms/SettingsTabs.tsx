@@ -2,13 +2,22 @@ import FormProfile from "@molecules/Settings/FormProfile";
 import { Tab } from "@headlessui/react";
 import FormEmail from "@molecules/Settings/FormEmail";
 import FormPassword from "@molecules/Settings/FormPassword";
+import clsx from "clsx";
+
+interface TabParam {
+  selected: boolean;
+}
 
 function SettingsTabs() {
-  const tabListStyle =
-    "outline-none focus:bg-light-bg-tertiary rounded-xl w-52 text-light-fg-primary hover:bg-light-fg-tertiary/[0.40] text-left p-2 pl-8 dark:text-light-fg-tertiary dark:focus:text-light-fg-primary";
+  const tabListStyle = ({ selected }: TabParam) =>
+    clsx(
+      "outline-none focus:bg-light-bg-tertiary rounded-xl w-52 text-light-fg-primary hover:bg-light-fg-tertiary/[0.40] text-left p-2 pl-8 dark:text-light-fg-tertiary dark:focus:text-light-fg-primary",
+      { "bg-light-bg-tertiary": selected },
+    );
+
   return (
     <div className="flex">
-      <Tab.Group>
+      <Tab.Group vertical>
         <Tab.List className="flex flex-col mr-10 space-y-1 p-1">
           <Tab className={tabListStyle}>Profile</Tab>
           <Tab className={tabListStyle}>Email</Tab>
