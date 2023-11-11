@@ -6,12 +6,19 @@ export interface RedisEnv {
   port: number;
 }
 
+export interface GoogleEnv {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
+}
+
 export interface AppEnv {
   appHostName: string;
   assetsPath: string;
   imagesPath: string;
   jwtSecret: string;
   redis: RedisEnv;
+  google: GoogleEnv;
 }
 
 export default async function envConfigFactory(): Promise<AppEnv> {
@@ -26,6 +33,9 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     "JWT_SECRET",
     "REDIS_HOST",
     "REDIS_PORT",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "GOOGLE_CALLBACK_URL",
   ];
 
   requiredEnvVariables.forEach((variable) => {
@@ -46,6 +56,11 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     assetsPath,
     imagesPath,
     jwtSecret: process.env.JWT_SECRET,
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+    },
     redis: {
       host: process.env.REDIS_HOST,
       port: parseInt(process.env.REDIS_PORT, 10),

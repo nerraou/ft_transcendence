@@ -10,6 +10,7 @@ import { LocalStrategy } from "./strategies/local.strategy";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { GoogleStrategy } from "./strategies/google.strategy";
 
 @Module({
   controllers: [AuthController],
@@ -19,6 +20,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     ImageService,
     LocalStrategy,
     JwtStrategy,
+    GoogleStrategy,
   ],
   imports: [
     JwtModule.register({

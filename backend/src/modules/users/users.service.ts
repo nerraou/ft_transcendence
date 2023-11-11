@@ -4,6 +4,7 @@ import { PrismaService } from "@common/modules/prisma/prisma.service";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { CreateUserWithGoogleDto } from "./dto/create-user-with-google.dto";
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,15 @@ export class UsersService {
   create(createUserDto: CreateUserDto) {
     return this.prisma.user.create({
       data: createUserDto,
+    });
+  }
+
+  createWithGoogle(createUserWithGoogleDto: CreateUserWithGoogleDto) {
+    return this.prisma.user.create({
+      data: {
+        ...createUserWithGoogleDto,
+        isEmailVerified: true,
+      },
     });
   }
 
@@ -42,6 +52,17 @@ export class UsersService {
       },
       data: {
         email,
+      },
+    });
+  }
+
+  updateGoogleAccountIdById(id: number, googleAccountId: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        googleAccountId,
       },
     });
   }
@@ -78,6 +99,14 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: {
         email,
+      },
+    });
+  }
+
+  findOneByGoogleId(googleId: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        googleAccountId: googleId,
       },
     });
   }

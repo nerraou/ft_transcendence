@@ -6,18 +6,22 @@ import {
   NotFoundException,
   UseGuards,
   Request,
+  Get,
 } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import { ConfigService } from "@nestjs/config";
 import { User } from "@prisma/client";
 
 import { AppEnv } from "@config/env-configuration";
+import { GoogleAuthResponse } from "@modules/users/decorators/google-user.decorators";
 
 import { AuthService } from "./auth.service";
 import { SignUpDto } from "./dto/sign-up.dto";
 import EmailExistsPipe from "./pipes/email-exists.pipe";
 import ConfirmEmailTokenDto from "./dto/confirm-email-token.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { GoogleAuthGuard } from "./guards/google-auth.guard";
+import { GoogleAuthResponse as GoogleAuthResponseType } from "./strategies/google.strategy";
 import {
   ConfirmApiDocumentation,
   SignInApiDocumentation,
@@ -62,6 +66,27 @@ export class AuthController {
 
     return {
       message: "success",
+    };
+  }
+
+  @Get("/google/authorize")
+  @UseGuards(GoogleAuthGuard)
+  googleAuthorize(@GoogleAuthResponse() response: GoogleAuthResponseType) {
+    this.mailService
+      .sendMail({
+        to: response.user.email,
+        subject: "Welcome to PongBoy",
+        template: "oauth-welcome",
+        context: {
+          firstName: response.user.firstName,
+          lastName: response.user.lastName,
+          provider: "Google",
+        },
+      })
+      .catch((e) => console.error("sendMail error:", e));
+
+    return {
+      accessToken: response.accessToken,
     };
   }
 
