@@ -1,5 +1,6 @@
-import ButtonsSaveRestore from "./ButtonsSaveRestore";
 import LableInputPassword from "./LableInputPassword";
+import ButtonCircle from "@atoms/ButtonCircle";
+import Save from "@atoms/icons/outline/Save";
 
 function FormPassword() {
   function onChange() {
@@ -20,7 +21,9 @@ function FormPassword() {
         error={false}
         onChange={onChange}
       />
-      <ButtonsSaveRestore />
+      <div className="flex justify-center ml-20">
+        <ButtonCircle color="bg-light-fg-link" icon={<Save />} />
+      </div>
     </form>
   );
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import BarStatus from "@atoms/BarStatus";
 import DeviceGamePad from "@icons/outline/DeviceGamePad";
 import Email from "@icons/outline/Email";

@@ -15,9 +15,9 @@ function LableInputText(props: LableInputTextProps) {
     borderColor = "border-dark-fg-secondary dark:border-dark-fg-primary";
   }
   return (
-    <div className="flex space-x-32">
-      <div className="w-36">
-        <label className="text-light-fg-primary dark:text-light-fg-tertiary">
+    <div className="flex space-x-32 xl:space-x-28 lg:space-x-20">
+      <div className="w-40">
+        <label className="text-light-fg-primary text-base dark:text-light-fg-tertiary">
           {props.labelValue}
         </label>
       </div>
@@ -25,7 +25,7 @@ function LableInputText(props: LableInputTextProps) {
         value={props.inputValue}
         placeholder={props.placeholder}
         borderColor={borderColor}
-        width="w-96"
+        width="w-96 lg:w-60"
         height="base"
         onChange={props.onChange}
       />

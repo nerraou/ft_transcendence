@@ -121,5 +121,5 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/stories/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  plugins: [],
+  plugins: [require("@headlessui/tailwindcss")],
 };
