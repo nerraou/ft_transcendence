@@ -3,6 +3,7 @@ import { v4 as uuidV4 } from "uuid";
 import { writeFile } from "fs/promises";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "@prisma/client";
+import { Profile as GoogleProfile } from "passport-google-oauth20";
 
 import { UsersService } from "@modules/users/users.service";
 import { HashService } from "@common/services/hash.service";
@@ -11,7 +12,7 @@ import { ImageService } from "@common/services/image.service";
 import { ConfigService } from "@nestjs/config";
 
 import { SignUpDto } from "./dto/sign-up.dto";
-import { Profile } from "passport-google-oauth20";
+import { FortyTwoProfile } from "./strategies/forty-two.strategy";
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
     });
   }
 
-  async googleSignUp(profile: Profile) {
+  async googleSignUp(profile: GoogleProfile) {
     const email = profile.emails[0].value;
 
     let dbUser = await this.usersService.findOneByEmail(email);
@@ -55,6 +56,39 @@ export class AuthService {
     } else {
       if (dbUser.isEmailVerified) {
         await this.usersService.updateGoogleAccountIdById(
+          dbUser.id,
+          profile.id,
+        );
+      }
+
+      success = dbUser.isEmailVerified;
+    }
+
+    return {
+      success: success,
+      user: dbUser,
+    };
+  }
+
+  async fortyTwoSignUp(profile: FortyTwoProfile) {
+    const email = profile.emails[0].value;
+
+    let dbUser = await this.usersService.findOneByEmail(email);
+    let success = true;
+
+    if (!dbUser) {
+      const filename = await this.generateAvatar();
+
+      dbUser = await this.usersService.createWithFortyTwo({
+        fortyTwoAccountId: profile.id,
+        email: email,
+        firstName: profile.name.givenName,
+        lastName: profile.name.familyName,
+        avatarPath: filename,
+      });
+    } else {
+      if (dbUser.isEmailVerified) {
+        await this.usersService.updateFortyTwoAccountIdById(
           dbUser.id,
           profile.id,
         );
@@ -94,6 +128,10 @@ export class AuthService {
 
   validateGoogleUser(googleId: string) {
     return this.usersService.findOneByGoogleId(googleId);
+  }
+
+  validateFortyTwoUser(fortyTwoId: string) {
+    return this.usersService.findOneByFortyTwoId(fortyTwoId);
   }
 
   async signIn(user: User) {

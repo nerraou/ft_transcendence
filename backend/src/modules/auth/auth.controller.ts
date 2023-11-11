@@ -14,6 +14,7 @@ import { User } from "@prisma/client";
 
 import { AppEnv } from "@config/env-configuration";
 import { GoogleAuthResponse } from "@modules/users/decorators/google-user.decorators";
+import { FortyTwoAuthResponse } from "@modules/users/decorators/forty-two-user.decorators";
 
 import { AuthService } from "./auth.service";
 import { SignUpDto } from "./dto/sign-up.dto";
@@ -21,7 +22,9 @@ import EmailExistsPipe from "./pipes/email-exists.pipe";
 import ConfirmEmailTokenDto from "./dto/confirm-email-token.dto";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { GoogleAuthGuard } from "./guards/google-auth.guard";
+import { FortyTwoAuthGuard } from "./guards/forty-two-auth.guard";
 import { GoogleAuthResponse as GoogleAuthResponseType } from "./strategies/google.strategy";
+import { FortyTwoAuthResponse as FortyTwoAuthResponseType } from "./strategies/forty-two.strategy";
 import {
   ConfirmApiDocumentation,
   SignInApiDocumentation,
@@ -81,6 +84,27 @@ export class AuthController {
           firstName: response.user.firstName,
           lastName: response.user.lastName,
           provider: "Google",
+        },
+      })
+      .catch((e) => console.error("sendMail error:", e));
+
+    return {
+      accessToken: response.accessToken,
+    };
+  }
+
+  @Get("/42/authorize")
+  @UseGuards(FortyTwoAuthGuard)
+  fortTwoAuthorize(@FortyTwoAuthResponse() response: FortyTwoAuthResponseType) {
+    this.mailService
+      .sendMail({
+        to: response.user.email,
+        subject: "Welcome to PongBoy",
+        template: "oauth-welcome",
+        context: {
+          firstName: response.user.firstName,
+          lastName: response.user.lastName,
+          provider: "42",
         },
       })
       .catch((e) => console.error("sendMail error:", e));

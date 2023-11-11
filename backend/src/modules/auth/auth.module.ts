@@ -11,6 +11,7 @@ import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { GoogleStrategy } from "./strategies/google.strategy";
+import { FortyTwoStrategy } from "./strategies/forty-two.strategy";
 
 @Module({
   controllers: [AuthController],
@@ -21,6 +22,7 @@ import { GoogleStrategy } from "./strategies/google.strategy";
     LocalStrategy,
     JwtStrategy,
     GoogleStrategy,
+    FortyTwoStrategy,
   ],
   imports: [
     JwtModule.register({

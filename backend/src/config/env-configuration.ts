@@ -12,6 +12,12 @@ export interface GoogleEnv {
   callbackUrl: string;
 }
 
+export interface FortyTwoEnv {
+  clientId: string;
+  clientSecret: string;
+  callbackUrl: string;
+}
+
 export interface AppEnv {
   appHostName: string;
   assetsPath: string;
@@ -19,6 +25,7 @@ export interface AppEnv {
   jwtSecret: string;
   redis: RedisEnv;
   google: GoogleEnv;
+  fortyTwo: FortyTwoEnv;
 }
 
 export default async function envConfigFactory(): Promise<AppEnv> {
@@ -36,11 +43,14 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "GOOGLE_CALLBACK_URL",
+    "FORTY_TWO_CLIENT_ID",
+    "FORTY_TWO_CLIENT_SECRET",
+    "FORTY_TWO_CALLBACK_URL",
   ];
 
   requiredEnvVariables.forEach((variable) => {
     if (!process.env[variable]) {
-      throw new Error(" env variable not found");
+      throw new Error(`'${variable}' env variable not found`);
     }
   });
 
@@ -60,6 +70,11 @@ export default async function envConfigFactory(): Promise<AppEnv> {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+    },
+    fortyTwo: {
+      clientId: process.env.FORTY_TWO_CLIENT_ID,
+      clientSecret: process.env.FORTY_TWO_CLIENT_SECRET,
+      callbackUrl: process.env.FORTY_TWO_CALLBACK_URL,
     },
     redis: {
       host: process.env.REDIS_HOST,

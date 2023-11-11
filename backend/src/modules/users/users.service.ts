@@ -5,6 +5,7 @@ import { PrismaService } from "@common/modules/prisma/prisma.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateUserWithGoogleDto } from "./dto/create-user-with-google.dto";
+import { CreateUserWithFortyTwoDto } from "./dto/create-user-with-forty-two.dto";
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,15 @@ export class UsersService {
     return this.prisma.user.create({
       data: {
         ...createUserWithGoogleDto,
+        isEmailVerified: true,
+      },
+    });
+  }
+
+  createWithFortyTwo(createUserWithFortyTwoDto: CreateUserWithFortyTwoDto) {
+    return this.prisma.user.create({
+      data: {
+        ...createUserWithFortyTwoDto,
         isEmailVerified: true,
       },
     });
@@ -67,6 +77,17 @@ export class UsersService {
     });
   }
 
+  updateFortyTwoAccountIdById(id: number, fortyTwoAccountId: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        fortyTwoAccountId,
+      },
+    });
+  }
+
   confirmEmail(token: string) {
     return this.prisma.user.update({
       where: {
@@ -107,6 +128,14 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: {
         googleAccountId: googleId,
+      },
+    });
+  }
+
+  findOneByFortyTwoId(fortyTwoId: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        googleAccountId: fortyTwoId,
       },
     });
   }
