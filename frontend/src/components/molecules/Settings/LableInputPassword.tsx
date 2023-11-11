@@ -17,8 +17,8 @@ function LableInputPassword(props: LableInputPasswordProps) {
     iconColor = "stroke-light-fg-secondary";
   }
   return (
-    <div className="flex space-x-32 xl:space-x-28 lg:space-x-20">
-      <div className="w-40">
+    <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
+      <div className="w-40 md:w-60">
         <label className="text-light-fg-primary text-base dark:text-light-fg-tertiary">
           {props.labelValue}
         </label>
@@ -28,7 +28,7 @@ function LableInputPassword(props: LableInputPasswordProps) {
         borderColor={borderColor}
         placeholder={props.labelValue}
         onChange={props.onChange}
-        width="w-96 lg:w-60"
+        width="w-96 sm:w-full"
       />
     </div>
   );

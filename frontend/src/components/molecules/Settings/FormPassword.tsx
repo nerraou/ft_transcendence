@@ -21,7 +21,7 @@ function FormPassword() {
         error={false}
         onChange={onChange}
       />
-      <div className="flex justify-center ml-20">
+      <div className="flex justify-center ml-20 sm:ml-0">
         <ButtonCircle color="bg-light-fg-link" icon={<Save />} />
       </div>
     </form>
