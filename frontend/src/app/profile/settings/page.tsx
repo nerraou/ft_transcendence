@@ -12,10 +12,10 @@ function Settings() {
         <UserHeader
           fullname="Nouhayla Erraou"
           image="/totoro.jpg"
-          isProfileOwner
+          isProfileOwner={false}
           isFriend
           level={2}
-          userStatus="online"
+          userStatus="in-game"
           username="noface"
         />
         <Bar width="w-5/6" />

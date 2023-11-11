@@ -83,10 +83,14 @@ function UserPopover(props: UserPopoverProps) {
 
 function UserHeaderActions(props: UserHeaderActionsProps) {
   if (props.isProfileOwner) {
-    return <Pencil color="stroke-light-fg-link" />;
+    return (
+      <div className="flex">
+        <Pencil color="stroke-light-fg-link" />
+      </div>
+    );
   } else {
     return (
-      <div className="flex gap-1">
+      <div className="flex gap-1 sm:gap-0">
         <DeviceGamePad
           color="stroke-light-fg-link"
           hover="hover:bg-light-fg-tertiary"
@@ -108,7 +112,7 @@ function UserHeader(props: UserHeaderProps) {
   return (
     <div className="box-border rounded-xl border-4 border-light-fg-primary bg-light-fg-link dark:bg-dark-bg-tertiary shadow-light-xl dark:shadow-dark-xl">
       <BarStatus status={props.userStatus} />
-      <div className="relative flex justify-between h-60 mb-xxl mt-sm mx-12 pt-xl px-xl bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
+      <div className="relative flex justify-between sm:justify-center h-60 mb-xxl sm:mb-lg mx-12 sm:mx-4 pt-xl px-xl bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
         <div className="absolute right-0 bottom-0">
           <Reflect />
         </div>
@@ -118,7 +122,7 @@ function UserHeader(props: UserHeaderProps) {
             username={props.username}
             image={props.image}
           />
-          <label className="text-light-fg-link text-xxl leading-none">
+          <label className="text-light-fg-link text-xxl lg:text-xl md:text-xl sm:text-base sm:text-center leading-none lg:leading-normal md:leading-normal">
             #{props.level}
           </label>
         </div>
