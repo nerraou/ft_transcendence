@@ -4,6 +4,8 @@ import { PrismaService } from "@common/modules/prisma/prisma.service";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { CreateUserWithGoogleDto } from "./dto/create-user-with-google.dto";
+import { CreateUserWithFortyTwoDto } from "./dto/create-user-with-forty-two.dto";
 
 @Injectable()
 export class UsersService {
@@ -12,6 +14,24 @@ export class UsersService {
   create(createUserDto: CreateUserDto) {
     return this.prisma.user.create({
       data: createUserDto,
+    });
+  }
+
+  createWithGoogle(createUserWithGoogleDto: CreateUserWithGoogleDto) {
+    return this.prisma.user.create({
+      data: {
+        ...createUserWithGoogleDto,
+        isEmailVerified: true,
+      },
+    });
+  }
+
+  createWithFortyTwo(createUserWithFortyTwoDto: CreateUserWithFortyTwoDto) {
+    return this.prisma.user.create({
+      data: {
+        ...createUserWithFortyTwoDto,
+        isEmailVerified: true,
+      },
     });
   }
 
@@ -42,6 +62,28 @@ export class UsersService {
       },
       data: {
         email,
+      },
+    });
+  }
+
+  updateGoogleAccountIdById(id: number, googleAccountId: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        googleAccountId,
+      },
+    });
+  }
+
+  updateFortyTwoAccountIdById(id: number, fortyTwoAccountId: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        fortyTwoAccountId,
       },
     });
   }
@@ -78,6 +120,22 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: {
         email,
+      },
+    });
+  }
+
+  findOneByGoogleId(googleId: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        googleAccountId: googleId,
+      },
+    });
+  }
+
+  findOneByFortyTwoId(fortyTwoId: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        googleAccountId: fortyTwoId,
       },
     });
   }
