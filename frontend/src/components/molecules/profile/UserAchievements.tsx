@@ -1,3 +1,5 @@
+"use client";
+
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 import CleanSheet from "@atoms/achievements/CleanSheet";
@@ -28,7 +30,7 @@ const achievements: Record<string, ReactNode> = {
 function UserAchievements(props: UserAchievementsProps) {
   const [sliderRef] = useKeenSlider({
     slides: {
-      perView: 9,
+      perView: 7,
     },
     breakpoints: {
       "(max-width: 500px)": {
@@ -42,7 +44,7 @@ function UserAchievements(props: UserAchievementsProps) {
   return (
     <div
       ref={sliderRef}
-      className="keen-slider flex items-center bg-light-bg-tertiary border border-light-fg-link rounded-full px-4 overflow-visible"
+      className="keen-slider flex items-center bg-light-bg-tertiary border border-light-fg-link rounded-full p-5 overflow-visible"
     >
       {props.achievements.map((achievement, index) => {
         return (

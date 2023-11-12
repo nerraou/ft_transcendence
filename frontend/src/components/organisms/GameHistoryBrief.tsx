@@ -51,7 +51,9 @@ function GameHistoryBrief(props: GameHistoryBriefProps) {
   return (
     <div>
       {!emptyHistory && <GameHistoryCards {...props} />}
-      {emptyHistory && <EmptyStatePlaceholder />}
+      <div className="flex justify-center">
+        {emptyHistory && <EmptyStatePlaceholder />}
+      </div>
     </div>
   );
 }
