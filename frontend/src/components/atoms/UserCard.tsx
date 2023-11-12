@@ -18,10 +18,10 @@ interface UserProps {
 function Username(props: UsernameProps) {
   return (
     <div className="flex flex-col">
-      <label className="text-light-fg-primary text-xl sm:text-lg md:text-lg lg:text-lg">
+      <label className="text-light-fg-primary text-xl sm:text-lg md:text-lg lg:text-lg sm:text-center">
         {props.fullName}
       </label>
-      <label className="text-light-fg-secondary text-lg leading-none sm:text-lg md:text-lg">
+      <label className="text-light-fg-secondary text-lg leading-none sm:text-lg md:text-lg sm:text-center">
         {props.username}
       </label>
     </div>
@@ -43,7 +43,7 @@ function UserImage(props: UserImageProps) {
 
 function User(props: UserProps) {
   return (
-    <div className="flex sm:flex-col sm:items-center gap-4 sm:gap-0 sm:w-full bg-light-bg-tertiary">
+    <div className="flex sm:flex-col sm:items-center gap-4 sm:gap-1 sm:w-full bg-light-bg-tertiary">
       <UserImage image={props.image} />
       <Username username={props.username} fullName={props.fullName} />
     </div>

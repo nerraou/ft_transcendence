@@ -1,7 +1,7 @@
 import InputText from "@components/atoms/InputText";
 import { ChangeEvent } from "react";
 
-interface LableInputTextProps {
+interface LabelInputTextProps {
   labelValue: string;
   inputValue?: string;
   placeholder: string;
@@ -9,15 +9,15 @@ interface LableInputTextProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LableInputText(props: LableInputTextProps) {
+function LabelInputText(props: LabelInputTextProps) {
   let borderColor = "border-light-fg-primary dark:border-dark-fg-primary";
   if (props.error) {
     borderColor = "border-dark-fg-secondary dark:border-dark-fg-primary";
   }
   return (
-    <div className="flex space-x-32">
-      <div className="w-36">
-        <label className="text-light-fg-primary dark:text-light-fg-tertiary">
+    <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
+      <div className="w-40 md:w-60">
+        <label className="text-light-fg-primary text-base dark:text-light-fg-tertiary">
           {props.labelValue}
         </label>
       </div>
@@ -25,7 +25,7 @@ function LableInputText(props: LableInputTextProps) {
         value={props.inputValue}
         placeholder={props.placeholder}
         borderColor={borderColor}
-        width="w-96"
+        width="w-96 sm:w-full"
         height="base"
         onChange={props.onChange}
       />
@@ -33,4 +33,4 @@ function LableInputText(props: LableInputTextProps) {
   );
 }
 
-export default LableInputText;
+export default LabelInputText;

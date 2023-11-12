@@ -1,6 +1,6 @@
 import ButtonsSaveRestore from "./ButtonsSaveRestore";
 import Enable2FA from "./Enable2FA";
-import LableInputText from "./LableInputText";
+import LabelInputText from "./LabelInputText";
 
 function FormProfile() {
   function onChange() {
@@ -9,19 +9,19 @@ function FormProfile() {
 
   return (
     <form className="space-y-5">
-      <LableInputText
+      <LabelInputText
         labelValue="Username"
         placeholder="name"
         error={false}
         onChange={onChange}
       />
-      <LableInputText
+      <LabelInputText
         labelValue="First Name"
         placeholder="First Name"
         error={false}
         onChange={onChange}
       />
-      <LableInputText
+      <LabelInputText
         labelValue="Last Name"
         placeholder="Last Name"
         error={false}

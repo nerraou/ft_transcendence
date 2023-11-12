@@ -5,7 +5,7 @@ function Reflect() {
       height="181"
       viewBox="0 0 400 181"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      className="sm:w-0 sm:h-0"
     >
       <path
         d="M0 181L400 0.774791L400 19.7748L41.5001 181L0 181Z"

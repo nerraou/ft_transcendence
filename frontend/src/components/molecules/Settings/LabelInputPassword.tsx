@@ -1,7 +1,7 @@
-import InputPassword from "@components/atoms/InputPassword";
+import InputPassword from "@atoms/InputPassword";
 import { ChangeEvent } from "react";
 
-interface LableInputPasswordProps {
+interface LabelInputPasswordProps {
   labelValue: string;
   inputValue?: string;
   placeholder: string;
@@ -9,7 +9,7 @@ interface LableInputPasswordProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LableInputPassword(props: LableInputPasswordProps) {
+function LabelInputPassword(props: LabelInputPasswordProps) {
   let borderColor = "border-light-fg-primary dark:border-dark-fg-primary ";
   let iconColor = "stroke-light-fg-primary dark:stroke-dark-fg-primary ";
   if (props.error) {
@@ -17,9 +17,9 @@ function LableInputPassword(props: LableInputPasswordProps) {
     iconColor = "stroke-light-fg-secondary";
   }
   return (
-    <div className="flex space-x-32">
-      <div className="w-36">
-        <label className="text-light-fg-primary dark:text-light-fg-tertiary">
+    <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
+      <div className="w-40 md:w-60">
+        <label className="text-light-fg-primary text-base dark:text-light-fg-tertiary">
           {props.labelValue}
         </label>
       </div>
@@ -28,9 +28,10 @@ function LableInputPassword(props: LableInputPasswordProps) {
         borderColor={borderColor}
         placeholder={props.labelValue}
         onChange={props.onChange}
+        width="w-96 sm:w-full"
       />
     </div>
   );
 }
 
-export default LableInputPassword;
+export default LabelInputPassword;
