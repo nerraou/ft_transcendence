@@ -1,7 +1,7 @@
 import InputText from "@components/atoms/InputText";
 import { ChangeEvent } from "react";
 
-interface LableInputTextProps {
+interface LabelInputTextProps {
   labelValue: string;
   inputValue?: string;
   placeholder: string;
@@ -9,7 +9,7 @@ interface LableInputTextProps {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LableInputText(props: LableInputTextProps) {
+function LabelInputText(props: LabelInputTextProps) {
   let borderColor = "border-light-fg-primary dark:border-dark-fg-primary";
   if (props.error) {
     borderColor = "border-dark-fg-secondary dark:border-dark-fg-primary";
@@ -33,4 +33,4 @@ function LableInputText(props: LableInputTextProps) {
   );
 }
 
-export default LableInputText;
+export default LabelInputText;

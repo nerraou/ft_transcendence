@@ -1,6 +1,6 @@
 import ButtonsSaveRestore from "./ButtonsSaveRestore";
 import Enable2FA from "./Enable2FA";
-import LableInputText from "./LableInputText";
+import LableInputText from "./LabelInputText";
 
 function FormProfile() {
   function onChange() {

@@ -1,6 +1,6 @@
-import LableInputPassword from "./LableInputPassword";
+import LableInputPassword from "./LabelInputPassword";
 import ButtonCircle from "@atoms/ButtonCircle";
-import Save from "@atoms/icons/outline/Save";
+import Save from "@icons/outline/Save";
 
 function FormPassword() {
   function onChange() {

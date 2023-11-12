@@ -1,6 +1,6 @@
 import ButtonsSaveRestore from "./ButtonsSaveRestore";
-import LableInputPassword from "./LableInputPassword";
-import LableInputText from "./LableInputText";
+import LableInputPassword from "./LabelInputPassword";
+import LableInputText from "./LabelInputText";
 
 function FormEmail() {
   function onChange() {
