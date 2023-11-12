@@ -1,4 +1,4 @@
-import LableInputPassword from "./LabelInputPassword";
+import LabelInputPassword from "./LabelInputPassword";
 import ButtonCircle from "@atoms/ButtonCircle";
 import Save from "@icons/outline/Save";
 
@@ -9,13 +9,13 @@ function FormPassword() {
 
   return (
     <form className="space-y-5">
-      <LableInputPassword
+      <LabelInputPassword
         labelValue="Current Password"
         placeholder="Password"
         error={false}
         onChange={onChange}
       />
-      <LableInputPassword
+      <LabelInputPassword
         labelValue="New Password"
         placeholder="Password"
         error={false}
