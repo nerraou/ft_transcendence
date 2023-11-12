@@ -35,6 +35,7 @@ function UserImage(props: UserImageProps) {
         src={props.image}
         alt="user image"
         fill
+        sizes="w-32 h-32 md:w-24 md:h-24 sm:w-20 sm:h-20 lg:w-16 lg:h-16"
         className="rounded-lg object-cover appearance-none"
       />
     </div>

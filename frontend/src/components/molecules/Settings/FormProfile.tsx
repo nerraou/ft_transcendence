@@ -11,7 +11,7 @@ function FormProfile() {
     <form className="space-y-5">
       <LabelInputText
         labelValue="Username"
-        placeholder="name"
+        placeholder="Username"
         error={false}
         onChange={onChange}
       />
