@@ -5,6 +5,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiParam,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
@@ -40,6 +41,15 @@ export function CreateContactApiDocumentation() {
           ],
           error: "Unprocessable Entity",
           statusCode: 422,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
         },
       },
     }),
@@ -86,6 +96,36 @@ export function AcceptContactApiDocumentation() {
         example: {
           message: "Forbidden",
           statusCode: 403,
+        },
+      },
+    }),
+  );
+}
+
+export function GetContactsApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Contacts"),
+    ApiBearerAuth(),
+    ApiQuery({
+      name: "page",
+      type: "number",
+    }),
+    ApiQuery({
+      name: "limit",
+      type: "number",
+    }),
+    ApiOkResponse({
+      description: "contacts list",
+      schema: {
+        example: {},
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
         },
       },
     }),

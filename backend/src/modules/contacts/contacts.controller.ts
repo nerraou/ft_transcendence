@@ -3,9 +3,11 @@ import {
   ConflictException,
   Controller,
   ForbiddenException,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import { User as UserEntity } from "@prisma/client";
@@ -21,7 +23,9 @@ import { CreateContactDto } from "./dto/create-contact.dto";
 import {
   AcceptContactApiDocumentation,
   CreateContactApiDocumentation,
+  GetContactsApiDocumentation,
 } from "./decorators/docs.decorator";
+import { GetContactsDto } from "./dto/get-contacts.dto";
 
 @Controller("contacts")
 export class ContactsController {
@@ -38,6 +42,10 @@ export class ContactsController {
     @Body(UserExistsPipe) contactToCreate: CreateContactDto,
     @User() connectedUser: UserEntity,
   ) {
+    if (connectedUser.id == contactToCreate.userId) {
+      throw new ForbiddenException();
+    }
+
     const contact = await this.contactsService.findContactByUsersIds(
       connectedUser.id,
       contactToCreate.userId,
@@ -53,7 +61,7 @@ export class ContactsController {
     );
 
     const socketId = await this.redisService.get(
-      contactToCreate.userId.toString(),
+      `user-${contactToCreate.userId}`,
     );
 
     if (socketId) {
@@ -93,7 +101,7 @@ export class ContactsController {
 
     await this.contactsService.acceptContactRequest(contactId);
 
-    const socketId = await this.redisService.get(contact.followerId.toString());
+    const socketId = await this.redisService.get(`user-${contact.followerId}`);
 
     if (socketId) {
       this.eventsGateway.server
@@ -109,6 +117,45 @@ export class ContactsController {
 
     return {
       message: "success",
+    };
+  }
+
+  @Get()
+  @GetContactsApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getContacts(
+    @User("id") userId: number,
+    @Query() query: GetContactsDto,
+  ) {
+    const contactsCount = await this.contactsService.getUserContactsCount(
+      userId,
+      query.page,
+      query.limit,
+    );
+    const contacts = await this.contactsService.getUserContacts(
+      userId,
+      query.page,
+      query.limit,
+    );
+
+    if (contactsCount == 0) {
+      return {
+        count: contactsCount,
+        contacts: [],
+      };
+    }
+
+    const mappedContacts = contacts.map((contact) => {
+      if (userId == contact.followerId) {
+        return contact.following;
+      } else {
+        return contact.follower;
+      }
+    });
+
+    return {
+      count: contactsCount,
+      contacts: mappedContacts,
     };
   }
 }

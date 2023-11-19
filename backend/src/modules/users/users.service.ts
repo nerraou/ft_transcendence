@@ -6,6 +6,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateUserWithGoogleDto } from "./dto/create-user-with-google.dto";
 import { CreateUserWithFortyTwoDto } from "./dto/create-user-with-forty-two.dto";
+import { UserStatus } from "@prisma/client";
 
 @Injectable()
 export class UsersService {
@@ -84,6 +85,17 @@ export class UsersService {
       },
       data: {
         fortyTwoAccountId,
+      },
+    });
+  }
+
+  updateStatusById(id: number, status: UserStatus) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        status,
       },
     });
   }
