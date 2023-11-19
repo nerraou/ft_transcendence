@@ -103,8 +103,8 @@ export class AuthService {
     };
   }
 
-  confirmEmail(token: string) {
-    return this.usersService.confirmEmail(token);
+  confirmEmail(email: string, token: string) {
+    return this.usersService.confirmEmail(email, token);
   }
 
   async validateUser(email: string, password: string) {

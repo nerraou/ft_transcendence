@@ -50,11 +50,13 @@ export class AuthController {
   @Post("sign-up")
   @SignUpApiDocumentation()
   async signUp(@Body(EmailExistsPipe) signUpDto: SignUpDto) {
-    const { verifyEmailToken } = await this.authService.signUp(signUpDto);
+    const { verifyEmailToken, email } = await this.authService.signUp(
+      signUpDto,
+    );
 
     const appHostName = this.configService.get("appHostName");
 
-    const accountConfirmationLink = `${appHostName}/auth/confirm/${verifyEmailToken}`;
+    const accountConfirmationLink = `${appHostName}/auth/confirm?email=${email}&token=${verifyEmailToken}`;
 
     this.mailService
       .sendMail({
@@ -119,7 +121,10 @@ export class AuthController {
   @HttpCode(200)
   async confirmEmail(@Body() confirmEmailTokenDto: ConfirmEmailTokenDto) {
     try {
-      await this.authService.confirmEmail(confirmEmailTokenDto.token);
+      await this.authService.confirmEmail(
+        confirmEmailTokenDto.email,
+        confirmEmailTokenDto.token,
+      );
       return {
         message: "success",
       };
