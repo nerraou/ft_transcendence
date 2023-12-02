@@ -1,29 +1,68 @@
 "use client";
 
+import { useForm, SubmitHandler } from "react-hook-form";
+import { object, string } from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
 import Link from "next/link";
-import ButtonOAuth from "./ButtonOAuth";
 import Button from "@atoms/Button";
 
+import ButtonOAuth from "./ButtonOAuth";
+import { useMutation } from "@tanstack/react-query";
+
+interface FormInput {
+  email: string;
+  password: string;
+}
+
+async function singUpUser(newUser: FormInput) {
+  const api = "https://api.pongboy.me/auth/sign-up";
+  console.log(newUser);
+  return await fetch(api, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(newUser),
+  });
+}
+
+const userSchema = object({
+  email: string().email().required("required!"),
+  password: string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one special case Character",
+    )
+    .required(),
+});
+
 function SignUpForm() {
-  function handlerInput() {
-    return;
-  }
-  function handlePassword() {
-    return;
-  }
+  const { register, handleSubmit, formState } = useForm<FormInput>({
+    resolver: yupResolver(userSchema),
+  });
+
+  const mutation = useMutation({
+    mutationFn: singUpUser,
+  });
+
+  const onSubmit: SubmitHandler<FormInput> = (data) => mutation.mutate(data);
+
+  console.log(formState.errors);
+
   return (
-    <form className="m-6 flex flex-col w-full items-center">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="m-6 flex flex-col w-full items-center"
+    >
       <div className="grid grid-rows-2 gap-4">
         <InputText
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           placeholder="Email"
           height="large"
           width="w-80 sm:w-64"
-          value="noha@gmail.com"
-          onChange={handlerInput}
+          {...register("email")}
         />
         <InputPassword
           height="large"
@@ -31,8 +70,7 @@ function SignUpForm() {
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
           placeholder="Password"
-          value="1234"
-          onChange={handlePassword}
+          {...register("password")}
         />
       </div>
       <label className="text-xl sm:text-base text-light-fg-tertiary m-6">

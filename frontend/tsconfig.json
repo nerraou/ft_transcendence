@@ -26,7 +26,8 @@
       "@atoms/*": ["./src/components/atoms/*"],
       "@molecules/*": ["./src/components/molecules/*"],
       "@organisms/*": ["./src/components/organisms/*"],
-      "@templates/*": ["./src/components/templates/*"]
+      "@templates/*": ["./src/components/templates/*"],
+      "@providers/*": ["./src/components/providers/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
