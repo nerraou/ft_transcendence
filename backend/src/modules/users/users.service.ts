@@ -88,9 +88,10 @@ export class UsersService {
     });
   }
 
-  confirmEmail(token: string) {
+  confirmEmail(email: string, token: string) {
     return this.prisma.user.update({
       where: {
+        email,
         verifyEmailToken: token,
       },
       data: {
