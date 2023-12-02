@@ -1,53 +1,19 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-import { object, string } from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import Link from "next/link";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
-import Link from "next/link";
 import Button from "@atoms/Button";
 
 import ButtonOAuth from "./ButtonOAuth";
-import { useMutation } from "@tanstack/react-query";
-
-interface FormInput {
-  email: string;
-  password: string;
-}
-
-async function singUpUser(newUser: FormInput) {
-  const api = "https://api.pongboy.me/auth/sign-up";
-  console.log(newUser);
-  return await fetch(api, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(newUser),
-  });
-}
-
-const userSchema = object({
-  email: string().email().required("required!"),
-  password: string()
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one special case Character",
-    )
-    .required(),
-});
+import UseSignUpForm from "./UseSignUpForm";
+import UseSignUpMutation from "./UseSignUpMutation";
 
 function SignUpForm() {
-  const { register, handleSubmit, formState } = useForm<FormInput>({
-    resolver: yupResolver(userSchema),
-  });
-
-  const mutation = useMutation({
-    mutationFn: singUpUser,
-  });
-
-  const onSubmit: SubmitHandler<FormInput> = (data) => mutation.mutate(data);
+  const { register, handleSubmit, formState } = UseSignUpForm();
+  const onSubmit = UseSignUpMutation();
 
   console.log(formState.errors);
 
