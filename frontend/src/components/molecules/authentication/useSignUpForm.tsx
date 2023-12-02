@@ -2,10 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-interface FormInput {
-  email: string;
-  password: string;
-}
+import { FormInput } from "./SignUp";
 
 const userSchema = yup.object({
   email: yup.string().email().required("required!"),
@@ -18,10 +15,10 @@ const userSchema = yup.object({
     .required(),
 });
 
-function UseSignUpForm() {
+function useSignUpForm() {
   return useForm<FormInput>({
     resolver: yupResolver(userSchema),
   });
 }
 
-export default UseSignUpForm;
+export default useSignUpForm;

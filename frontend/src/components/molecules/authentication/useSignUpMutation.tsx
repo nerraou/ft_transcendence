@@ -1,10 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { SubmitHandler } from "react-hook-form";
 
-interface FormInput {
-  email: string;
-  password: string;
-}
+import { FormInput } from "./SignUp";
 
 async function singUpUser(newUser: FormInput) {
   const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/sign-up";
@@ -16,13 +12,12 @@ async function singUpUser(newUser: FormInput) {
   });
 }
 
-function UseSignUpMutation() {
+function useSignUpMutation() {
   const mutation = useMutation({
     mutationFn: singUpUser,
   });
-  const onSubmit: SubmitHandler<FormInput> = (data) => mutation.mutate(data);
 
-  return onSubmit;
+  return mutation;
 }
 
-export default UseSignUpMutation;
+export default useSignUpMutation;

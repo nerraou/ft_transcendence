@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { SubmitHandler } from "react-hook-form";
+import { useState } from "react";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
@@ -8,13 +10,28 @@ import Bar from "@atoms/decoration/Bar";
 import Button from "@atoms/Button";
 
 import ButtonOAuth from "./ButtonOAuth";
-import UseSignUpForm from "./UseSignUpForm";
-import UseSignUpMutation from "./UseSignUpMutation";
+import useSignUpForm from "./useSignUpForm";
+import useSignUpMutation from "./useSignUpMutation";
+
+export interface FormInput {
+  email: string;
+  password: string;
+}
 
 function SignUpForm() {
-  const { register, handleSubmit, formState } = UseSignUpForm();
-  const onSubmit = UseSignUpMutation();
+  const [isPasswordVisible, setPasswordVisibility] = useState(false);
+  const { register, handleSubmit, formState } = useSignUpForm();
 
+  const mutation = useSignUpMutation();
+  const onSubmit: SubmitHandler<FormInput> = (data) => mutation.mutate(data);
+
+  function changePasswordVisibility() {
+    if (isPasswordVisible == false) {
+      setPasswordVisibility(true);
+    } else {
+      setPasswordVisibility(false);
+    }
+  }
   console.log(formState.errors);
 
   return (
@@ -22,7 +39,7 @@ function SignUpForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col w-full items-center"
     >
-      <div className="grid grid-rows-2 gap-4">
+      <div className="space-y-4">
         <InputText
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           placeholder="Email"
@@ -36,6 +53,8 @@ function SignUpForm() {
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
           placeholder="Password"
+          onPasswordVisibilityChange={changePasswordVisibility}
+          isPasswordVisible={isPasswordVisible}
           {...register("password")}
         />
       </div>
