@@ -89,9 +89,11 @@ export function ConfirmApiDocumentation() {
       description: "Confirm email",
       schema: {
         properties: {
+          email: { type: "string" },
           token: { type: "string" },
         },
         example: {
+          emai: "jdoe@email.com",
           token: "126401d9-cd58-42a1-894f-94ac1fd7255e",
         },
       },
