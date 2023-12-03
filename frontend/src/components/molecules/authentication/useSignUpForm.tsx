@@ -5,14 +5,14 @@ import * as yup from "yup";
 import { FormInput } from "./SignUp";
 
 const userSchema = yup.object({
-  email: yup.string().email().required("required!"),
+  email: yup.string().email().required(),
   password: yup
     .string()
+    .required()
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one special case Character",
-    )
-    .required(),
+      /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8,}$/,
+      "Password required (numbers, uppercase ,lowercase), at least 8 characters long",
+    ),
 });
 
 function useSignUpForm() {

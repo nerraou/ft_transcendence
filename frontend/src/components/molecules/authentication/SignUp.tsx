@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
+import { ErrorMessage } from "@hookform/error-message";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
@@ -32,7 +33,6 @@ function SignUpForm() {
       setPasswordVisibility(false);
     }
   }
-  console.log(formState.errors);
 
   return (
     <form
@@ -40,23 +40,43 @@ function SignUpForm() {
       className="m-6 flex flex-col w-full items-center"
     >
       <div className="space-y-4">
-        <InputText
-          borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          placeholder="Email"
-          height="large"
-          width="w-80 sm:w-64"
-          {...register("email")}
-        />
-        <InputPassword
-          height="large"
-          width="w-80 sm:w-64"
-          borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
-          placeholder="Password"
-          onPasswordVisibilityChange={changePasswordVisibility}
-          isPasswordVisible={isPasswordVisible}
-          {...register("password")}
-        />
+        <div>
+          <InputText
+            borderColor="border-light-fg-primary dark:border-dark-fg-primary"
+            placeholder="Email"
+            height="large"
+            width="w-80 sm:w-64"
+            {...register("email")}
+          />
+          <ErrorMessage
+            errors={formState.errors}
+            name="email"
+            render={({ message }) => (
+              <p className="text-light-fg-secondary">{message}</p>
+            )}
+          />
+        </div>
+        <div>
+          <InputPassword
+            height="large"
+            width="w-80 sm:w-64"
+            borderColor="border-light-fg-primary dark:border-dark-fg-primary"
+            iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
+            placeholder="Password"
+            onPasswordVisibilityChange={changePasswordVisibility}
+            isPasswordVisible={isPasswordVisible}
+            {...register("password")}
+          />
+          <ErrorMessage
+            errors={formState.errors}
+            name="password"
+            render={({ message }) => (
+              <div className="text-light-fg-secondary w-80 sm:w-64">
+                {message}
+              </div>
+            )}
+          />
+        </div>
       </div>
       <label className="text-xl sm:text-base text-light-fg-tertiary m-6">
         Already a ponger?{" "}
