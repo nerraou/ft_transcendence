@@ -14,11 +14,9 @@ async function singUpUser(newUser: FormInput) {
 }
 
 function useSignUpMutation() {
-  const mutation = useMutation<Response, RequestError, FormInput>({
+  return useMutation<Response, RequestError, FormInput>({
     mutationFn: singUpUser,
   });
-
-  return mutation;
 }
 
 export default useSignUpMutation;

@@ -11,7 +11,7 @@ const userSchema = yup.object({
     .required()
     .matches(
       /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8,}$/,
-      "Password required (numbers, uppercase ,lowercase), at least 8 characters long",
+      "Password required (numbers ,uppercase ,lowercase), at least 8 characters long",
     ),
 });
 

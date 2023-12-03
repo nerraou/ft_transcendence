@@ -13,18 +13,38 @@ import Button from "@atoms/Button";
 import ButtonOAuth from "./ButtonOAuth";
 import useSignUpForm from "./useSignUpForm";
 import useSignUpMutation from "./useSignUpMutation";
+import { RequestError } from "@utils/baseQuery";
+import Modal from "@components/atoms/Modal";
 
 export interface FormInput {
   email: string;
   password: string;
 }
 
+function callModal(
+  isError: boolean,
+  error: RequestError | null,
+  isSuccess: boolean,
+) {
+  if (isError) {
+    if (error?.response.status == 409) {
+      return <Modal title="Error" description="Email already exists!" />;
+    } else {
+      return <Modal title="Error" description="Something went wrong!" />;
+    }
+  } else if (isSuccess) {
+    return (
+      <Modal title="Success" description="Sign up completed successfully!" />
+    );
+  }
+}
+
 function SignUpForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { register, handleSubmit, formState } = useSignUpForm();
 
-  const mutation = useSignUpMutation();
-  const onSubmit: SubmitHandler<FormInput> = (data) => mutation.mutate(data);
+  const { mutate, isPending, isError, isSuccess, error } = useSignUpMutation();
+  const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
 
   function changePasswordVisibility() {
     if (isPasswordVisible == false) {
@@ -39,6 +59,7 @@ function SignUpForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col w-full items-center"
     >
+      {callModal(isError, error, isSuccess)}
       <div className="space-y-4">
         <div>
           <InputText
@@ -88,7 +109,7 @@ function SignUpForm() {
         </Link>
       </label>
       <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
-        <Button text="Sign Up" />
+        <Button text="Sign Up" disabled={isPending} />
         <ButtonOAuth />
       </div>
     </form>
