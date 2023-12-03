@@ -64,4 +64,56 @@ export class ContactsService {
       lastName: user.lastName,
     };
   }
+
+  getUserContactsCount(userId: number, page: number, limit: number) {
+    return this.prisma.contact.count({
+      where: {
+        OR: [
+          {
+            followerId: userId,
+          },
+          {
+            followingId: userId,
+          },
+        ],
+      },
+      skip: (page - 1) * page,
+      take: limit,
+    });
+  }
+
+  getUserContacts(userId: number, page: number, limit: number) {
+    const selectFields = {
+      id: true,
+      username: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      avatarPath: true,
+      status: true,
+    };
+
+    return this.prisma.contact.findMany({
+      where: {
+        OR: [
+          {
+            followerId: userId,
+          },
+          {
+            followingId: userId,
+          },
+        ],
+      },
+      skip: (page - 1) * page,
+      take: limit,
+      include: {
+        follower: {
+          select: selectFields,
+        },
+        following: {
+          select: selectFields,
+        },
+      },
+    });
+  }
 }

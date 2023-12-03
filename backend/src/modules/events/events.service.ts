@@ -8,6 +8,7 @@ import { Socket } from "socket.io";
 import { RedisService } from "@common/modules/redis/redis.service";
 import { AppEnv } from "@config/env-configuration";
 import { JwtPayload } from "@modules/auth/strategies/jwt.strategy";
+import { UsersService } from "@modules/users/users.service";
 
 @Injectable()
 export class EventsService {
@@ -15,26 +16,29 @@ export class EventsService {
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<AppEnv>,
+    private readonly usersService: UsersService,
   ) {}
 
-  userConnected(client: Socket) {
+  async userConnected(client: Socket) {
     const payload = this.verifyJwt(client.request);
 
     if (!payload) {
       return client.disconnect();
     }
 
-    return this.redisService.set(payload.sub.toString(), client.id);
+    await this.redisService.set(`user-${payload.sub}`, client.id);
+    await this.usersService.updateStatusById(payload.sub, "ONLINE");
   }
 
-  userDisonnected(client: Socket) {
+  async userDisonnected(client: Socket) {
     const payload = this.verifyJwt(client.request);
 
     if (!payload) {
       throw new WsException("Unauthorized");
     }
 
-    return this.redisService.del(payload.sub.toString());
+    await this.redisService.del(`user-${payload.sub}`);
+    await this.usersService.updateStatusById(payload.sub, "OFFLINE");
   }
 
   private verifyJwt(request: any): JwtPayload | undefined {

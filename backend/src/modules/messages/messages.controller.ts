@@ -42,7 +42,7 @@ export class MessagesController {
     );
 
     const socketId = await this.redisService.get(
-      createMessageDto.receiverId.toString(),
+      `user-${createMessageDto.receiverId}`,
     );
 
     if (socketId) {
