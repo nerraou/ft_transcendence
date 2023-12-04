@@ -41,7 +41,7 @@ function callModal(
   isSuccess: boolean,
 ) {
   if (isError) {
-    if (error?.response.status == 409) {
+    if (error?.response?.status == 409) {
       return <Modal title="Error" description="Email already exists!" />;
     } else {
       return <Modal title="Error" description="Something went wrong!" />;
