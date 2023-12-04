@@ -5,10 +5,10 @@ import * as yup from "yup";
 import { FormInput } from "./SignUp";
 
 const userSchema = yup.object({
-  email: yup.string().email().required(),
+  email: yup.string().email("Try a valid email").required("Email is required"),
   password: yup
     .string()
-    .required()
+    .required("Password is required")
     .matches(
       /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8,}$/,
       "Password required (numbers ,uppercase ,lowercase), at least 8 characters long",
