@@ -142,7 +142,7 @@ function SignUpForm() {
         </Link>
       </label>
       <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
-        <Button text="Sign Up" disabled={isPending} />
+        <Button text="Sign Up" disabled={isPending} loading={isPending} />
         <ButtonOAuth />
       </div>
     </form>
