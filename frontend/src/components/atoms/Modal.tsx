@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, Fragment } from "react";
+import { ReactNode, useState, Fragment, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 interface ModalProps {
@@ -11,12 +11,14 @@ interface ModalProps {
 
 function Modal(props: ModalProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const completeDevRef = useRef(null);
 
   return (
     <>
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
           as="div"
+          initialFocus={completeDevRef}
           className="relative z-10"
           onClose={() => setIsOpen(false)}
         >
@@ -43,18 +45,17 @@ function Modal(props: ModalProps) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-max  p-10 rounded-md bg-light-bg-tertiary border-solid border-2 border-light-fg-primary">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-xl text-light-fg-primary leading-6"
-                  >
+                <Dialog.Panel className="flex flex-col items-center justify-center w-full max-w-max p-10 rounded-md bg-light-bg-tertiary border-solid border-2 border-light-fg-primary">
+                  <Dialog.Title className="text-xl text-light-fg-primary leading-6">
                     {props.title}
                   </Dialog.Title>
                   <Dialog.Description className="text-lg text-light-fg-link mt-4">
                     <p>{props.description}</p>
                   </Dialog.Description>
 
-                  <div className="mt-5">{props.action}</div>
+                  <div className="mt-5" ref={completeDevRef}>
+                    {props.action}
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

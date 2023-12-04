@@ -1,7 +1,13 @@
 function Loading() {
   return (
-    <svg width="50" height="50" viewBox="0 0 61 61" fill="none">
-      <g clip-path="url(#clip0_2136_4115)">
+    <svg
+      width="40"
+      height="40"
+      viewBox="0 0 61 61"
+      fill="none"
+      className="animate-spin"
+    >
+      <g clipPath="url(#clip0_2136_4115)">
         <path
           opacity="0.2"
           fillRule="evenodd"
