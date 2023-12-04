@@ -43,7 +43,7 @@ function Modal(props: ModalProps) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-80 h-40 p-10 rounded-md bg-light-bg-tertiary border-solid border-2 border-light-fg-primary">
+                <Dialog.Panel className="w-full max-w-max  p-10 rounded-md bg-light-bg-tertiary border-solid border-2 border-light-fg-primary">
                   <Dialog.Title
                     as="h3"
                     className="text-xl text-light-fg-primary leading-6"
@@ -54,7 +54,7 @@ function Modal(props: ModalProps) {
                     <p>{props.description}</p>
                   </Dialog.Description>
 
-                  <div>{props.action}</div>
+                  <div className="mt-5">{props.action}</div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

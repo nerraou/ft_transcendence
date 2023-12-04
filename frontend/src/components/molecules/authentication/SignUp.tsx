@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { ErrorMessage } from "@hookform/error-message";
+import clsx from "clsx";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
@@ -15,10 +16,23 @@ import useSignUpForm from "./useSignUpForm";
 import useSignUpMutation from "./useSignUpMutation";
 import { RequestError } from "@utils/baseQuery";
 import Modal from "@components/atoms/Modal";
+import Link from "next/link";
 
 export interface FormInput {
   email: string;
   password: string;
+}
+
+function SingInRedirect() {
+  const router = useRouter();
+  return (
+    <Button
+      text="Sign In"
+      onClick={() => {
+        router.push("/sign-in");
+      }}
+    />
+  );
 }
 
 function callModal(
@@ -34,14 +48,18 @@ function callModal(
     }
   } else if (isSuccess) {
     return (
-      <Modal title="Success" description="Sign up completed successfully!" />
+      <Modal
+        title="Success"
+        description="Sign up completed successfully!"
+        action={<SingInRedirect />}
+      />
     );
   }
 }
 
 function SignUpForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
-  const { register, handleSubmit, formState } = useSignUpForm();
+  const { register, handleSubmit, formState, getFieldState } = useSignUpForm();
 
   const { mutate, isPending, isError, isSuccess, error } = useSignUpMutation();
   const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
@@ -54,6 +72,9 @@ function SignUpForm() {
     }
   }
 
+  const email = getFieldState("email");
+  const password = getFieldState("password");
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -63,7 +84,13 @@ function SignUpForm() {
       <div className="space-y-4">
         <div>
           <InputText
-            borderColor="border-light-fg-primary dark:border-dark-fg-primary"
+            borderColor={clsx(
+              {
+                "border-light-fg-secondary": isError || email.invalid,
+              },
+              { "border-light-fg-primary": isSuccess || !email.invalid },
+              "dark:border-dark-fg-primary",
+            )}
             placeholder="Email"
             height="large"
             width="w-80 sm:w-64"
@@ -81,7 +108,13 @@ function SignUpForm() {
           <InputPassword
             height="large"
             width="w-80 sm:w-64"
-            borderColor="border-light-fg-primary dark:border-dark-fg-primary"
+            borderColor={clsx(
+              {
+                "border-light-fg-secondary": isError || password.invalid,
+              },
+              { "border-light-fg-primary": isSuccess || !password.invalid },
+              "dark:border-dark-fg-primary",
+            )}
             iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
             placeholder="Password"
             onPasswordVisibilityChange={changePasswordVisibility}

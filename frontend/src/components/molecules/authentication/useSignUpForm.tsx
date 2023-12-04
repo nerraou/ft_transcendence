@@ -17,6 +17,7 @@ const userSchema = yup.object({
 
 function useSignUpForm() {
   return useForm<FormInput>({
+    defaultValues: { email: "", password: "" },
     resolver: yupResolver(userSchema),
   });
 }
