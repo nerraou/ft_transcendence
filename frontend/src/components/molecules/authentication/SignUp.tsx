@@ -1,39 +1,136 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { SubmitHandler } from "react-hook-form";
+import { useState } from "react";
+import { ErrorMessage } from "@hookform/error-message";
+import clsx from "clsx";
+
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
-import Link from "next/link";
-import ButtonOAuth from "./ButtonOAuth";
 import Button from "@atoms/Button";
 
-function SignUpForm() {
-  function handlerInput() {
-    return;
-  }
-  function handlePassword() {
-    return;
-  }
+import ButtonOAuth from "./ButtonOAuth";
+import useSignUpForm from "./useSignUpForm";
+import useSignUpMutation from "./useSignUpMutation";
+import { RequestError } from "@utils/baseQuery";
+import Modal from "@components/atoms/Modal";
+import Link from "next/link";
+
+export interface FormInput {
+  email: string;
+  password: string;
+}
+
+function SingInRedirect() {
+  const router = useRouter();
   return (
-    <form className="m-6 flex flex-col w-full items-center">
-      <div className="grid grid-rows-2 gap-4">
-        <InputText
-          borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          placeholder="Email"
-          height="large"
-          width="w-80 sm:w-64"
-          value="noha@gmail.com"
-          onChange={handlerInput}
-        />
-        <InputPassword
-          height="large"
-          width="w-80 sm:w-64"
-          borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
-          placeholder="Password"
-          value="1234"
-          onChange={handlePassword}
-        />
+    <Button
+      text="Sign In"
+      onClick={() => {
+        router.push("/sign-in");
+      }}
+    />
+  );
+}
+
+function callModal(
+  isError: boolean,
+  error: RequestError | null,
+  isSuccess: boolean,
+) {
+  if (isError) {
+    if (error?.response?.status == 409) {
+      return <Modal title="Error" description="Email already exists!" />;
+    } else {
+      return <Modal title="Error" description="Something went wrong!" />;
+    }
+  } else if (isSuccess) {
+    return (
+      <Modal
+        title="Success"
+        description="Sign up completed successfully!"
+        action={<SingInRedirect />}
+      />
+    );
+  }
+}
+
+function SignUpForm() {
+  const [isPasswordVisible, setPasswordVisibility] = useState(false);
+  const { register, handleSubmit, formState, getFieldState } = useSignUpForm();
+
+  const { mutate, isPending, isError, isSuccess, error } = useSignUpMutation();
+  const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
+
+  function changePasswordVisibility() {
+    if (isPasswordVisible == false) {
+      setPasswordVisibility(true);
+    } else {
+      setPasswordVisibility(false);
+    }
+  }
+
+  const email = getFieldState("email");
+  const password = getFieldState("password");
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="m-6 flex flex-col w-full items-center"
+    >
+      {callModal(isError, error, isSuccess)}
+      <div className="space-y-4">
+        <div>
+          <InputText
+            borderColor={clsx(
+              {
+                "border-light-fg-secondary": isError || email.invalid,
+              },
+              { "border-light-fg-primary": isSuccess || !email.invalid },
+              "dark:border-dark-fg-primary",
+            )}
+            placeholder="Email"
+            height="large"
+            width="w-80 sm:w-64"
+            {...register("email")}
+          />
+          <ErrorMessage
+            errors={formState.errors}
+            name="email"
+            render={({ message }) => (
+              <p className="text-light-fg-secondary">{message}</p>
+            )}
+          />
+        </div>
+        <div>
+          <InputPassword
+            height="large"
+            width="w-80 sm:w-64"
+            borderColor={clsx(
+              {
+                "border-light-fg-secondary": isError || password.invalid,
+              },
+              { "border-light-fg-primary": isSuccess || !password.invalid },
+              "dark:border-dark-fg-primary",
+            )}
+            iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
+            placeholder="Password"
+            onPasswordVisibilityChange={changePasswordVisibility}
+            isPasswordVisible={isPasswordVisible}
+            {...register("password")}
+          />
+          <ErrorMessage
+            errors={formState.errors}
+            name="password"
+            render={({ message }) => (
+              <div className="text-light-fg-secondary w-80 sm:w-64">
+                {message}
+              </div>
+            )}
+          />
+        </div>
       </div>
       <label className="text-xl sm:text-base text-light-fg-tertiary m-6">
         Already a ponger?{" "}
@@ -45,7 +142,7 @@ function SignUpForm() {
         </Link>
       </label>
       <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
-        <Button text="Sign Up" />
+        <Button text="Sign Up" disabled={isPending} loading={isPending} />
         <ButtonOAuth />
       </div>
     </form>

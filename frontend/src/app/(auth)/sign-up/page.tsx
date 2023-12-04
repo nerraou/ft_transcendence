@@ -1,9 +1,9 @@
-import ButtonPlay from "@components/atoms/ButtonPlay";
-import Bar from "@components/atoms/decoration/Bar";
-import ButtonBA from "@components/atoms/decoration/ButtonsBA";
-import ButtonStartSelect from "@components/atoms/decoration/ButtonsStartSelect";
-import SignUp from "@components/molecules/authentication/SignUp";
-import LayoutAuth from "@components/templates/LayoutAuth";
+import ButtonPlay from "@atoms/ButtonPlay";
+import Bar from "@atoms/decoration/Bar";
+import ButtonBA from "@atoms/decoration/ButtonsBA";
+import ButtonStartSelect from "@atoms/decoration/ButtonsStartSelect";
+import SignUp from "@molecules/authentication/SignUp";
+import LayoutAuth from "@templates/LayoutAuth";
 
 function SignUpPage() {
   return (

@@ -1,13 +1,25 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
-import Link from "next/link";
-import ButtonOAuth from "./ButtonOAuth";
 import Button from "@atoms/Button";
 
+import ButtonOAuth from "./ButtonOAuth";
+
 function SignInForm() {
+  const [isPasswordVisible, setPasswordVisibility] = useState(false);
+
+  function changePasswordVisibility() {
+    if (isPasswordVisible == false) {
+      setPasswordVisibility(true);
+    } else {
+      setPasswordVisibility(false);
+    }
+  }
   function handlerInput() {
     return;
   }
@@ -16,7 +28,7 @@ function SignInForm() {
   }
   return (
     <form className="m-6 flex flex-col items-center w-full">
-      <div className="grid grid-rows-2 gap-4">
+      <div className="space-y-4">
         <InputText
           borderColor="border-light-fg-primary dark:border-dark-fg-primary"
           placeholder="Email"
@@ -33,6 +45,8 @@ function SignInForm() {
           placeholder="Password"
           value="1234"
           onChange={handlePassword}
+          isPasswordVisible={isPasswordVisible}
+          onPasswordVisibilityChange={changePasswordVisibility}
         />
       </div>
       <label className="text-xl sm:text-base text-light-fg-tertiary m-6">

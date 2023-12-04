@@ -1,3 +1,4 @@
+import ReactQueryProvider from "@providers/ReactQueryProvider";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Electrolize } from "next/font/google";
@@ -20,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={electrolize.className}>
-      <body>{children}</body>
+      <body>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+      </body>
     </html>
   );
 }
