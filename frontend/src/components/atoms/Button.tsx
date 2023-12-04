@@ -1,5 +1,6 @@
 import { MouseEvent } from "react";
 import clsx from "clsx";
+import Loading from "./icons/outline/Loading";
 
 interface ButtonProps {
   text: string;
@@ -13,13 +14,12 @@ function Button(props: ButtonProps) {
       disabled={props.disabled}
       onClick={props.onClick}
       className={clsx(
-        " border-light-fg-primary ",
-        "dark:border-dark-fg-primary border rounded-full w-52 h-14 text-light-bg-tertiary text-base",
-        { "bg-light-bg-secondary": props.disabled },
-        { "bg-light-fg-link": !props.disabled },
+        " border-light-fg-primary flex justify-center items-center",
+        "dark:border-dark-fg-primary bg-light-fg-link border",
+        "rounded-full w-52 h-14 text-light-bg-tertiary text-base",
       )}
     >
-      {props.text}
+      {props.disabled ? <Loading /> : props.text}
     </button>
   );
 }
