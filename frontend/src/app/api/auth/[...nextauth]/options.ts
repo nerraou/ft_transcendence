@@ -1,5 +1,5 @@
+import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -10,15 +10,16 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/sign-in";
 
-        const user = await fetch(url, {
+        const res = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(credentials),
         });
-        if (user.status == 200) {
+        if (res.status == 200) {
           // Any object returned will be saved in `user` property of the JWT
+          const user = await res.json();
           return user;
         } else {
           // If you return null then an error will be displayed advising the user to check their details.
@@ -29,7 +30,27 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-
+  callbacks: {
+    async jwt({ token, user }) {
+      // Persist the OAuth access_token to the token right after signin
+      if (user) {
+        return {
+          ...token,
+          accessToken: user.accessToken,
+        };
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Send properties to the client, like an access_token from a provider.
+      return {
+        ...session,
+        user: {
+          accessToken: token.accessToken,
+        },
+      };
+    },
+  },
   pages: {
     signIn: "/sign-in",
   },
