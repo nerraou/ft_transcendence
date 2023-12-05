@@ -2,16 +2,72 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ErrorMessage } from "@hookform/error-message";
+import { SubmitHandler } from "react-hook-form";
+import { signIn } from "next-auth/react";
+import clsx from "clsx";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
 import Button from "@atoms/Button";
+// import Modal from "@components/atoms/Modal";
 
 import ButtonOAuth from "./ButtonOAuth";
+import useSignInForm from "./useSignInForm";
+import { useRouter } from "next/navigation";
+
+export interface FormInput {
+  email: string;
+  password: string;
+}
+
+// function callModal(
+//   isError: boolean,
+//   error: RequestError | null,
+//   isSuccess: boolean,
+// ) {
+//   if (isError) {
+//     if (error?.response?.status == 401) {
+//       return (
+//         <Modal
+//           title="Error"
+//           description="The Email/password combination is not valid"
+//         />
+//       );
+//     } else {
+//       return <Modal title="Error" description="Something went wrong!" />;
+//     }
+//   } else if (isSuccess) {
+//     return (
+//       <Modal title="Success" description="Sign up completed successfully!" />
+//     );
+//   }
+// }
 
 function SignInForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
+  const { register, formState, getFieldState, handleSubmit } = useSignInForm();
+  const router = useRouter();
+
+  const onSubmit: SubmitHandler<FormInput> = async (data) => {
+    console.log(data);
+
+    try {
+      const res = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+      if (res?.error) {
+        console.log("Error");
+        return;
+      }
+      router.replace("/profile");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   function changePasswordVisibility() {
     if (isPasswordVisible == false) {
@@ -20,34 +76,66 @@ function SignInForm() {
       setPasswordVisibility(false);
     }
   }
-  function handlerInput() {
-    return;
-  }
-  function handlePassword() {
-    return;
-  }
+
+  const email = getFieldState("email");
+  const password = getFieldState("password");
+
   return (
-    <form className="m-6 flex flex-col items-center w-full">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="m-6 flex flex-col items-center w-full"
+    >
       <div className="space-y-4">
-        <InputText
-          borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          placeholder="Email"
-          height="large"
-          width="w-80 sm:w-64"
-          value="noha@gmail.com"
-          onChange={handlerInput}
-        />
-        <InputPassword
-          height="large"
-          width="w-80 sm:w-64"
-          borderColor="border-light-fg-primary dark:border-dark-fg-primary"
-          iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
-          placeholder="Password"
-          value="1234"
-          onChange={handlePassword}
-          isPasswordVisible={isPasswordVisible}
-          onPasswordVisibilityChange={changePasswordVisibility}
-        />
+        <div>
+          <InputText
+            borderColor={clsx(
+              {
+                "border-light-fg-secondary": email.invalid,
+              },
+              { "border-light-fg-primary": !email.invalid },
+              "dark:border-dark-fg-primary",
+            )}
+            placeholder="Email"
+            height="large"
+            width="w-80 sm:w-64"
+            {...register("email")}
+          />
+          <ErrorMessage
+            errors={formState.errors}
+            name="email"
+            render={({ message }) => (
+              <p className="text-light-fg-secondary">{message}</p>
+            )}
+          />
+        </div>
+
+        <div>
+          <InputPassword
+            height="large"
+            width="w-80 sm:w-64"
+            borderColor={clsx(
+              {
+                "border-light-fg-secondary": password.invalid,
+              },
+              { "border-light-fg-primary": !password.invalid },
+              "dark:border-dark-fg-primary",
+            )}
+            iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
+            placeholder="Password"
+            {...register("password")}
+            isPasswordVisible={isPasswordVisible}
+            onPasswordVisibilityChange={changePasswordVisibility}
+          />
+          <ErrorMessage
+            errors={formState.errors}
+            name="password"
+            render={({ message }) => (
+              <div className="text-light-fg-secondary w-80 sm:w-64">
+                {message}
+              </div>
+            )}
+          />
+        </div>
       </div>
       <label className="text-xl sm:text-base text-light-fg-tertiary m-6">
         You don’t have an account?{" "}
@@ -66,7 +154,7 @@ function SignInForm() {
   );
 }
 
-function SignIn() {
+function SignInComponent() {
   return (
     <div className="box-border rounded-xl border-4 border-light-fg-primary dark:border-dark-fg-primary bg-light-fg-link shadow-light-xl dark:shadow-light-xl sm:no-tailwind dark:sm:shadow-none">
       <Bar reverse width="w-2/3" margin="my-11 mx-28 sm:mx-0" />
@@ -82,4 +170,4 @@ function SignIn() {
     </div>
   );
 }
-export default SignIn;
+export default SignInComponent;
