@@ -4,14 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { ErrorMessage } from "@hookform/error-message";
 import { SubmitHandler } from "react-hook-form";
-import { signIn } from "next-auth/react";
+import { SignInResponse, signIn } from "next-auth/react";
 import clsx from "clsx";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
 import Button from "@atoms/Button";
-// import Modal from "@components/atoms/Modal";
+import Modal from "@atoms/Modal";
 
 import ButtonOAuth from "./ButtonOAuth";
 import useSignInForm from "./useSignInForm";
@@ -22,50 +22,66 @@ export interface FormInput {
   password: string;
 }
 
-// function callModal(
-//   isError: boolean,
-//   error: RequestError | null,
-//   isSuccess: boolean,
-// ) {
-//   if (isError) {
-//     if (error?.response?.status == 401) {
-//       return (
-//         <Modal
-//           title="Error"
-//           description="The Email/password combination is not valid"
-//         />
-//       );
-//     } else {
-//       return <Modal title="Error" description="Something went wrong!" />;
-//     }
-//   } else if (isSuccess) {
-//     return (
-//       <Modal title="Success" description="Sign up completed successfully!" />
-//     );
-//   }
-// }
+interface redirectProps {
+  path: string;
+  text: string;
+}
+
+function Redirect(props: redirectProps) {
+  const router = useRouter();
+  return (
+    <Button
+      text={props.text}
+      onClick={() => {
+        router.replace(props.path);
+      }}
+    />
+  );
+}
+
+function callModal(res: SignInResponse | undefined) {
+  if (res?.error) {
+    if (res?.status == 401) {
+      return (
+        <Modal
+          title="Error"
+          description="The Email/password combination is not valid"
+          action={<Redirect path="sign-up" text="reate acount" />}
+        />
+      );
+    } else {
+      return <Modal title="Error" description="Something went wrong!" />;
+    }
+  } else if (res?.ok) {
+    return (
+      <Modal
+        title="Welcom to BongBoy"
+        description="Complet your acount from here"
+        action={<Redirect path="profile/settings" text="Settings" />}
+      />
+    );
+  }
+}
 
 function SignInForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { register, formState, getFieldState, handleSubmit } = useSignInForm();
-  const router = useRouter();
+  const [isLoading, setLoading] = useState(false);
+  const [res, setRes] = useState<undefined | SignInResponse>();
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
-    console.log(data);
-
     try {
-      const res = await signIn("credentials", {
+      setLoading(true);
+      setRes(undefined);
+      const response = await signIn("credentials", {
         email: data.email,
         password: data.password,
         redirect: false,
       });
-      if (res?.error) {
-        console.log("Error");
-        return;
-      }
-      router.replace("/profile");
+      setRes(response);
+      setLoading(false);
     } catch (error) {
-      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -85,6 +101,8 @@ function SignInForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col items-center w-full"
     >
+      {callModal(res)}
+
       <div className="space-y-4">
         <div>
           <InputText
@@ -147,7 +165,7 @@ function SignInForm() {
         </Link>
       </label>
       <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
-        <Button text="Sign In" />
+        <Button text="Sign In" disabled={isLoading} loading={isLoading} />
         <ButtonOAuth />
       </div>
     </form>

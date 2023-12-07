@@ -18,21 +18,16 @@ export const authOptions: NextAuthOptions = {
           body: JSON.stringify(credentials),
         });
         if (res.status == 200) {
-          // Any object returned will be saved in `user` property of the JWT
           const user = await res.json();
           return user;
         } else {
-          // If you return null then an error will be displayed advising the user to check their details.
           return null;
-
-          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
         }
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // Persist the OAuth access_token to the token right after signin
       if (user) {
         return {
           ...token,
@@ -42,7 +37,6 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // Send properties to the client, like an access_token from a provider.
       return {
         ...session,
         user: {
