@@ -135,7 +135,7 @@ function SignUpForm() {
       <label className="text-xl sm:text-base text-light-fg-tertiary m-6">
         Already a ponger?{" "}
         <Link
-          href="/sign-up"
+          href="/sign-in"
           className="text-light-fg-primary dark:text-dark-fg-primary"
         >
           Sign In

@@ -46,7 +46,7 @@ function callModal(res: SignInResponse | undefined) {
         <Modal
           title="Error"
           description="The Email/password combination is not valid"
-          action={<Redirect path="sign-up" text="reate acount" />}
+          action={<Redirect path="sign-up" text="Create account" />}
         />
       );
     } else {
@@ -56,7 +56,7 @@ function callModal(res: SignInResponse | undefined) {
     return (
       <Modal
         title="Welcom to BongBoy"
-        description="Complet your acount from here"
+        description="Complete your acount from here"
         action={<Redirect path="profile/settings" text="Settings" />}
       />
     );
@@ -109,8 +109,8 @@ function SignInForm() {
             borderColor={clsx(
               {
                 "border-light-fg-secondary": email.invalid,
+                "border-light-fg-primary": !email.invalid,
               },
-              { "border-light-fg-primary": !email.invalid },
               "dark:border-dark-fg-primary",
             )}
             placeholder="Email"
