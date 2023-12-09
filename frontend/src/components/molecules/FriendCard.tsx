@@ -10,7 +10,7 @@ import User from "@atoms/UserCard";
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-export type UserStatus = "online" | "offline" | "in-game";
+export type UserStatus = "ONLINE" | "OFFLINE" | "IN_GAME";
 
 interface FriendCardProps {
   fullname: string;
@@ -70,7 +70,7 @@ function FriendCardActions(props: FriendCardActionsProps) {
         color="stroke-light-fg-link"
         hover="hover:bg-light-fg-tertiary"
         round="rounded-sm"
-        animated={props.status == "online"}
+        animated={props.status == "ONLINE"}
       />
       <Email
         color="stroke-light-fg-link"

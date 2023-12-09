@@ -1,4 +1,4 @@
-import { UserStatus } from "@molecules/profile/UserHeader";
+import { UserStatus } from "@components/molecules/FriendCard";
 
 interface StatusProps {
   status?: UserStatus;
@@ -33,16 +33,16 @@ function InGameStatus() {
 function Status(props: StatusProps) {
   let color = "fill-light-fg-primary";
 
-  if (props.status == "offline") {
+  if (props.status == "OFFLINE") {
     color = "fill-light-fg-secondary";
-  } else if (props.status == "online") {
+  } else if (props.status == "ONLINE") {
     color = "fill-light-bg-primary";
   }
 
   return (
     <>
-      {props.status != "in-game" && <Sign color={color} />}
-      {props.status == "in-game" && <InGameStatus />}
+      {props.status != "IN_GAME" && <Sign color={color} />}
+      {props.status == "IN_GAME" && <InGameStatus />}
     </>
   );
 }
