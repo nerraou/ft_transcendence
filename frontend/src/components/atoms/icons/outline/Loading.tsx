@@ -1,11 +1,17 @@
-function Loading() {
+import clsx from "clsx";
+
+interface LoadingProps {
+  width?: string;
+  height?: string;
+}
+function Loading(props: LoadingProps) {
+  const { width = "w-10", height = "h-10" } = props;
+
   return (
     <svg
-      width="40"
-      height="40"
       viewBox="0 0 61 61"
       fill="none"
-      className="animate-spin"
+      className={clsx("animate-spin", width, height)}
     >
       <g clipPath="url(#clip0_2136_4115)">
         <path
