@@ -11,8 +11,9 @@ const electrolize = Electrolize({
 });
 
 export const metadata: Metadata = {
-  title: "Home",
-  description: "home",
+  title: "PongBoy",
+  description: "PongBoy",
+  icons: "/icon.svg",
 };
 
 export default function RootLayout({
