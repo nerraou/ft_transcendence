@@ -30,9 +30,12 @@ interface FriendProps {
   contacts: Friend[];
   nextPage: number;
 }
+interface FriendsListProps {
+  token: string | unknown;
+}
 
 async function getFriends(page: number, token: string | unknown) {
-  const limit = 4;
+  const limit = 10;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
     `/contacts?limit=${limit}&page=${page}`;
@@ -46,10 +49,6 @@ async function getFriends(page: number, token: string | unknown) {
     nextPage = null;
   }
   return { ...response, nextPage: nextPage };
-}
-
-interface FriendsListProps {
-  token: string | unknown;
 }
 
 function FriendsList(props: FriendsListProps) {
@@ -125,12 +124,18 @@ function FriendsPage() {
   }
 
   if (sessionStatus === "loading") {
-    return <p>Loading</p>;
+    return (
+      <LoadingPage
+        bgColor=" bg-light-bg-tertiary dark:bg-dark-bg-primary"
+        width="w-screen"
+        height="h-screen"
+      />
+    );
   }
 
   return (
     <Layout>
-      <div className="flex flex-col justify-center py-16 sm:py-0 px-8 space-y-8">
+      <div className="flex flex-col justify-center py-16 sm:py-0 px-8 space-y-8 ">
         <div className="flex justify-end">
           <InputSearch
             value="Search"
