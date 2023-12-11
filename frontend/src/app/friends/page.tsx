@@ -7,20 +7,20 @@ import FriendCard from "@molecules/FriendCard";
 import Layout from "@templates/Layout";
 import { UserStatus } from "@molecules/FriendCard";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { Fragment, useEffect } from "react";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { Fragment, Suspense, useEffect } from "react";
 import Loading from "@components/atoms/icons/outline/Loading";
 import Modal from "@components/atoms/Modal";
-import baseQuery from "@utils/baseQuery";
 import Button from "@components/atoms/Button";
 import { redirect } from "next/navigation";
+import LoadingPage from "../loading";
 
 interface Friend {
-  id: number;
+  id?: number;
   username: string;
-  email: string;
+  email?: string;
   firstName: string;
-  lastName: string;
+  lastName?: string;
   avatarPath: string;
   status: UserStatus;
 }
@@ -32,12 +32,12 @@ interface FriendProps {
 }
 
 async function getFriends(page: number, token: string | unknown) {
-  const limit = 20;
+  const limit = 4;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
     `/contacts?limit=${limit}&page=${page}`;
 
-  const res = await baseQuery(url, {
+  const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
   let nextPage: number | null = page + 1;
@@ -48,21 +48,24 @@ async function getFriends(page: number, token: string | unknown) {
   return { ...response, nextPage: nextPage };
 }
 
-function FriendsPage() {
-  const { data: session, status: sessionStatus } = useSession();
+interface FriendsListProps {
+  token: string | unknown;
+}
+
+function FriendsList(props: FriendsListProps) {
   const { ref, inView } = useInView();
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
-  const { status, data, isFetchingNextPage, refetch, fetchNextPage } =
-    useInfiniteQuery<FriendProps>({
-      enabled: session?.user.accessToken ? true : false,
+  const { data, isError, isFetchingNextPage, refetch, fetchNextPage } =
+    useSuspenseInfiniteQuery<FriendProps>({
       queryKey: ["friend"],
       queryFn: ({ pageParam }) => {
-        return getFriends(pageParam as number, session?.user.accessToken);
+        return getFriends(pageParam as number, props.token);
       },
-
       initialPageParam: 1,
-      getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+      getNextPageParam: (_, pages) => {
+        return pages.length + 1;
+      },
     });
 
   useEffect(() => {
@@ -70,6 +73,52 @@ function FriendsPage() {
       fetchNextPage();
     }
   }, [fetchNextPage, inView]);
+
+  return (
+    <div className="flex flex-col justify-center">
+      <div className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-8  sm:px-8 ">
+        {data?.pages?.map((page, key) => {
+          return (
+            <Fragment key={key}>
+              {page.contacts?.map((value) => {
+                return (
+                  <FriendCard
+                    key={value.id}
+                    fullname={value.firstName + " " + value.lastName}
+                    image={imageUrl + value.avatarPath}
+                    username={value.username}
+                    userStatus={value.status}
+                    level={3}
+                  />
+                );
+              })}
+            </Fragment>
+          );
+        })}
+      </div>
+      <div className="inline-flex justify-center sm:mb-16 mt-8" ref={ref}>
+        {isFetchingNextPage ? <Loading width="w-16" height="w-16" /> : null}
+      </div>
+      {isError ? (
+        <Modal
+          title="Error"
+          description="Something went wrong"
+          action={
+            <Button
+              text="Retry"
+              onClick={() => {
+                refetch();
+              }}
+            />
+          }
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function FriendsPage() {
+  const { data: session, status: sessionStatus } = useSession();
 
   if (sessionStatus === "unauthenticated") {
     redirect("/sign-in");
@@ -96,43 +145,9 @@ function FriendsPage() {
             textColor=""
           />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-8  sm:px-8">
-          {data?.pages?.map((page, key) => {
-            return (
-              <Fragment key={key}>
-                {page.contacts?.map((value) => {
-                  return (
-                    <FriendCard
-                      key={value.id}
-                      fullname={value.firstName + " " + value.lastName}
-                      image={imageUrl + value.avatarPath}
-                      username={value.username}
-                      userStatus={value.status}
-                      level={3}
-                    />
-                  );
-                })}
-              </Fragment>
-            );
-          })}
-        </div>
-        <div className="inline-flex justify-center sm:mb-16" ref={ref}>
-          {isFetchingNextPage ? <Loading width="w-16" height="w-16" /> : null}
-        </div>
-        {status === "error" ? (
-          <Modal
-            title="Error"
-            description="Something went wrong"
-            action={
-              <Button
-                text="Retry"
-                onClick={() => {
-                  refetch();
-                }}
-              />
-            }
-          />
-        ) : null}
+        <Suspense fallback={<LoadingPage />}>
+          <FriendsList token={session?.user.accessToken} />
+        </Suspense>
       </div>
     </Layout>
   );
