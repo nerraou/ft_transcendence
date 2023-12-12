@@ -89,7 +89,9 @@ function Loading(props: LoadingProps) {
         />
       </svg>
 
-      <span className="text-xxl text-light-fg-link">LOADING...</span>
+      <span className="text-xxl text-light-fg-link dark:text-dark-bg-secondary">
+        LOADING...
+      </span>
     </div>
   );
 }

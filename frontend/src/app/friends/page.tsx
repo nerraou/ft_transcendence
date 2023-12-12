@@ -7,8 +7,14 @@ import FriendCard from "@molecules/FriendCard";
 import Layout from "@templates/Layout";
 import { UserStatus } from "@molecules/FriendCard";
 import { useInView } from "react-intersection-observer";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+
+import {
+  useSuspenseInfiniteQuery,
+  QueryErrorResetBoundary,
+} from "@tanstack/react-query";
 import { Fragment, Suspense, useEffect } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+
 import Loading from "@components/atoms/icons/outline/Loading";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
@@ -43,6 +49,11 @@ async function getFriends(page: number, token: string | unknown) {
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch friend");
+  }
+
   let nextPage: number | null = page + 1;
   const response = await res.json();
   if (response.count == 0) {
@@ -55,7 +66,7 @@ function FriendsList(props: FriendsListProps) {
   const { ref, inView } = useInView();
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
-  const { data, isError, isFetchingNextPage, refetch, fetchNextPage } =
+  const { data, isFetchingNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery<FriendProps>({
       queryKey: ["friend"],
       queryFn: ({ pageParam }) => {
@@ -98,20 +109,6 @@ function FriendsList(props: FriendsListProps) {
       <div className="inline-flex justify-center sm:mb-16 mt-8" ref={ref}>
         {isFetchingNextPage ? <Loading width="w-16" height="w-16" /> : null}
       </div>
-      {isError ? (
-        <Modal
-          title="Error"
-          description="Something went wrong"
-          action={
-            <Button
-              text="Retry"
-              onClick={() => {
-                refetch();
-              }}
-            />
-          }
-        />
-      ) : null}
     </div>
   );
 }
@@ -150,9 +147,32 @@ function FriendsPage() {
             textColor=""
           />
         </div>
-        <Suspense fallback={<LoadingPage />}>
-          <FriendsList token={session?.user.accessToken} />
-        </Suspense>
+
+        <QueryErrorResetBoundary>
+          {({ reset }) => (
+            <ErrorBoundary
+              onReset={reset}
+              fallbackRender={({ resetErrorBoundary }) => (
+                <Modal
+                  title="Error"
+                  description="Something went wrong"
+                  action={
+                    <Button
+                      text="Retry"
+                      onClick={() => {
+                        resetErrorBoundary();
+                      }}
+                    />
+                  }
+                />
+              )}
+            >
+              <Suspense fallback={<LoadingPage />}>
+                <FriendsList token={session?.user.accessToken} />
+              </Suspense>
+            </ErrorBoundary>
+          )}
+        </QueryErrorResetBoundary>
       </div>
     </Layout>
   );

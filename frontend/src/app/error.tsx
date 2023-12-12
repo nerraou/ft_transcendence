@@ -89,7 +89,7 @@ export default function Error({
         />
       </svg>
 
-      <span className="text-xxl text-light-fg-link">
+      <span className="text-xxl text-light-fg-link dark:text-dark-bg-secondary">
         Well this is not excpected
       </span>
     </div>
