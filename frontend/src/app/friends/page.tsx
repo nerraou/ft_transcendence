@@ -22,11 +22,11 @@ import { redirect } from "next/navigation";
 import LoadingPage from "../loading";
 
 interface Friend {
-  id?: number;
+  id: number;
   username: string;
-  email?: string;
+  email: string;
   firstName: string;
-  lastName?: string;
+  lastName: string;
   avatarPath: string;
   status: UserStatus;
 }
