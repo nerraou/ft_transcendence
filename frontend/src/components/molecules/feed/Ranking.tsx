@@ -8,7 +8,7 @@ import ThirdRanked from "@components/atoms/achievements/ThirdRanked";
 interface User {
   fullName: string;
   username: string;
-  image?: string;
+  image: string;
 }
 
 export interface RankingProps {
@@ -33,7 +33,7 @@ const Ranking = ({ users, onViewMore }: RankingProps) => {
   return (
     <div className="flex flex-col align-start w-full gap-8 p-8 rounded-lg border border-light-fg-link bg-light-bg-tertiary dark:bg-dark-fg-tertiary dark:border-dark-fg-primary">
       <div className="flex flex-row justify-between w-full">
-        <p className="text-light-fg-primary text-xl font-[400]">Top Players</p>
+        <p className="text-light-fg-primary text-xl">Top Players</p>
         <button
           className="flex flex-row items-center gap-2"
           onClick={() => onViewMore()}

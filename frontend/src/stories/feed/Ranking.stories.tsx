@@ -13,7 +13,7 @@ export default meta;
 type Story = StoryObj<typeof Ranking>;
 
 export const Default: Story = (args: RankingProps) => (
-  <div style={{ width: "400px" }}>
+  <div className="w-96">
     <Ranking {...args} />
   </div>
 );
@@ -23,14 +23,17 @@ Default.args = {
     {
       fullName: "Larbi El Hilali",
       username: "CE0",
+      image: "/default/user-circle.png",
     },
     {
       fullName: "Mahmoud zridi",
       username: "MrDrogon",
+      image: "/default/user-circle.png",
     },
     {
       fullName: "John Doe",
       username: "johndoe",
+      image: "/default/user-circle.png",
     },
   ],
   onViewMore: () => action("onViewMore"),

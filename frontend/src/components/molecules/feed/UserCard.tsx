@@ -20,20 +20,16 @@ const UserImage = (props: UserImageProps) => {
 interface UserCardProps {
   fullName: string;
   username: string;
-  image?: string;
+  image: string;
 }
 
 const UserCard = (props: UserCardProps) => {
-  const defaultImage = "/default/user-circle.png";
-
   return (
     <div className="flex gap-4 max-w-max bg-inherit">
-      <UserImage image={props.image ?? defaultImage} />
+      <UserImage image={props.image} />
       <div className="flex flex-col gap-2">
-        <label className="text-light-fg-link text-base font-[400]">
-          {props.fullName}
-        </label>
-        <label className="text-light-fg-link text-sm leading-none font-[400]">
+        <label className="text-light-fg-link text-base">{props.fullName}</label>
+        <label className="text-light-fg-link text-sm leading-none">
           {props.username}
         </label>
       </div>
