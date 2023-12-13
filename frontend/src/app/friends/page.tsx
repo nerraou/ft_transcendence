@@ -20,6 +20,7 @@ import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
 import { redirect } from "next/navigation";
 import LoadingPage from "../loading";
+import baseQuery from "@utils/baseQuery";
 
 interface Friend {
   id: number;
@@ -46,7 +47,7 @@ async function getFriends(page: number, token: string | unknown) {
     process.env.NEXT_PUBLIC_API_BASE_URL +
     `/contacts?limit=${limit}&page=${page}`;
 
-  const res = await fetch(url, {
+  const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -86,7 +87,7 @@ function FriendsList(props: FriendsListProps) {
 
   return (
     <div className="flex flex-col justify-center">
-      <div className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-8  sm:px-8 ">
+      <div className="grid grid-cols-2 md:grid-cols-1 sm:grid-cols-1 gap-8 sm:px-8 ">
         {data?.pages?.map((page, key) => {
           return (
             <Fragment key={key}>
@@ -132,7 +133,7 @@ function FriendsPage() {
 
   return (
     <Layout>
-      <div className="flex flex-col justify-center py-16 sm:py-0 px-8 space-y-8 ">
+      <div className="flex flex-col justify-center py-16 sm:py-0 px-8 space-y-8">
         <div className="flex justify-end">
           <InputSearch
             value="Search"

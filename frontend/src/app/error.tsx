@@ -20,7 +20,6 @@ export default function Error({
         height="190"
         viewBox="0 0 172 190"
         fill="none"
-        // className="animate-bounce"
         onClick={() => reset()}
       >
         <path
