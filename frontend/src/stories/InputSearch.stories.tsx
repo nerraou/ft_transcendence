@@ -4,7 +4,7 @@ import { Meta, StoryObj } from "@storybook/react";
 const meta: Meta<typeof InputSearch> = {
   title: "Input/InputSearch",
   component: InputSearch,
-  tags: ["autodcs"],
+  tags: ["autodocs"],
 };
 
 export default meta;

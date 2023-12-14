@@ -4,7 +4,7 @@ import { Meta, StoryObj } from "@storybook/react";
 const meta: Meta<typeof ChannelCard> = {
   title: "Components/atoms/channel/ChannelCard",
   component: ChannelCard,
-  tags: ["autodcs"],
+  tags: ["autodocs"],
 };
 
 export default meta;

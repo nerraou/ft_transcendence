@@ -5,7 +5,7 @@ import { action } from "@storybook/addon-actions";
 const meta: Meta<typeof Post> = {
   title: "Feed/Post",
   component: Post,
-  tags: ["autodcs"],
+  tags: ["autodocs"],
 };
 
 export default meta;
