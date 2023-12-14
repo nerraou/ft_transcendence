@@ -1,4 +1,5 @@
 import Bar from "@atoms/decoration/Bar";
+import EditImage from "@molecules/Settings/EditImage";
 import UserHeader from "@molecules/profile/UserHeader";
 import SettingsTabs from "@organisms/SettingsTabs";
 import Layout from "@templates/Layout";
@@ -13,10 +14,13 @@ function Settings() {
           isProfileOwner={false}
           isFriend
           level={2}
-          userStatus="in-game"
+          userStatus="IN_GAME"
           username="noface"
         />
         <Bar width="w-5/6" />
+        <div className="flex justify-center">
+          <EditImage image="/totoro.jpg" />
+        </div>
         <SettingsTabs />
       </div>
     </Layout>
