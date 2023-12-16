@@ -8,7 +8,7 @@ import InputText from "@components/atoms/InputText";
 
 interface TFAModalProps {
   isOpen: boolean;
-  OnClose: () => void;
+  onClose: () => void;
 }
 
 function TFAModal(props: TFAModalProps) {
@@ -29,7 +29,7 @@ function TFAModal(props: TFAModalProps) {
         as="div"
         initialFocus={completeDevRef}
         className="relative z-10"
-        onClose={props.OnClose}
+        onClose={props.onClose}
       >
         <Transition.Child
           as={Fragment}
