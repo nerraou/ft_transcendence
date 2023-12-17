@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Electrolize } from "next/font/google";
 import AuthSessionProvider from "@components/providers/SessionProvider";
+import { SocketProvider } from "@contexts/socket";
 
 const electrolize = Electrolize({
   weight: "400",
@@ -25,7 +26,9 @@ export default function RootLayout({
     <html lang="en" className={electrolize.className}>
       <body>
         <AuthSessionProvider>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <SocketProvider>
+            <ReactQueryProvider>{children}</ReactQueryProvider>
+          </SocketProvider>
         </AuthSessionProvider>
       </body>
     </html>

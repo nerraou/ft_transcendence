@@ -7,9 +7,7 @@ export class ImageService {
     const colors = [
       "#956362",
       "#FCF9E8",
-      "#FDEECD",
       "#E94635",
-      "#FDEECD",
       "#EF9935",
       "#7E2625",
       "#F4C127",

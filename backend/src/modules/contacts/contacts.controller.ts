@@ -127,16 +127,13 @@ export class ContactsController {
     @User("id") userId: number,
     @Query() query: GetContactsDto,
   ) {
-    const contactsCount = await this.contactsService.getUserContactsCount(
-      userId,
-      query.page,
-      query.limit,
-    );
     const contacts = await this.contactsService.getUserContacts(
       userId,
       query.page,
       query.limit,
     );
+
+    const contactsCount = contacts.length;
 
     if (contactsCount == 0) {
       return {

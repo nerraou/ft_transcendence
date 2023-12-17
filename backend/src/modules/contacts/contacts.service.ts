@@ -65,23 +65,6 @@ export class ContactsService {
     };
   }
 
-  getUserContactsCount(userId: number, page: number, limit: number) {
-    return this.prisma.contact.count({
-      where: {
-        OR: [
-          {
-            followerId: userId,
-          },
-          {
-            followingId: userId,
-          },
-        ],
-      },
-      skip: (page - 1) * page,
-      take: limit,
-    });
-  }
-
   getUserContacts(userId: number, page: number, limit: number) {
     const selectFields = {
       id: true,

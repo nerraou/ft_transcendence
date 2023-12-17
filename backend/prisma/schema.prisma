@@ -18,6 +18,7 @@ model User {
   lastName          String?    @map("last_name") @db.VarChar(64)
   password          String?    @map("password") @db.VarChar(72)
   avatarPath        String     @map("avatar_path") @db.VarChar(255)
+  rating            Int        @default(400) @map("rating")
   status            UserStatus @default(OFFLINE) @map("status")
   fortyTwoAccountId String?    @unique @map("forty_two_account_id") @db.VarChar(255)
   googleAccountId   String?    @unique @map("google_account_id") @db.VarChar(255)
@@ -31,6 +32,8 @@ model User {
   following  Contact[] @relation("follower")
   sent       Message[] @relation("sent")
   received   Message[] @relation("received")
+  player     Game[]    @relation("player")
+  opponent   Game[]    @relation("opponent")
 
   @@map("users")
 }
@@ -65,6 +68,29 @@ model Message {
   @@map("messages")
 }
 
+model Game {
+  id         Int        @id @default(autoincrement()) @map("id")
+  playerId   Int        @map("player_id")
+  opponentId Int        @map("opponent_id")
+  winner     GameWinner @map("winner")
+  duration   Int        @map("duration")
+
+  playerScore     Int @map("player_score")
+  playerOldRating Int @map("player_old_rating")
+  playerNewRating Int @map("player_new_rating")
+
+  opponentScore     Int      @map("opponent_score")
+  opponentOldRating Int      @map("opponent_old_rating")
+  opponentNewRating Int      @map("opponent_new_rating")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  player   User @relation("player", fields: [playerId], references: [id])
+  opponent User @relation("opponent", fields: [opponentId], references: [id])
+
+  @@map("games")
+}
+
 enum ContactStatus {
   ACCEPTED
   PENDING
@@ -74,4 +100,9 @@ enum UserStatus {
   OFFLINE
   ONLINE
   IN_GAME
+}
+
+enum GameWinner {
+  PLAYER
+  OPPONENT
 }
