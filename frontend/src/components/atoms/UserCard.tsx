@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Image from "next/image";
 
 interface UsernameProps {
@@ -13,6 +14,7 @@ interface UserProps {
   fullName: string;
   username: string;
   image: string;
+  background?: string;
 }
 
 function Username(props: UsernameProps) {
@@ -43,8 +45,14 @@ function UserImage(props: UserImageProps) {
 }
 
 function User(props: UserProps) {
+  const background = props.background ?? "bg-light-bg-tertiary";
   return (
-    <div className="flex sm:flex-col sm:items-center gap-4 sm:gap-1 sm:w-full bg-light-bg-tertiary">
+    <div
+      className={clsx(
+        "flex sm:flex-col sm:items-center gap-4 sm:gap-1 sm:w-full",
+        background,
+      )}
+    >
       <UserImage image={props.image} />
       <Username username={props.username} fullName={props.fullName} />
     </div>

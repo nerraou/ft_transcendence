@@ -18,7 +18,7 @@ function ProfilePage() {
           isProfileOwner={false}
           isFriend
           level={2}
-          userStatus="in-game"
+          userStatus="IN_GAME"
         />
         <Bar width="w-5/6" />
         <StatsBar wins={45} losses={55} matches={100} />
