@@ -32,8 +32,8 @@ const UserCard = ({ user }: UserCardProps) => {
 interface LikeSectionProps {
   count: number;
   liked: boolean;
-  onLike: (id: string) => void;
-  postId: string;
+  onLike: (id: number) => void;
+  postId: number;
 }
 
 const LikeSection = ({ count, liked, onLike, postId }: LikeSectionProps) => {
@@ -60,8 +60,8 @@ const LikeSection = ({ count, liked, onLike, postId }: LikeSectionProps) => {
   );
 };
 
-interface PostData {
-  id: string;
+export interface PostData {
+  id: number;
   user: User;
   content: string;
   image?: string;
@@ -70,7 +70,7 @@ interface PostData {
 
 interface PostProps {
   post: PostData;
-  onLike: (id: string) => void;
+  onLike: (id: number) => void;
   liked: boolean;
 }
 

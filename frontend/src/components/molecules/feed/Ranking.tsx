@@ -5,7 +5,7 @@ import FirstRanked from "@components/atoms/achievements/FirstRanked";
 import SecondRanked from "@components/atoms/achievements/SecondRanked";
 import ThirdRanked from "@components/atoms/achievements/ThirdRanked";
 
-interface User {
+export interface User {
   fullName: string;
   username: string;
   image: string;
@@ -33,7 +33,7 @@ const Ranking = ({ users, onViewMore }: RankingProps) => {
   return (
     <div className="flex flex-col align-start w-full gap-8 p-8 rounded-lg border border-light-fg-link bg-light-bg-tertiary dark:bg-dark-fg-tertiary dark:border-dark-fg-primary">
       <div className="flex flex-row justify-between w-full">
-        <p className="text-light-fg-primary text-xl">Top Players</p>
+        <p className="text-light-fg-primary text-xl lg:text-lg md:text-md sm:text-lg">Top Players</p>
         <button
           className="flex flex-row items-center gap-2"
           onClick={() => onViewMore()}

@@ -30,7 +30,7 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
   };
 
   return (
-    <div className="flex flex-col items-start justify-center gap-8 rounded-lg px-8 py-4 border-2 shadow-light-lg border-light-fg-link dark:border-dark-bg-primary4 bg-light-bg-tertiary dark:bg-dark-fg-primary">
+    <div className="flex flex-col items-start justify-center gap-8 rounded-lg px-8 py-4 border-2 shadow-light-lg border-light-fg-link dark:border-dark-bg-primary4 bg-light-bg-tertiary dark:bg-dark-fg-primary w-full">
       <div className="flex flex-row items-start justify-center gap-4 w-full">
         <Image
           src={avatar || "/default/user-circle.png"}
