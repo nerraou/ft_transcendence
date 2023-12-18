@@ -3,7 +3,7 @@ import { ChangeEvent } from "react";
 
 interface LabelInputPasswordProps {
   labelValue: string;
-  inputValue?: string;
+  value?: string;
   placeholder: string;
   error: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;

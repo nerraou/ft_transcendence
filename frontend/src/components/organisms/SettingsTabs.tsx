@@ -6,7 +6,16 @@ import FormEmail from "@molecules/Settings/FormEmail";
 import FormPassword from "@molecules/Settings/FormPassword";
 import clsx from "clsx";
 
-function SettingsTabs() {
+interface FormProps {
+  jwt: string | unknown;
+  username: string;
+  firstName: string;
+  lastName: string;
+  is2faEnabled: boolean;
+  email: string;
+}
+
+function SettingsTabs(props: FormProps) {
   const tabListStyle = clsx(
     "outline-none focus:bg-light-bg-tertiary rounded-xl lg:rounded-base md:rounded-base sm:rounded-base",
     "w-52 lg:w-60 md:w-60 sm:w-60 text-light-fg-primary hover:bg-light-fg-tertiary/[0.40]",
@@ -22,9 +31,15 @@ function SettingsTabs() {
           <Tab className={tabListStyle}>Email</Tab>
           <Tab className={tabListStyle}>Password</Tab>
         </Tab.List>
-        <Tab.Panels className="p-10 px-20 xl:p-5 lg:p-5 sm:p-5 lg:mb-6 md:p-5 md:mb-6 sm:mb-6 border-solid border-4 border-light-fg-primary dark:border-dark-fg-primary rounded-b-xl">
+        <Tab.Panels className="p-10 px-20 xl:p-5 lg:p-5 sm:p-5 xl:mb-8 lg:mb-6 md:p-5 md:mb-6 sm:mb-6 border-solid border-4 border-light-fg-primary dark:border-dark-fg-primary rounded-b-xl">
           <Tab.Panel>
-            <FormProfile />
+            <FormProfile
+              firstName={props.firstName}
+              lastName={props.lastName}
+              username={props.username}
+              is2faEnabled={props.is2faEnabled}
+              jwt={props.jwt}
+            />
           </Tab.Panel>
           <Tab.Panel>
             <FormEmail />

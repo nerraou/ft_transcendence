@@ -1,14 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import ButtonsSaveRestore from "./ButtonsSaveRestore";
-import Enable2FA from "./Enable2FA";
 import LabelInputText from "./LabelInputText";
+import Enable2FA from "./Enable2FA";
 import TFAModal from "./TFAModal";
 
-function FormProfile() {
-  const [enable2FA, setEnable2FA] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+import useProfileMutation from "./useProfileMutation";
+import { SubmitHandler } from "react-hook-form";
+import useProfileForm from "./useProfileForm";
+import clsx from "clsx";
 
+interface FormInputProfileProps {
+  jwt: string | unknown;
+  username: string;
+  firstName: string;
+  lastName: string;
+  is2faEnabled: boolean;
+}
+
+export interface FormInputProfile {
+  username: string;
+  firstName: string;
+  lastName: string;
+}
+
+function FormProfile(props: FormInputProfileProps) {
+  const [enable2FA, setEnable2FA] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { register, handleSubmit, formState, getFieldState, setError, reset } =
+    useProfileForm({
+      lastName: props.lastName,
+      firstName: props.firstName,
+      username: props.username,
+    });
+
+  const { mutate, isPending, isError, isSuccess, error } = useProfileMutation(
+    props.jwt,
+  );
+
+  useEffect(() => {
+    if (error?.response?.status === 409) {
+      setError("username", {
+        type: "custom",
+        message: "This username is already exist",
+      });
+    }
+  }, [isError, error, setError]);
+
+  const onSubmit: SubmitHandler<FormInputProfile> = (data) => mutate(data);
   const current2FA = false;
+
+  const username = getFieldState("username");
+  const firstName = getFieldState("firstName");
+  const lastName = getFieldState("lastName");
+
   function onChange(value: boolean) {
     if (!current2FA && value) {
       setIsOpen(true);
@@ -16,38 +62,67 @@ function FormProfile() {
     setEnable2FA(true);
   }
 
-  function onClick() {
-    setIsOpen(false);
+  function onClose() {
+    return setIsOpen(false);
   }
+
   return (
-    <form className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <LabelInputText
         labelValue="Username"
         placeholder="Username"
-        error={false}
-        onChange={() => {
-          return;
-        }}
+        borderColor={clsx(
+          {
+            "border-light-fg-secondary": isError || username.invalid,
+          },
+          { "border-light-fg-primary": isSuccess || !username.invalid },
+          "dark:border-dark-fg-primary",
+        )}
+        errors={formState.errors}
+        {...register("username")}
       />
+
       <LabelInputText
+        borderColor={clsx(
+          {
+            "border-light-fg-secondary": isError || firstName.invalid,
+          },
+          { "border-light-fg-primary": isSuccess || !firstName.invalid },
+          "dark:border-dark-fg-primary",
+        )}
         labelValue="First Name"
         placeholder="First Name"
-        error={false}
-        onChange={() => {
-          return;
-        }}
+        {...register("firstName")}
+        errors={formState.errors}
       />
+
       <LabelInputText
+        borderColor={clsx(
+          {
+            "border-light-fg-secondary": isError || lastName.invalid,
+          },
+          { "border-light-fg-primary": isSuccess || !lastName.invalid },
+          "dark:border-dark-fg-primary",
+        )}
         labelValue="Last Name"
         placeholder="Last Name"
-        error={false}
-        onChange={() => {
-          return;
+        {...register("lastName")}
+        errors={formState.errors}
+      />
+
+      <Enable2FA checked={enable2FA} onChange={onChange} />
+      <TFAModal isOpen={isOpen} onClose={onClose} />
+      <ButtonsSaveRestore
+        isSaveLoading={isPending}
+        isSavePenging={isPending}
+        onClick={() => {
+          reset({
+            username: props.username,
+            firstName: props.firstName,
+            lastName: props.lastName,
+          });
         }}
       />
-      <Enable2FA checked={enable2FA} onChange={onChange} />
-      <TFAModal isOpen={isOpen} onClose={onClick} />
-      <ButtonsSaveRestore />
     </form>
   );
 }
