@@ -12,7 +12,8 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { User as UserEntity } from "@prisma/client";
-import { writeFile } from "fs/promises";
+import { writeFile, unlink } from "fs/promises";
+import { v4 as uuid4 } from "uuid";
 
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
@@ -149,14 +150,24 @@ export class UsersController {
     @User() user: UserEntity,
     @UploadedFile(FileSizeValidationPipe) file: Express.Multer.File,
   ) {
-    const avatarPath = `${this.configService.get("imagesPath")}/${
+    const oldAvatarPath = `${this.configService.get("imagesPath")}/${
       user.avatarPath
     }`;
 
-    await writeFile(avatarPath, file.buffer);
+    const filename = uuid4() + ".png";
+    const newAvatarPath = `${this.configService.get("imagesPath")}/${filename}`;
+
+    await this.usersService.updateAvatarPath(user.id, filename);
+
+    await writeFile(newAvatarPath, file.buffer);
+
+    unlink(oldAvatarPath).catch((e) => {
+      console.error("can't delete old avatar", e.message);
+    });
 
     return {
       message: "success",
+      avatarPath: filename,
     };
   }
 }
