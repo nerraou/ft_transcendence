@@ -56,6 +56,7 @@ export class UsersController {
       is2faEnabled: user.is2faEnabled,
       isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
+      status: user.status,
     };
   }
 
