@@ -26,6 +26,7 @@ export function MeApiDocumentation() {
           avatarPath: "7e3b2ca3-cb75-4857-b0d4-66174f1b9a32.png",
           is2faEnabled: false,
           isEmailVerified: true,
+          status: "ONLINE | OFFLINE | IN_GAME",
           createdAt: 1692017290161,
         },
       },
