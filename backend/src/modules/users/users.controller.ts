@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
@@ -15,7 +16,6 @@ import { writeFile } from "fs/promises";
 
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
-import EmailExistsPipe from "@modules/auth/pipes/email-exists.pipe";
 
 import { HashService } from "@common/services/hash.service";
 
@@ -29,7 +29,6 @@ import {
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UsersService } from "./users.service";
-import UsernameExistsPipe from "./pipes/username-exists.pipe";
 import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { FileSizeValidationPipe } from "./pipes/file-size-validation.pipe";
@@ -65,8 +64,18 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateProfile(
     @User("id") userId: number,
-    @Body(UsernameExistsPipe) updateProfileDto: UpdateProfileDto,
+    @Body() updateProfileDto: UpdateProfileDto,
   ) {
+    if (updateProfileDto.username) {
+      const user = await this.usersService.findOneByUsername(
+        updateProfileDto.username,
+      );
+
+      if (user && user.id != userId) {
+        throw new ConflictException();
+      }
+    }
+
     await this.usersService.updateProfile(userId, updateProfileDto);
 
     return {
@@ -79,7 +88,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateEmail(
     @User() user: UserEntity,
-    @Body(EmailExistsPipe) updateEmailDto: UpdateEmailDto,
+    @Body() updateEmailDto: UpdateEmailDto,
   ) {
     const isPasswordsIdentical = await this.hashService.compare(
       updateEmailDto.password,
@@ -88,6 +97,14 @@ export class UsersController {
 
     if (!isPasswordsIdentical) {
       throw new ForbiddenException();
+    }
+
+    const otherUser = await this.usersService.findOneByEmail(
+      updateEmailDto.email,
+    );
+
+    if (otherUser && otherUser.id != user.id) {
+      throw new ConflictException();
     }
 
     await this.usersService.updateEmail(user.id, updateEmailDto.email);
