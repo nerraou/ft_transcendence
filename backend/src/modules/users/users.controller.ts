@@ -16,7 +16,6 @@ import { writeFile } from "fs/promises";
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import EmailExistsPipe from "@modules/auth/pipes/email-exists.pipe";
-
 import { HashService } from "@common/services/hash.service";
 
 import {
@@ -129,7 +128,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor("image"))
   async updateAvatar(
     @User() user: UserEntity,
-    @UploadedFile(FileSizeValidationPipe) file: Express.Multer.File,
+    @UploadedFile(new FileSizeValidationPipe())
+    file: Express.Multer.File,
   ) {
     const avatarPath = `${this.configService.get("imagesPath")}/${
       user.avatarPath
