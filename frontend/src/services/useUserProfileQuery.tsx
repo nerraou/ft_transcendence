@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
 
 async function getUserHeader(token: string | unknown) {
@@ -8,9 +8,10 @@ async function getUserHeader(token: string | unknown) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    cache: "no-cache",
   });
-
-  return await res.json();
+  const response = res.json();
+  return response;
 }
 
 export interface UserHeaderProps {
@@ -26,11 +27,10 @@ export interface UserHeaderProps {
 }
 
 export function useUserProfileQuery(token: string | unknown) {
-  return useQuery<UserHeaderProps>({
+  return useSuspenseQuery<UserHeaderProps>({
     queryKey: ["user"],
     queryFn: () => {
       return getUserHeader(token);
     },
-    enabled: !!token,
   });
 }

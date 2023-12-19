@@ -3,6 +3,9 @@
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { ErrorBoundary } from "react-error-boundary";
+
 import Bar from "@atoms/decoration/Bar";
 import EditImage from "@molecules/Settings/EditImage";
 import UserHeader from "@molecules/profile/UserHeader";
@@ -11,16 +14,50 @@ import Layout from "@templates/Layout";
 
 import LoadingPage from "../../loading";
 import { useUserProfileQuery } from "@services/useUserProfileQuery";
-import Loading from "../../loading";
+import { Fragment, Suspense } from "react";
+import Modal from "@components/atoms/Modal";
+import Button from "@components/atoms/Button";
 
-function Settings() {
-  const { data: session, status: sessionStatus } = useSession();
-  const token = session?.user.accessToken;
+interface SettingsProps {
+  token: string | unknown;
+}
+
+function Settings(props: SettingsProps) {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
-  const { data, status } = useUserProfileQuery(token);
-  console.log(data);
-  console.log(status);
+  const { data } = useUserProfileQuery(props.token);
+
+  return (
+    <Fragment>
+      <UserHeader
+        fullname={data.firstName + " " + data.lastName}
+        image={imageUrl + data.avatarPath}
+        isProfileOwner={true}
+        isFriend
+        level={2}
+        userStatus="ONLINE"
+        username={data?.username}
+      />
+
+      <Bar width="w-5/6" />
+      <div className="flex justify-center">
+        <EditImage image={imageUrl + data.avatarPath} />
+      </div>
+
+      <SettingsTabs
+        firstName={data.firstName}
+        lastName={data.lastName}
+        username={data.username}
+        is2faEnabled={data.is2faEnabled}
+        email={data.email}
+        jwt={props.token}
+      />
+    </Fragment>
+  );
+}
+
+export default function SettingsPage() {
+  const { data: session, status: sessionStatus } = useSession();
 
   if (sessionStatus === "unauthenticated") {
     redirect("/sign-in");
@@ -39,38 +76,32 @@ function Settings() {
   return (
     <Layout>
       <div className="flex flex-col p-8 space-y-16">
-        {status == "pending" && <Loading />}
-
-        {status == "success" && (
-          <UserHeader
-            fullname={data.firstName + " " + data.lastName}
-            image={imageUrl + data.avatarPath}
-            isProfileOwner={true}
-            isFriend
-            level={2}
-            userStatus="ONLINE"
-            username={data?.username}
-          />
-        )}
-        <Bar width="w-5/6" />
-        <div className="flex justify-center">
-          {status == "success" && (
-            <EditImage image={imageUrl + data.avatarPath} />
+        <QueryErrorResetBoundary>
+          {({ reset }) => (
+            <ErrorBoundary
+              onReset={reset}
+              fallbackRender={({ resetErrorBoundary }) => (
+                <Modal
+                  title="Error"
+                  description="Something went wrong"
+                  action={
+                    <Button
+                      text="Retry"
+                      onClick={() => {
+                        resetErrorBoundary();
+                      }}
+                    />
+                  }
+                />
+              )}
+            >
+              <Suspense fallback={<LoadingPage />}>
+                <Settings token={session?.user.accessToken} />
+              </Suspense>
+            </ErrorBoundary>
           )}
-        </div>
-        {status == "success" && (
-          <SettingsTabs
-            firstName={data.firstName}
-            lastName={data.lastName}
-            username={data.username}
-            is2faEnabled={data.is2faEnabled}
-            email={data.email}
-            jwt={session?.user.accessToken}
-          />
-        )}
+        </QueryErrorResetBoundary>
       </div>
     </Layout>
   );
 }
-
-export default Settings;

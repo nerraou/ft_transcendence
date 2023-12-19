@@ -1,7 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import baseQuery, { RequestError } from "@utils/baseQuery";
 
 import { FormInputProfile } from "./FormProfile";
-import baseQuery, { RequestError } from "@utils/baseQuery";
 
 async function profileForm(
   profileInput: FormInputProfile,
@@ -20,9 +20,13 @@ async function profileForm(
 }
 
 function useProfileMutation(token: string | unknown) {
+  const queryClient = useQueryClient();
   return useMutation<Response, RequestError, FormInputProfile>({
     mutationFn: (profileInput) => {
       return profileForm(profileInput, token);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 }
