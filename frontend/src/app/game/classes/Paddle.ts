@@ -16,12 +16,12 @@ export default class Paddle extends Base {
     this.height = height;
   }
 
-  draw() {
+  draw(color = "#fff") {
     if (!this.p5) {
       throw new UninitializedP5InstanceError();
     }
 
-    this.p5.fill(255);
+    this.p5.fill(color);
     this.p5.noStroke();
     this.p5.rect(this.position.x, this.position.y, this.width, this.height);
   }

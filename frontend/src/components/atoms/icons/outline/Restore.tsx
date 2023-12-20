@@ -1,14 +1,19 @@
+import clsx from "clsx";
 import { MouseEvent } from "react";
 
 interface RestoreProps {
+  width?: string;
+  height?: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Restore(props: RestoreProps) {
+  const { width = "w-5", height = "w-5" } = props;
+
   return (
     <svg
       onClick={props.onClick}
-      className="stroke-light-fg-tertiary"
+      className={clsx("stroke-light-fg-tertiary", width, height)}
       width="20"
       height="20"
       viewBox="0 0 24 24"

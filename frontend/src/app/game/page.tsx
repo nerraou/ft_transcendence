@@ -10,7 +10,6 @@ import { useSocket } from "@contexts/socket";
 
 import Game from "./Game";
 import { GameConfig } from "./hooks/useGame";
-import { Circle } from "@uiw/react-color";
 
 function useDecodeAccessToken(params: any) {
   const [payload, setPayload] = useState<any>();
@@ -30,7 +29,6 @@ function useDecodeAccessToken(params: any) {
 export default function Page() {
   const { data: session, status: sessionStatus } = useSession();
   const socketClient = useSocket();
-  const [hex, setHex] = useState("#fff");
 
   const [gameConfig, setGameConfig] = useState<GameConfig>();
   const [gameStatus, setGameStatus] = useState<"idle" | "pending" | "started">(
@@ -79,34 +77,6 @@ export default function Page() {
   if (gameStatus == "idle") {
     return (
       <div>
-        <Circle
-          style={{ width: "200px" }}
-          colors={[
-            "#f44336",
-            "#e91e63",
-            "#9c27b0",
-            "#673ab7",
-            "#3f51b5",
-            "#2196f3",
-            "#03a9f4",
-            "#00bcd4",
-            "#009688",
-            "#4caf50",
-            "#8bc34a",
-            "#cddc39",
-            "#ffeb3b",
-            "#ffc107",
-            "#ff9800",
-            "#ff5722",
-            "#795548",
-            "#607d8b",
-          ]}
-          color={hex}
-          onChange={(color) => {
-            setHex(color.hex);
-          }}
-        />
-
         <Button
           text="Start game"
           onClick={() => {
