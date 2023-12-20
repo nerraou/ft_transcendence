@@ -17,7 +17,6 @@ import { v4 as uuid4 } from "uuid";
 
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
-
 import { HashService } from "@common/services/hash.service";
 
 import {
@@ -148,7 +147,8 @@ export class UsersController {
   @UseInterceptors(FileInterceptor("image"))
   async updateAvatar(
     @User() user: UserEntity,
-    @UploadedFile(FileSizeValidationPipe) file: Express.Multer.File,
+    @UploadedFile(new FileSizeValidationPipe())
+    file: Express.Multer.File,
   ) {
     const oldAvatarPath = `${this.configService.get("imagesPath")}/${
       user.avatarPath

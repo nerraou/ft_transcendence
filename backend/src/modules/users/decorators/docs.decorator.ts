@@ -6,6 +6,7 @@ import {
   ApiConsumes,
   ApiForbiddenResponse,
   ApiOkResponse,
+  ApiPayloadTooLargeResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
@@ -197,6 +198,15 @@ export function UpdateAvatarApiDocumentation() {
       schema: {
         example: {
           message: "success",
+        },
+      },
+    }),
+    ApiPayloadTooLargeResponse({
+      description: "Payload Too Large",
+      schema: {
+        example: {
+          message: "Payload Too Large",
+          statusCode: 413,
         },
       },
     }),

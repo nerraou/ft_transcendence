@@ -11,6 +11,7 @@ import { AuthModule } from "@modules/auth/auth.module";
 import { EventsModule } from "@modules/events/events.module";
 import { ContactsModule } from "@modules/contacts/contacts.module";
 import { MessagesModule } from "@modules/messages/messages.module";
+import { PostsModule } from "@modules/posts/posts.module";
 
 import { AppController } from "./app.controller";
 
@@ -21,6 +22,7 @@ import { AppController } from "./app.controller";
     AuthModule,
     forwardRef(() => EventsModule),
     ContactsModule,
+    PostsModule,
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,
