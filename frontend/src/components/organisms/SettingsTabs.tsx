@@ -42,10 +42,10 @@ function SettingsTabs(props: FormProps) {
             />
           </Tab.Panel>
           <Tab.Panel>
-            <FormEmail />
+            <FormEmail jwt={props.jwt} email={props.email} />
           </Tab.Panel>
           <Tab.Panel>
-            <FormPassword />
+            <FormPassword jwt={props.jwt} />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>

@@ -1,21 +1,25 @@
 import InputPassword from "@atoms/InputPassword";
-import { ChangeEvent } from "react";
+import { ErrorMessage } from "@hookform/error-message";
+import { ChangeEvent, forwardRef } from "react";
+import { FieldErrors } from "react-hook-form";
+import { FormInputEmail } from "./FormEmail";
 
 interface LabelInputPasswordProps {
   labelValue: string;
   value?: string;
+  name?: string;
+  errors?: FieldErrors<FormInputEmail>;
   placeholder: string;
-  error: boolean;
+  borderColor: string;
+  isPasswordVisible: boolean;
+  onPasswordVisibilityChange?: () => void;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LabelInputPassword(props: LabelInputPasswordProps) {
-  let borderColor = "border-light-fg-primary dark:border-dark-fg-primary ";
-  let iconColor = "stroke-light-fg-primary dark:stroke-dark-fg-primary ";
-  if (props.error) {
-    borderColor = "border-dark-fg-secondary";
-    iconColor = "stroke-light-fg-secondary";
-  }
+const LabelInputPassword = forwardRef<
+  HTMLInputElement,
+  LabelInputPasswordProps
+>(function LabelInputPassword(props, ref) {
   return (
     <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
       <div className="w-40 md:w-60">
@@ -23,15 +27,28 @@ function LabelInputPassword(props: LabelInputPasswordProps) {
           {props.labelValue}
         </label>
       </div>
-      <InputPassword
-        iconColor={iconColor}
-        borderColor={borderColor}
-        placeholder={props.labelValue}
-        onChange={props.onChange}
-        width="w-96 sm:w-full"
-      />
+      <div className="border-solid border-light-fg-tertiary">
+        <InputPassword
+          ref={ref}
+          name={props.name}
+          iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
+          borderColor={props.borderColor}
+          placeholder={props.placeholder}
+          onChange={props.onChange}
+          onPasswordVisibilityChange={props.onPasswordVisibilityChange}
+          isPasswordVisible={props.isPasswordVisible}
+          width="w-96 sm:w-full"
+        />
+        <ErrorMessage
+          errors={props.errors}
+          name={props.name as any}
+          render={({ message }) => (
+            <p className="text-light-fg-secondary">{message}</p>
+          )}
+        />
+      </div>
     </div>
   );
-}
+});
 
 export default LabelInputPassword;
