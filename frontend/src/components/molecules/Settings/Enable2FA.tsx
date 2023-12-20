@@ -2,6 +2,7 @@ import ToggleSwitch from "@atoms/ToggleSwitch";
 
 interface Enable2FAProps {
   onChange: (value: boolean) => void;
+  checked: boolean;
 }
 
 function Enable2FA(props: Enable2FAProps) {
@@ -10,7 +11,7 @@ function Enable2FA(props: Enable2FAProps) {
       <label className="text-light-fg-primary dark:text-light-fg-tertiary">
         Enable 2FA
       </label>
-      <ToggleSwitch checked onChange={props.onChange} />
+      <ToggleSwitch checked={props.checked} onChange={props.onChange} />
     </div>
   );
 }

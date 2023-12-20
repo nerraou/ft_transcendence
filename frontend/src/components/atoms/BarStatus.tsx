@@ -1,5 +1,5 @@
 import Status from "@atoms/Status";
-import { UserStatus } from "@molecules/profile/UserHeader";
+import { UserStatus } from "@molecules/FriendCard";
 
 interface BarStatusProps {
   status?: UserStatus;
