@@ -17,7 +17,9 @@ export interface FormInputPassword {
 }
 
 function FormPassword(props: FormInputPsswordProps) {
-  const [isPasswordVisible, setPasswordVisibility] = useState(false);
+  const [isCurrentPasswordVisible, setCurrentPasswordVisibility] =
+    useState(false);
+  const [isNewPasswordVisible, setNewPasswordVisibility] = useState(false);
   const { register, handleSubmit, formState, getFieldState, setError } =
     usePasswordForm();
 
@@ -25,11 +27,19 @@ function FormPassword(props: FormInputPsswordProps) {
     props.jwt,
   );
 
-  function changePasswordVisibility() {
-    if (isPasswordVisible == false) {
-      setPasswordVisibility(true);
+  function changeCurrentPasswordVisibility() {
+    if (isCurrentPasswordVisible == false) {
+      setCurrentPasswordVisibility(true);
     } else {
-      setPasswordVisibility(false);
+      setCurrentPasswordVisibility(false);
+    }
+  }
+
+  function changeNewPasswordVisibility() {
+    if (isNewPasswordVisible == false) {
+      setNewPasswordVisibility(true);
+    } else {
+      setNewPasswordVisibility(false);
     }
   }
 
@@ -59,14 +69,14 @@ function FormPassword(props: FormInputPsswordProps) {
           { "border-light-fg-primary": isSuccess || !currentPassword.invalid },
           "dark:border-dark-fg-primary",
         )}
-        onPasswordVisibilityChange={changePasswordVisibility}
-        isPasswordVisible={isPasswordVisible}
+        onPasswordVisibilityChange={changeCurrentPasswordVisibility}
+        isPasswordVisible={isCurrentPasswordVisible}
         {...register("currentPassword")}
         errors={formState.errors}
       />
 
       <LabelInputPassword
-        labelValue="Current Password"
+        labelValue="New Password"
         placeholder="**********"
         borderColor={clsx(
           {
@@ -75,8 +85,8 @@ function FormPassword(props: FormInputPsswordProps) {
           { "border-light-fg-primary": isSuccess || !newPassword.invalid },
           "dark:border-dark-fg-primary",
         )}
-        onPasswordVisibilityChange={changePasswordVisibility}
-        isPasswordVisible={isPasswordVisible}
+        onPasswordVisibilityChange={changeNewPasswordVisibility}
+        isPasswordVisible={isNewPasswordVisible}
         {...register("newPassword")}
         errors={formState.errors}
       />

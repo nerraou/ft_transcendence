@@ -14,7 +14,7 @@ type Story = StoryObj<typeof TFAModal>;
 export const Default: Story = {
   args: {
     isOpen: false,
-    OnClose: () => {
+    onClose: () => {
       return;
     },
   },
