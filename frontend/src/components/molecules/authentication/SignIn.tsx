@@ -57,7 +57,7 @@ function callModal(res: SignInResponse | undefined) {
       <Modal
         title="Welcom to BongBoy"
         description="Complete your acount from here"
-        action={<Redirect path="profile/settings" text="Settings" />}
+        action={<Redirect path="/profile/settings" text="Settings" />}
       />
     );
   }
@@ -134,8 +134,8 @@ function SignInForm() {
             borderColor={clsx(
               {
                 "border-light-fg-secondary": password.invalid,
+                "border-light-fg-primary": !password.invalid,
               },
-              { "border-light-fg-primary": !password.invalid },
               "dark:border-dark-fg-primary",
             )}
             iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"

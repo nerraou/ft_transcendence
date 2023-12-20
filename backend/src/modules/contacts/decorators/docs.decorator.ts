@@ -27,7 +27,8 @@ export function CreateContactApiDocumentation() {
       description: "Successful sign in response",
       schema: {
         example: {
-          accessToken: "eyJhbGci...vijhqOQ",
+          message: "success",
+          contactId: 1,
         },
       },
     }),
@@ -77,7 +78,7 @@ export function AcceptContactApiDocumentation() {
       description: "Successful sign in response",
       schema: {
         example: {
-          accessToken: "eyJhbGci...vijhqOQ",
+          message: "success",
         },
       },
     }),
@@ -117,7 +118,20 @@ export function GetContactsApiDocumentation() {
     ApiOkResponse({
       description: "contacts list",
       schema: {
-        example: {},
+        example: {
+          count: 1,
+          contacts: [
+            {
+              id: 1,
+              username: null,
+              email: "jdoe@example.com",
+              firstName: "string",
+              lastName: null,
+              avatarPath: "7e3b2ca3-cb75-4857-b0d4-66174f1b9a32.png",
+              status: "ONLINE | OFFLINE | IN_GAME",
+            },
+          ],
+        },
       },
     }),
     ApiUnauthorizedResponse({
