@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 
-import useP5 from "../../hooks/useP5";
-import usePlayer from "../../hooks/usePlayer";
+import useP5 from "../../play/hooks/useP5";
+import usePlayer from "../../play/hooks/usePlayer";
 
 interface GameBoardProps {
   width: number;

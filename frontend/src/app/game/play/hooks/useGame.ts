@@ -6,6 +6,14 @@ import { useSocket } from "@contexts/socket";
 import useBall from "./useBall";
 import usePlayer, { PaddleSide } from "./usePlayer";
 
+export interface PlayerEntity {
+  id: number;
+  rating: number;
+  socketId: string;
+  avatar: string;
+  username: string;
+}
+
 export interface GameConfig {
   gameId: string;
   ballSpeed: number;
@@ -17,6 +25,8 @@ export interface GameConfig {
     x: number;
     y: number;
   };
+  player: PlayerEntity;
+  opponent: PlayerEntity;
 }
 
 interface UseGameParams {
@@ -60,6 +70,9 @@ export default function useGame(params: UseGameParams) {
     radius: 20,
   });
 
+  const { incrementScore: incrementPlayerScore } = player;
+  const { incrementScore: incrementOpponentScore } = opponent;
+
   useEffect(() => {
     if (!socketClient || !gameConfig) {
       return;
@@ -96,6 +109,27 @@ export default function useGame(params: UseGameParams) {
       socketClient.removeListener("ball-moved", onBallMoved);
     };
   }, [socketClient, ball]);
+
+  useEffect(() => {
+    if (!socketClient) {
+      return;
+    }
+
+    function onBallOut(data: any) {
+      const { scoreFor } = data;
+      if (scoreFor == "player") {
+        incrementPlayerScore();
+      } else {
+        incrementOpponentScore();
+      }
+    }
+
+    socketClient.on("ball-out", onBallOut);
+
+    return () => {
+      socketClient.removeListener("ball-out", onBallOut);
+    };
+  }, [socketClient, incrementPlayerScore, incrementOpponentScore]);
 
   function handleLeftPaddleTouch() {
     const p = player;

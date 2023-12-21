@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { v4 as uuid4 } from "uuid";
-import { Server } from "socket.io";
+// import { Server } from "socket.io";
 
 import Game from "./classes/Game";
 import { PlayerEntity } from "./types";
 import {
   BALL_SPEED,
-  BOARD_HEIGHT,
-  BOARD_WIDTH,
+  // BOARD_HEIGHT,
+  // BOARD_WIDTH,
   PADDLE_SPEED,
 } from "./classes/constants";
 
@@ -19,7 +19,7 @@ export class GameLoopService {
     this.start();
     // setInterval(() => {
     //   this.games.forEach((game) => {
-    //     game.socketServer.to(game.getSocketRoomName()).emit("game-debug", {
+    //     game.events.emit("game-debug", {
     //       paddleWidth: game.player.paddle.width,
     //       paddleHeight: game.player.paddle.height,
     //       leftPaddle: game.player.paddle.position.toJSON(),
@@ -51,7 +51,7 @@ export class GameLoopService {
     }, 1000 / 60);
   }
 
-  createGame(player: PlayerEntity, opponent: PlayerEntity) {
+  createGame(player: PlayerEntity, opponent: PlayerEntity, scoreToWin: number) {
     const id = `game-${uuid4()}`;
 
     const game = new Game({
@@ -61,7 +61,7 @@ export class GameLoopService {
       ballSpeed: BALL_SPEED,
       paddleSpeed: PADDLE_SPEED,
       socketRoomName: id,
-      scoreToWin: 5,
+      scoreToWin: scoreToWin,
     });
 
     this.games.set(id, game);

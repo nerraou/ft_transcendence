@@ -19,13 +19,15 @@ import { PlayerEntity } from "@modules/game-loop/types";
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
 import Game from "@modules/game-loop/classes/Game";
+import { Mutex } from "async-mutex";
 
 type EventName = "message" | "player-join-queue" | "player-moved";
 
 @WebSocketGateway({ cors: true })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
-  private playersQueue: PlayerEntity[] = [];
+  private playersQueue: Map<number, PlayerEntity[]> = new Map();
+  private playersQueueMutex = new Mutex();
 
   constructor(
     private readonly eventsService: EventsService,
@@ -39,8 +41,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // TODO: broadcast online status using client.broadcast.emit()
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
+  async handleDisconnect(@ConnectedSocket() client: Socket) {
     let game: Game | undefined;
+
+    // this.gameLoopService.playerDisconnected(client.data.gameId);
 
     if (client.data.gameId) {
       game = this.gameLoopService.getGameById(client.data.gameId);
@@ -49,19 +53,46 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (game) {
       if (game.player.score != 0 || game.opponent.score != 0) {
         if (client.id == game.player.socketId) {
-          game.events.emit("game-over", { winnerId: game.opponent.id });
+          game.events.emit("game-over", {
+            winnerId: game.opponent.id,
+            status: "abandoned",
+          });
         } else {
-          game.events.emit("game-over", { winnerId: game.player.id });
+          game.events.emit("game-over", {
+            winnerId: game.player.id,
+            status: "abandoned",
+          });
         }
       } else {
         this.server.to(client.data.gameId).emit("game-aborted");
       }
 
       this.gameLoopService.removeGame(client.data.gameId);
+    } else if ("scoreToWin" in client.data) {
+      try {
+        await this.playersQueueMutex.waitForUnlock();
+        await this.playersQueueMutex.acquire();
+
+        const queue = this.playersQueue.get(client.data.scoreToWin);
+
+        if (queue) {
+          const index = queue.findIndex(
+            (player) => player.socketId == client.id,
+          );
+
+          if (index != -1) {
+            queue.splice(index, 1);
+          }
+        }
+      } catch (error) {
+        console.error("events.gateway - handleConnection", error.message);
+      } finally {
+        this.playersQueueMutex.release();
+      }
     }
 
     this.eventsService.userDisonnected(client).catch(() => {
-      console.log("failed to update disconnect data");
+      console.error("failed to update disconnect data");
     });
 
     // TODO: broadcast online status using client.broadcast.emit()
@@ -81,66 +112,102 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage<EventName>("player-join-queue")
   @UseGuards(WSJwtAuthGuard)
-  onPlayerJoinQueue(
+  async onPlayerJoinQueue(
     @ConnectedSocket() client: Socket,
+    @MessageBody() data: any,
     @User() user: UserEntity,
   ) {
-    if (this.playersQueue.length == 0) {
-      this.playersQueue.push({
+    try {
+      await this.playersQueueMutex.waitForUnlock();
+      await this.playersQueueMutex.acquire();
+
+      const { scoreToWin } = data;
+      client.data.scoreToWin = scoreToWin;
+
+      const playersQueue = this.playersQueue.get(scoreToWin);
+
+      const incommingPlayer: PlayerEntity = {
         id: user.id,
         rating: user.rating,
         socketId: client.id,
-      });
-    } else {
-      const player = this.playersQueue.shift();
-      const opponent: PlayerEntity = {
-        id: user.id,
-        rating: user.rating,
-        socketId: client.id,
+        avatar: user.avatarPath,
+        username: user.username,
       };
 
-      const game = this.gameLoopService.createGame(player, opponent);
+      if (!playersQueue) {
+        this.playersQueue.set(scoreToWin, [incommingPlayer]);
+      } else if (playersQueue.length == 0) {
+        playersQueue.push(incommingPlayer);
+      } else {
+        const player = playersQueue.shift();
+        const opponent: PlayerEntity = {
+          id: user.id,
+          rating: user.rating,
+          socketId: client.id,
+          avatar: user.avatarPath,
+          username: user.username,
+        };
 
-      const playerSocket = this.server.sockets.sockets.get(player.socketId);
-      const opponentSocket = this.server.sockets.sockets.get(opponent.socketId);
+        const game = this.gameLoopService.createGame(
+          player,
+          opponent,
+          data.scoreToWin,
+        );
 
-      playerSocket.data.gameId = game.getSocketRoomName();
-      opponentSocket.data.gameId = game.getSocketRoomName();
+        const playerSocket = this.server.sockets.sockets.get(player.socketId);
+        const opponentSocket = this.server.sockets.sockets.get(
+          opponent.socketId,
+        );
 
-      playerSocket.join(game.getSocketRoomName());
-      opponentSocket.join(game.getSocketRoomName());
+        playerSocket.data.gameId = game.getSocketRoomName();
+        opponentSocket.data.gameId = game.getSocketRoomName();
 
-      game.events.on("game-started", (data: any) => {
-        this.server.to(game.getSocketRoomName()).emit("game-started", data);
-      });
+        playerSocket.join(game.getSocketRoomName());
+        opponentSocket.join(game.getSocketRoomName());
 
-      game.events.on("ball-moved", (data: any) => {
-        this.server.to(game.getSocketRoomName()).emit("ball-moved", data);
-      });
+        game.events.on("game-debug", (data) =>
+          this.server.to(game.getSocketRoomName()).emit("game-debug", data),
+        );
 
-      game.events.on("game-over", (data: any) => {
-        this.gamesService
-          .createGame({
-            startedAt: game.startedAt,
-            winner: data.winnerId == player.id ? "PLAYER" : "OPPONENT",
-            player: {
-              id: game.player.id,
-              rating: game.player.rating,
-              score: game.player.score,
-            },
-            opponent: {
-              id: game.opponent.id,
-              rating: game.opponent.rating,
-              score: game.opponent.score,
-            },
-          })
-          .catch((e) => {
-            console.log("cannot create game", e);
-          });
+        game.events.on("game-started", (data: any) => {
+          this.server.to(game.getSocketRoomName()).emit("game-started", data);
+        });
 
-        this.gameLoopService.removeGame(game.getId());
-        this.server.to(game.getSocketRoomName()).emit("game-over", data);
-      });
+        game.events.on("ball-moved", (data: any) => {
+          this.server.to(game.getSocketRoomName()).emit("ball-moved", data);
+        });
+
+        game.events.on("ball-out", (data: any) => {
+          this.server.to(game.getSocketRoomName()).emit("ball-out", data);
+        });
+
+        game.events.on("game-over", (data: any) => {
+          this.gamesService
+            .createGame({
+              startedAt: game.startedAt,
+              winner: data.winnerId == player.id ? "PLAYER" : "OPPONENT",
+              player: {
+                id: game.player.id,
+                rating: game.player.rating,
+                score: game.player.score,
+              },
+              opponent: {
+                id: game.opponent.id,
+                rating: game.opponent.rating,
+                score: game.opponent.score,
+              },
+            })
+            .catch((e) => {
+              console.log("cannot create game", e);
+            });
+          this.gameLoopService.removeGame(game.getId());
+          this.server.to(game.getSocketRoomName()).emit("game-over", data);
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.playersQueueMutex.release();
     }
   }
 

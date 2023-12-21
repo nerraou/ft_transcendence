@@ -11,10 +11,10 @@ export default function useWindowEvent<K extends keyof WindowEventMap>(
   const savedHandler = useRef(eventHandler);
 
   useEffect(() => {
-    if (!window) {
-      return;
-    }
+    savedHandler.current = eventHandler;
+  });
 
+  useEffect(() => {
     const listener: typeof eventHandler = (event) =>
       savedHandler.current(event);
 

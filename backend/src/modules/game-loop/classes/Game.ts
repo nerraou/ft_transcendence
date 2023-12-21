@@ -71,6 +71,8 @@ export default class Game {
         ballPosition: this.ball.position.toJSON(),
         ballDirection: this.ballDirection,
         opponentId: this.opponent.id,
+        player: this.player,
+        opponent: this.opponent,
       });
     }
   }
@@ -100,6 +102,10 @@ export default class Game {
     } else if (this.player.score == this.scoreToWin) {
       winnerId = this.player.id;
     }
+
+    this.events.emit("ball-out", {
+      scoreFor: outSide == "left" ? "opponent" : "player",
+    });
 
     if (winnerId) {
       this.events.emit("game-over", { winnerId });
@@ -208,11 +214,21 @@ export default class Game {
   }
 
   private initPlayers(player: PlayerEntity, opponent: PlayerEntity) {
-    this.player = new Player("left", player.id, player.rating, player.socketId);
+    this.player = new Player(
+      "left",
+      player.id,
+      player.rating,
+      player.avatar,
+      player.username,
+      player.socketId,
+    );
+
     this.opponent = new Player(
       "right",
       opponent.id,
-      player.rating,
+      opponent.rating,
+      opponent.avatar,
+      opponent.username,
       opponent.socketId,
     );
   }

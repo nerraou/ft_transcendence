@@ -14,17 +14,28 @@ export default class Player {
   public socketId: string;
   public score = 0;
   public rating: number;
+  public avatar: string;
+  public username: string;
 
   public paddle: Paddle;
   public side: PaddleSide;
 
   private yDirection: PaddleDirection;
 
-  constructor(side: PaddleSide, id: number, rating: number, socketId: string) {
+  constructor(
+    side: PaddleSide,
+    id: number,
+    rating: number,
+    avatar: string,
+    username: string,
+    socketId: string,
+  ) {
     this.initPaddle(side);
     this.id = id;
     this.socketId = socketId;
     this.rating = rating;
+    this.avatar = avatar;
+    this.username = username;
   }
 
   moveUp() {
@@ -51,5 +62,14 @@ export default class Player {
     }
 
     this.paddle = new Paddle(x, BOARD_HEIGHT / 2, PADDLE_WIDTH, PADDLE_HEIGHT);
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      rating: this.rating,
+      avatar: this.avatar,
+      username: this.username,
+    };
   }
 }

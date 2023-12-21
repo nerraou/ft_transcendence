@@ -44,6 +44,7 @@
     "@nestjs/websockets": "^10.2.1",
     "@prisma/client": "^5.0.0",
     "@socket.io/redis-adapter": "^8.2.1",
+    "async-mutex": "^0.4.0",
     "bcrypt": "^5.1.0",
     "canvas": "^2.11.2",
     "class-transformer": "^0.5.1",

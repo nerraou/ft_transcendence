@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Vector } from "p5";
 
 import usePaddle from "./usePaddle";
-import { PADDLE_PADDING, PADDLE_SPEED } from "../constants";
+import { PADDLE_PADDING, PADDLE_SPEED } from "../../constants";
 
 export const PADDLE_WIDTH = 15;
 export const PADDLE_HEIGHT = 100;
@@ -45,6 +45,7 @@ function computePosition(args: ComputePositionFunctionArgs) {
 
 export default function usePlayer(params: UsePlayerParams) {
   const [yDirection, setYDirection] = useState(0);
+  const [score, setScore] = useState(0);
 
   const paddle = usePaddle({
     width: PADDLE_WIDTH,
@@ -74,6 +75,10 @@ export default function usePlayer(params: UsePlayerParams) {
     setYDirection(0);
   }, []);
 
+  const incrementScore = useCallback(function incrementScore() {
+    setScore((value) => value + 1);
+  }, []);
+
   const updatePosition = useCallback(
     function updatePosition(height: number) {
       let newY = paddle.position.y + yDirection * PADDLE_SPEED;
@@ -93,9 +98,11 @@ export default function usePlayer(params: UsePlayerParams) {
     paddle,
     isMoving: yDirection != 0,
     direction: yDirection,
+    score,
     moveUp,
     moveDown,
     stopMoving,
     updatePosition,
+    incrementScore,
   };
 }

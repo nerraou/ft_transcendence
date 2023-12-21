@@ -5,11 +5,12 @@ import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
 
 import Layout from "@components/templates/Layout";
+import useWindowEvent from "@hooks/useWindowEvent";
+import Bar from "@components/atoms/decoration/Bar";
 
 import ActionsSection from "./components/ActionsSection";
 import { CustomizeGameSection } from "./components/CustomizeGameSection";
 import GameBoard from "./components/GameBoard";
-import useWindowEvent from "./hooks/useWindowEvent";
 
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
 
@@ -45,12 +46,14 @@ export default function MakeGame() {
     searchParams.set("board_color", boardColor);
     searchParams.set("score_to_win", scoreToWin);
 
-    router.push(`/game?${searchParams.toString()}`);
+    router.push(`/game/play?${searchParams.toString()}`);
   }
 
   return (
     <Layout>
-      <section className="px-8 pt-8">
+      <section className="px-8">
+        <Bar width="w-2/3" margin="my-6" />
+
         <ActionsSection
           width="w-11/12"
           onReset={resetHandler}
