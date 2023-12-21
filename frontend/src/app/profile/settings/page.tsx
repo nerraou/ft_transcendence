@@ -41,7 +41,7 @@ function Settings(props: SettingsProps) {
 
       <Bar width="w-5/6" />
       <div className="flex justify-center">
-        <EditImage image={imageUrl + data.avatarPath} />
+        <EditImage jwt={props.token} image={imageUrl + data.avatarPath} />
       </div>
 
       <SettingsTabs
