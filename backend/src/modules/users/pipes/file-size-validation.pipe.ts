@@ -1,16 +1,32 @@
 import {
   PipeTransform,
   Injectable,
-  UnprocessableEntityException,
+  PayloadTooLargeException,
 } from "@nestjs/common";
+
+export const ONE_MEGA = 1048576;
+
+interface FileSizeValidationPipeOptions {
+  maxSize: number;
+  isOptional: boolean;
+}
 
 @Injectable()
 export class FileSizeValidationPipe implements PipeTransform {
-  transform(value: Express.Multer.File) {
-    const oneMega = 1048576;
+  constructor(private options?: FileSizeValidationPipeOptions) {
+    this.options = options || {
+      isOptional: false,
+      maxSize: ONE_MEGA,
+    };
+  }
 
-    if (value.size > oneMega) {
-      throw new UnprocessableEntityException();
+  transform(value: Express.Multer.File) {
+    if (!value && this.options.isOptional) {
+      return value;
+    }
+
+    if (value.size > this.options.maxSize) {
+      throw new PayloadTooLargeException();
     }
 
     return value;

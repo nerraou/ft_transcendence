@@ -6,6 +6,7 @@ import {
   ApiConsumes,
   ApiForbiddenResponse,
   ApiOkResponse,
+  ApiPayloadTooLargeResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
@@ -26,6 +27,7 @@ export function MeApiDocumentation() {
           avatarPath: "7e3b2ca3-cb75-4857-b0d4-66174f1b9a32.png",
           is2faEnabled: false,
           isEmailVerified: true,
+          status: "ONLINE | OFFLINE | IN_GAME",
           createdAt: 1692017290161,
         },
       },
@@ -196,6 +198,15 @@ export function UpdateAvatarApiDocumentation() {
       schema: {
         example: {
           message: "success",
+        },
+      },
+    }),
+    ApiPayloadTooLargeResponse({
+      description: "Payload Too Large",
+      schema: {
+        example: {
+          message: "Payload Too Large",
+          statusCode: 413,
         },
       },
     }),

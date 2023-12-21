@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
@@ -11,12 +12,11 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { User as UserEntity } from "@prisma/client";
-import { writeFile } from "fs/promises";
+import { writeFile, unlink } from "fs/promises";
+import { v4 as uuid4 } from "uuid";
 
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
-import EmailExistsPipe from "@modules/auth/pipes/email-exists.pipe";
-
 import { HashService } from "@common/services/hash.service";
 
 import {
@@ -29,7 +29,6 @@ import {
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UsersService } from "./users.service";
-import UsernameExistsPipe from "./pipes/username-exists.pipe";
 import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { FileSizeValidationPipe } from "./pipes/file-size-validation.pipe";
@@ -56,6 +55,7 @@ export class UsersController {
       is2faEnabled: user.is2faEnabled,
       isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
+      status: user.status,
     };
   }
 
@@ -64,8 +64,18 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateProfile(
     @User("id") userId: number,
-    @Body(UsernameExistsPipe) updateProfileDto: UpdateProfileDto,
+    @Body() updateProfileDto: UpdateProfileDto,
   ) {
+    if (updateProfileDto.username) {
+      const user = await this.usersService.findOneByUsername(
+        updateProfileDto.username,
+      );
+
+      if (user && user.id != userId) {
+        throw new ConflictException();
+      }
+    }
+
     await this.usersService.updateProfile(userId, updateProfileDto);
 
     return {
@@ -78,7 +88,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   async updateEmail(
     @User() user: UserEntity,
-    @Body(EmailExistsPipe) updateEmailDto: UpdateEmailDto,
+    @Body() updateEmailDto: UpdateEmailDto,
   ) {
     const isPasswordsIdentical = await this.hashService.compare(
       updateEmailDto.password,
@@ -87,6 +97,14 @@ export class UsersController {
 
     if (!isPasswordsIdentical) {
       throw new ForbiddenException();
+    }
+
+    const otherUser = await this.usersService.findOneByEmail(
+      updateEmailDto.email,
+    );
+
+    if (otherUser && otherUser.id != user.id) {
+      throw new ConflictException();
     }
 
     await this.usersService.updateEmail(user.id, updateEmailDto.email);
@@ -129,16 +147,27 @@ export class UsersController {
   @UseInterceptors(FileInterceptor("image"))
   async updateAvatar(
     @User() user: UserEntity,
-    @UploadedFile(FileSizeValidationPipe) file: Express.Multer.File,
+    @UploadedFile(new FileSizeValidationPipe())
+    file: Express.Multer.File,
   ) {
-    const avatarPath = `${this.configService.get("imagesPath")}/${
+    const oldAvatarPath = `${this.configService.get("imagesPath")}/${
       user.avatarPath
     }`;
 
-    await writeFile(avatarPath, file.buffer);
+    const filename = uuid4() + ".png";
+    const newAvatarPath = `${this.configService.get("imagesPath")}/${filename}`;
+
+    await this.usersService.updateAvatarPath(user.id, filename);
+
+    await writeFile(newAvatarPath, file.buffer);
+
+    unlink(oldAvatarPath).catch((e) => {
+      console.error("can't delete old avatar", e.message);
+    });
 
     return {
       message: "success",
+      avatarPath: filename,
     };
   }
 }
