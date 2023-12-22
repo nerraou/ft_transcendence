@@ -40,9 +40,9 @@ model User {
 
 model Contact {
   id          Int           @id @default(autoincrement()) @map("id")
-  followerId  Int
-  followingId Int
-  status      ContactStatus @default(PENDING)
+  followerId  Int           @map("follower_id")
+  followingId Int           @map("following_id")
+  status      ContactStatus @default(PENDING) @map("status")
   createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamp()
   updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamp()
 

@@ -45,7 +45,9 @@ export class UsersController {
   @Get("/me")
   @MeApiDocumentation()
   @UseGuards(JwtAuthGuard)
-  getProfile(@User() user: UserEntity) {
+  async getProfile(@User() user: UserEntity) {
+    const ranking = await this.usersService.getUserRanking(user.id);
+
     return {
       id: user.id,
       username: user.username,
@@ -57,6 +59,8 @@ export class UsersController {
       isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
       status: user.status,
+      rating: user.rating,
+      ranking,
     };
   }
 

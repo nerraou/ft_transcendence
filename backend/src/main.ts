@@ -1,3 +1,5 @@
+import "@polyfills";
+
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { HttpStatus, ValidationPipe } from "@nestjs/common";

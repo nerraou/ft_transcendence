@@ -133,26 +133,9 @@ export class ContactsController {
       query.limit,
     );
 
-    const contactsCount = contacts.length;
-
-    if (contactsCount == 0) {
-      return {
-        count: contactsCount,
-        contacts: [],
-      };
-    }
-
-    const mappedContacts = contacts.map((contact) => {
-      if (userId == contact.followerId) {
-        return contact.following;
-      } else {
-        return contact.follower;
-      }
-    });
-
     return {
-      count: contactsCount,
-      contacts: mappedContacts,
+      count: contacts.length,
+      contacts: contacts,
     };
   }
 }
