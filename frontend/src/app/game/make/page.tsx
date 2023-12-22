@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
 
@@ -10,7 +11,10 @@ import Bar from "@components/atoms/decoration/Bar";
 
 import ActionsSection from "./components/ActionsSection";
 import { CustomizeGameSection } from "./components/CustomizeGameSection";
-import GameBoard from "./components/GameBoard";
+
+const GameBoard = dynamic(() => import("./components/GameBoard"), {
+  ssr: false,
+});
 
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
 
