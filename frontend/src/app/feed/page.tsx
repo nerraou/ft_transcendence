@@ -2,7 +2,7 @@
 
 import Layout from "@templates/Layout";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import Loading from "@components/atoms/icons/outline/Loading";
 import LoadingPage from "../loading";
@@ -10,67 +10,66 @@ import baseQuery from "@utils/baseQuery";
 import {
   useSuspenseInfiniteQuery,
   QueryErrorResetBoundary,
-  useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Fragment, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useInView } from "react-intersection-observer";
 
-import Post, { PostData } from "@components/molecules/feed/Post";
-import Ranking, { RankingProps, User } from "@components/molecules/feed/Ranking";
+import Post from "@components/molecules/feed/Post";
+import Ranking, { RankingProps } from "@components/molecules/feed/Ranking";
 import Communities, {
-  Channel,
   CommunitiesProps,
 } from "@components/molecules/feed/Communities";
 import CreatePost from "@components/molecules/feed/CreatePost";
 import clsx from "clsx";
+import Modal from "@components/atoms/Modal";
+import Button from "@components/atoms/Button";
 
-
-interface FullPostData extends PostData {
-  likedBy: number[];
+interface FullPostData {
+  id: number;
+  content: string | null;
+  imagePath: string | null;
+  likesCount: number;
+  createdAt: string;
+  likedByUser: boolean;
+  owner: {
+    id: number;
+    username: string | null;
+    avatarPath: string;
+    firstName: string | null;
+    lastName: string | null;
+  };
 }
-
-const mockedPosts: FullPostData[] = [
-    {
-      id: 1,
-      user: {
-        name: "John Doe",
-        avatar: "/default/user-circle.png",
-      },
-      content: "This is fun.",
-      likes: 10,
-      image: "/default/user-circle.png",
-      likedBy: [],
-    },
-    {
-      id: 2,
-      user: {
-        name: "John Doe",
-        avatar: "/default/user-circle.png",
-      },
-      content: "This is fun.",
-      likes: 11,
-      likedBy: [1, 2],
-    },
-  ]
 
 interface FeedProps {
   posts: FullPostData[];
   ref: (node?: Element | null | undefined) => void;
-  onLike: (id: number) => void;
+  onLike: (id: number) => Promise<void>;
 }
 
-// takes a list of posts and renders them and then puts the ref at the bottom
 const Feed = (props: FeedProps) => {
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
   const { posts, ref } = props;
   return (
     <div className="flex flex-col items-center justify-center w-full gap-4">
       {posts.map((post) => (
         <Post
           key={post.id}
-          post={post}
-          onLike={props.onLike}
-          liked={post.likedBy.includes(post.id)}
+          post={{
+            id: post.id,
+            content: post.content,
+            image: post.imagePath ? imageUrl + post.imagePath : null,
+            user: {
+              name: `${post.owner.firstName} ${post.owner.lastName}`,
+              avatar: post.owner.avatarPath
+                ? imageUrl + post.owner.avatarPath
+                : null,
+            },
+            likes: post.likesCount,
+            createdAt: post.createdAt,
+          }}
+          onLike={() => props.onLike(post.id)}
+          liked={post.likedByUser}
         />
       ))}
       <div ref={ref}></div>
@@ -103,16 +102,11 @@ const RightSide = ({ rankingProps, communitiesProps }: RightSideProps) => {
 async function fetchPosts(page: number, token: string | unknown) {
   const limit = 10;
   const url =
-    process.env.NEXT_PUBLIC_API_BASE_URL +
-    `/posts?limit=${limit}&page=${page}`;
+    process.env.NEXT_PUBLIC_API_BASE_URL + `/posts?limit=${limit}&page=${page}`;
 
   const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch posts");
-  }
 
   let nextPage: number | null = page + 1;
   const response = await res.json();
@@ -122,7 +116,31 @@ async function fetchPosts(page: number, token: string | unknown) {
   return { ...response, nextPage: nextPage };
 }
 
+// a function that post a new post with content and image(string($binaray)) to the server
+async function postPost(
+  content: string,
+  image: string,
+  token: string | unknown,
+) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/posts";
+  const res = await baseQuery(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ content: content, image: image }),
+  });
+  const response = await res.json();
+  return response;
+}
 
+async function likePost(id: number, token: string | unknown) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/posts/like/${id}`;
+  return await baseQuery(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchRanking(token: string | unknown) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/users/ranking";
 
@@ -130,14 +148,11 @@ async function fetchRanking(token: string | unknown) {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch ranking");
-  }
-
   const response = await res.json();
   return response;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchCommunities(token: string | unknown) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels";
 
@@ -145,136 +160,122 @@ async function fetchCommunities(token: string | unknown) {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch communities");
-  }
-
   const response = await res.json();
   return response;
 }
 
 interface UserProps {
   count: number;
-  posts: User[];
+  posts: FullPostData[];
   nextPage: number;
 }
-
-interface ChannelProps {
-  count: number;
-  channels: Channel[];
-  nextPage: number;
-}
-
 
 function FeedPage() {
-  const { data: session, status } = useSession();
+  const [query, setQuery] = useState("");
 
+  const { data: session } = useSession();
   const { ref, inView } = useInView();
 
-  const { data: posts, isFetchingNextPage: isFetchingPostsNextPage, fetchNextPage: fetchNextPagePosts } =
-    useSuspenseInfiniteQuery<UserProps>({
-      queryKey: ["posts"],
-      queryFn: ({ pageParam }) => {
-        return fetchPosts(pageParam as number, session?.user.accessToken);
-      },
-      initialPageParam: 1,
-      getNextPageParam: (_, pages) => {
-        return pages.length + 1;
-      },
-    });
+  const {
+    data: postPages,
+    isFetchingNextPage: isFetchingPostsNextPage,
+    fetchNextPage: fetchNextPagePosts,
+  } = useSuspenseInfiniteQuery<UserProps>({
+    queryKey: ["posts"],
+    queryFn: ({ pageParam }) => {
+      return fetchPosts(pageParam as number, session?.user.accessToken);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (_, pages) => {
+      return pages.length + 1;
+    },
+  });
 
-  const { data: ranking, isFetching: isFetchingRanking } =
-    useSuspenseQuery<UserProps>({
-      queryKey: ["ranking"],
-      queryFn: () => {
-        return fetchRanking(session?.user.accessToken);
-      },
-    });
+  const posts = postPages?.pages.flatMap((page) => page.posts) || [];
 
-  const { data: communities, isFetching: isFetchingCommunities } =
-    useSuspenseQuery<ChannelProps>({
-      queryKey: ["communities"],
-      queryFn: () => {
-        return fetchCommunities(session?.user.accessToken);
-      },
-    });
-  
   useEffect(() => {
-      if (inView) {
-        fetchNextPagePosts();
-      }
+    if (inView) {
+      fetchNextPagePosts();
     }
-  , [fetchNextPagePosts, inView]);
+  }, [fetchNextPagePosts, inView]);
 
   return (
-    <Layout>
-      <div
-    //   flip the order
-        className={clsx(
-          "flex flex-row justify-center items-start w-full gap-8 py-16 px-8",          
-          "md:flex-col-reverse md:items-center md:gap-4",
-          "sm:flex-col-reverse md:items-center"
-        )}
-      >
-        <div className="flex flex-col items-center justify-center w-full gap-8 lg:w-3/4">
-          <CreatePost
-            onPost={(content) => {
-              console.log("post");
-            }}
-          />
-          <Feed
-            // posts={data?.pages.flatMap((page) => page.posts) || []}
-            posts={posts.pages || []}
-            ref={ref}
-            onLike={(id) => {
-              console.log("like");
-            }}
-          />
-          {/* {isFetchingNextPage && <Loading />} */}
-        </div>
-        <RightSide
-          rankingProps={{
-            users: [ranking?.users || []],
-            onViewMore: () => {
-              console.log("view more");
-            },
-          }}
-          communitiesProps={{
-            channels: [communities?.channels || []],
-            onJoin: (id) => {
-              console.log("join");
-            },
-            query: "",
-            onSearchChange: (e) => {
-              console.log("search change");
-            },
-            onSearchClear: () => {
-              console.log("search clear");
-            },
+    <div
+      className={clsx(
+        "flex flex-row justify-center items-start w-full gap-8 py-16 px-8",
+        "md:flex-col-reverse md:items-center md:gap-4",
+        "sm:flex-col-reverse md:items-center",
+      )}
+    >
+      <div className="flex flex-col items-center justify-center w-full gap-8 lg:w-3/4">
+        <CreatePost
+          onPost={async (content, image) => {
+            await postPost(content, image, session?.user.accessToken);
           }}
         />
+        <Feed
+          posts={posts || []}
+          ref={ref}
+          onLike={async (id) => {
+            await likePost(id, session?.user.accessToken);
+          }}
+        />
+        {isFetchingPostsNextPage && <Loading />}
       </div>
-    </Layout>
+      <RightSide
+        rankingProps={{
+          users: [],
+          onViewMore: () => {
+            // TODO: implement view more
+          },
+        }}
+        communitiesProps={{
+          channels: [],
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          onJoin: (_id) => {
+            // TODO: implement join
+          },
+          query: query,
+          onSearchChange: (e) => {
+            setQuery(e?.target?.value || "");
+          },
+          onSearchClear: () => {
+            setQuery("");
+          },
+        }}
+      />
+    </div>
   );
 }
 
 export default function SuspendedFeedPage() {
   return (
-    <ErrorBoundary
-      fallbackRender={({ error, resetErrorBoundary }) => (
-        <QueryErrorResetBoundary>
-          <Suspense fallback={<LoadingPage />}>
-            <FeedPage />
-          </Suspense>
-        </QueryErrorResetBoundary>
-      )}
-      onReset={() => {
-        // reset the state of your app so the error doesn't happen again
-      }}
-    >
-      <Suspense fallback={<LoadingPage />}>
-        <FeedPage />
-      </Suspense>
-    </ErrorBoundary>
+    <Layout>
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <ErrorBoundary
+            fallbackRender={({ resetErrorBoundary }) => (
+              <Modal
+                title="Error"
+                description="Something went wrong"
+                action={
+                  <Button
+                    text="Retry"
+                    onClick={() => {
+                      resetErrorBoundary();
+                    }}
+                  />
+                }
+              />
+            )}
+            onReset={reset}
+          >
+            <Suspense fallback={<LoadingPage />}>
+              <FeedPage />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
+    </Layout>
   );
 }
