@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useRef, useState } from "react";
 import Send from "@icons/outline/Send";
 import Photo from "@icons/outline/Photo";
+import X from "@components/atoms/icons/outline/X";
 
 interface CreatePostProps {
   avatar?: string;
@@ -47,6 +48,26 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
             placeholder="What are you thinking?"
             onChange={(e) => setContent(e.target.value)}
           />
+          {image && (
+            <>
+              <div className="flex items-end w-full justify-end">
+                <button
+                  onClick={() => setImage("")}
+                  className="text-light-fg-primary dark:text-dark-fg-primary flex"
+                >
+                  clear <X />
+                </button>
+              </div>
+              <Image
+                src={image}
+                alt={"post image"}
+                width={0}
+                height={0}
+                sizes="100vw"
+                className="rounded-[8px] w-full h-auto min-w-[150px]"
+              />
+            </>
+          )}
           <div className="flex flex-row items-center justify-between w-full">
             <button
               onClick={() => hiddenFileInput.current?.click()}
