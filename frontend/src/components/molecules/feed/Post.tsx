@@ -2,10 +2,11 @@ import React from "react";
 import Image from "next/image";
 import Like from "@icons/outline/Like";
 import LikeFilled from "@icons/outline/LikeFilled";
+import { useState } from "react";
 
 interface User {
   name: string;
-  avatar?: string;
+  avatar?: string | null;
 }
 
 interface UserCardProps {
@@ -63,21 +64,25 @@ const LikeSection = ({ count, liked, onLike, postId }: LikeSectionProps) => {
 export interface PostData {
   id: number;
   user: User;
-  content: string;
-  image?: string;
+  content: string | null;
+  image: string | null;
   likes: number;
+  createdAt: string;
 }
 
 interface PostProps {
   post: PostData;
-  onLike: (id: number) => void;
+  onLike: (id: number) => Promise<void>;
   liked: boolean;
 }
 
 const Post = ({ post, onLike, liked }: PostProps) => {
+  const [isLiked, setIsLiked] = useState(liked);
+
   return (
     <div className="inline-flex flex-col items-start gap-4 border-2 rounded-lg border-light-fg-link dark:border-dark-fg-primary bg-light-bg-primary dark:bg-dark-bg-primary px-8 py-4 shadow-light-lg w-full text-light-fg-primary dark:text-light-bg-tertiary">
       <UserCard user={post.user} />
+      <p className="text-xs">{new Date(post.createdAt)?.toLocaleString()}</p>
       <p className="text-lg">{post.content}</p>
       {post.image && (
         <div>
@@ -87,14 +92,16 @@ const Post = ({ post, onLike, liked }: PostProps) => {
             width={0}
             height={0}
             sizes="100vw"
-            className="rounded-[8px] w-full h-auto min-w-[150px]"
+            className="rounded-base w-full h-auto min-w-[150px]"
           />
         </div>
       )}
       <LikeSection
         count={post.likes}
         liked={liked}
-        onLike={onLike}
+        onLike={(id) => {
+          onLike(id).then(() => setIsLiked(!isLiked));
+        }}
         postId={post.id}
       />
     </div>

@@ -15,7 +15,8 @@ type Story = StoryObj<typeof Post>;
 export const Default: Story = {
   args: {
     post: {
-      id: "1",
+      id: 1,
+      createdAt: "2021-08-01T00:00:00.000Z",
       user: {
         name: "John Doe",
         avatar: "/default/user-circle.png",
@@ -27,6 +28,7 @@ export const Default: Story = {
     liked: false,
     onLike: () => {
       action("onLike");
+      return Promise.resolve();
     },
   },
 };
@@ -34,17 +36,20 @@ export const Default: Story = {
 export const LikedNoImage: Story = {
   args: {
     post: {
-      id: "1",
+      id: 1,
+      createdAt: "2021-08-01T00:00:00.000Z",
       user: {
         name: "John Doe",
         avatar: "/default/user-circle.png",
       },
       content: "This is fun.",
       likes: 11,
+      image: null,
     },
     liked: true,
     onLike: () => {
       action("onLike");
+      return Promise.resolve();
     },
   },
 };
