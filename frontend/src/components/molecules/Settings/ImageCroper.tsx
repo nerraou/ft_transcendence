@@ -2,7 +2,8 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { getCroppedImg } from "./ImageCroperCanvasUtils";
 import Cropper, { Area } from "react-easy-crop";
 import { Dialog, Transition } from "@headlessui/react";
-import Button from "@components/atoms/Button";
+import Button from "@atoms/Button";
+import Slider from "@atoms/Slider";
 
 interface ImageCroperProps {
   file: File | undefined;
@@ -28,7 +29,7 @@ export default function ImageCroper(props: ImageCroperProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState(0);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState<number>(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function ImageCroper(props: ImageCroperProps) {
             >
               <Dialog.Panel className="flex flex-col items-start  sm:items-n w-full max-w-max sm:p-4 p-10 rounded-lg bg-light-bg-tertiary dark:bg-dark-bg-primary space-y-8 lg:space-y-4 md:space-y-4 sm:space-y-4">
                 <div>
-                  <div className="relative w-96 h-96">
+                  <div className="relative w-96 h-96 mb-5">
                     <Cropper
                       image={imageSrc}
                       crop={crop}
@@ -112,28 +113,33 @@ export default function ImageCroper(props: ImageCroperProps) {
                       onZoomChange={setZoom}
                     />
                   </div>
-                  <input
-                    type="range"
-                    step={0.01}
-                    min={1}
-                    max={5}
-                    value={zoom}
-                    onChange={(e) => {
-                      setZoom(parseFloat(e.currentTarget.value));
-                    }}
-                  />
-
-                  <input
-                    type="range"
-                    min={0}
-                    max={180}
-                    value={rotation}
-                    onChange={(e) =>
-                      setRotation(parseFloat(e.currentTarget.value))
-                    }
-                  />
-
-                  <Button text="Save" onClick={showCroppedImage} />
+                  <div className="space-y-5">
+                    <div className="flex justify-between items-center space-x-14">
+                      <label className="text-light-fg-primary">Zoom</label>
+                      <Slider
+                        step={0.01}
+                        min={1}
+                        max={5}
+                        value={zoom}
+                        onChange={(value) => {
+                          setZoom(value as number);
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center space-x-9">
+                      <label className="text-light-fg-primary">Rotation</label>
+                      <Slider
+                        step={1}
+                        min={1}
+                        max={360}
+                        value={rotation}
+                        onChange={(value) => {
+                          setRotation(value as number);
+                        }}
+                      />
+                    </div>
+                    <Button text="Save" onClick={showCroppedImage} />
+                  </div>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
