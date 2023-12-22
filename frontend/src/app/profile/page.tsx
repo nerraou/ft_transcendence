@@ -1,11 +1,11 @@
 import Layout from "@templates/Layout";
 import UserHeader from "@molecules/profile/UserHeader";
-import Bar from "@atoms/decoration/Bar";
 import UserAchievements from "@molecules/profile/UserAchievements";
 import GameHistoryBrief from "@organisms/GameHistoryBrief";
 import StatsBar from "@molecules/profile/StatsBar";
 import ButtonPlay from "@components/atoms/ButtonPlay";
 import ButtonHistory from "@components/atoms/ButtonHistory";
+import BarRating from "@components/atoms/BarRating";
 
 function ProfilePage() {
   return (
@@ -20,7 +20,7 @@ function ProfilePage() {
           level={2}
           userStatus="IN_GAME"
         />
-        <Bar width="w-5/6" />
+        <BarRating rating={98} />
         <StatsBar wins={45} losses={55} matches={100} />
         <div className="self-center w-4/6 sm:w-full">
           <UserAchievements

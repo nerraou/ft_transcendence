@@ -51,15 +51,12 @@ async function getFriends(page: number, token: string | unknown) {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch friend");
-  }
-
   let nextPage: number | null = page + 1;
   const response = await res.json();
   if (response.count == 0) {
     nextPage = null;
   }
+
   return { ...response, nextPage: nextPage };
 }
 
@@ -69,7 +66,7 @@ function FriendsList(props: FriendsListProps) {
 
   const { data, isFetchingNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery<FriendProps>({
-      queryKey: ["friend"],
+      queryKey: ["friends"],
       queryFn: ({ pageParam }) => {
         return getFriends(pageParam as number, props.token);
       },

@@ -28,12 +28,14 @@ model User {
   createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamp()
   updatedAt         DateTime   @updatedAt @map("updated_at") @db.Timestamp()
 
-  followedBy Contact[] @relation("following")
-  following  Contact[] @relation("follower")
-  sent       Message[] @relation("sent")
-  received   Message[] @relation("received")
-  player     Game[]    @relation("player")
-  opponent   Game[]    @relation("opponent")
+  followedBy Contact[]  @relation("following")
+  following  Contact[]  @relation("follower")
+  sent       Message[]  @relation("sent")
+  received   Message[]  @relation("received")
+  player     Game[]     @relation("player")
+  opponent   Game[]     @relation("opponent")
+  posts      Post[]
+  PostLike   PostLike[]
 
   @@map("users")
 }
@@ -89,6 +91,33 @@ model Game {
   opponent User @relation("opponent", fields: [opponentId], references: [id])
 
   @@map("games")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement()) @map("id")
+  content    String?  @map("text")
+  imagePath  String?  @map("image_path") @db.VarChar(255)
+  userId     Int      @map("user_id")
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  postLikes PostLike[]
+
+  owner User @relation(fields: [userId], references: [id])
+
+  @@map("posts")
+}
+
+model PostLike {
+  userId Int @map("user_id")
+  postId Int @map("post_id")
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  @@id([userId, postId])
+  @@map("posts_likes")
 }
 
 enum ContactStatus {

@@ -13,6 +13,7 @@ import { ContactsModule } from "@modules/contacts/contacts.module";
 import { MessagesModule } from "@modules/messages/messages.module";
 import { GamesModule } from "@modules/games/games.module";
 import { GameLoopModule } from "@/modules/game-loop/game-loop.module";
+import { PostsModule } from "@modules/posts/posts.module";
 
 import { AppController } from "./app.controller";
 
@@ -25,6 +26,7 @@ import { AppController } from "./app.controller";
     ContactsModule,
     GamesModule,
     GameLoopModule,
+    PostsModule,
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,
