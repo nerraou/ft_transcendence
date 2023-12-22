@@ -16,9 +16,8 @@ async function editAvatar(avatarPath: Blob, token: string | unknown) {
   });
 
   const res = await response.json();
-  console.log(res);
 
-  return response;
+  return res;
 }
 
 function useAvatarMutation(token: string | unknown) {
