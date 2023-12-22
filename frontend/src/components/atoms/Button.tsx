@@ -1,7 +1,7 @@
 import { MouseEvent } from "react";
 import clsx from "clsx";
 import Loading from "./icons/outline/Loading";
-import Check from "./icons/Check";
+import Check from "./icons/outline/Check";
 
 interface ButtonProps {
   text: string;
