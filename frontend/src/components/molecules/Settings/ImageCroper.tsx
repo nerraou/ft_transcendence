@@ -102,7 +102,7 @@ export default function ImageCroper(props: ImageCroperProps) {
             >
               <Dialog.Panel className="flex flex-col items-start  sm:items-n w-full max-w-max sm:p-4 p-10 rounded-lg bg-light-bg-tertiary dark:bg-dark-bg-primary space-y-8 lg:space-y-4 md:space-y-4 sm:space-y-4">
                 <div>
-                  <div className="relative w-96 h-96 mb-5">
+                  <div className="relative w-96 h-96 sm:w-full sm:h-72 mb-5 ">
                     <Cropper
                       image={imageSrc}
                       crop={crop}
