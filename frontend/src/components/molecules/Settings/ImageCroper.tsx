@@ -9,6 +9,9 @@ interface ImageCroperProps {
   file: File | undefined;
   onCropComplete: (image: Blob) => void;
   isOpen: boolean;
+  isPending: boolean;
+  isError: boolean;
+  isSuccess: boolean;
   onClose: () => void;
 }
 
@@ -31,6 +34,8 @@ export default function ImageCroper(props: ImageCroperProps) {
   const [rotation, setRotation] = useState(0);
   const [zoom, setZoom] = useState<number>(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+
+  const error = props.isError;
 
   useEffect(() => {
     if (props.file) {
@@ -99,48 +104,62 @@ export default function ImageCroper(props: ImageCroperProps) {
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="flex flex-col items-start  sm:items-n w-full max-w-max sm:p-4 p-10 rounded-lg bg-light-bg-tertiary dark:bg-dark-bg-primary space-y-8 lg:space-y-4 md:space-y-4 sm:space-y-4">
-                <div>
-                  <div className="relative w-96 h-96 mb-5">
-                    <Cropper
-                      image={imageSrc}
-                      crop={crop}
-                      rotation={rotation}
-                      zoom={zoom}
-                      aspect={1}
-                      onCropChange={setCrop}
-                      onRotationChange={setRotation}
-                      onCropComplete={onCropComplete}
-                      onZoomChange={setZoom}
-                    />
-                  </div>
-                  <div className="space-y-5">
-                    <div className="flex justify-between items-center space-x-14">
-                      <label className="text-light-fg-primary">Zoom</label>
-                      <Slider
-                        step={0.01}
-                        min={1}
-                        max={5}
-                        value={zoom}
-                        onChange={(value) => {
-                          setZoom(value as number);
-                        }}
+                {error ? (
+                  <span className="text-lg text-light-fg-primary">
+                    Somthing went wrong
+                  </span>
+                ) : (
+                  <div>
+                    <div className="relative w-96 h-96 mb-5">
+                      <Cropper
+                        image={imageSrc}
+                        crop={crop}
+                        rotation={rotation}
+                        zoom={zoom}
+                        aspect={1}
+                        onCropChange={setCrop}
+                        onRotationChange={setRotation}
+                        onCropComplete={onCropComplete}
+                        onZoomChange={setZoom}
                       />
                     </div>
-                    <div className="flex justify-between items-center space-x-9">
-                      <label className="text-light-fg-primary">Rotation</label>
-                      <Slider
-                        step={1}
-                        min={1}
-                        max={360}
-                        value={rotation}
-                        onChange={(value) => {
-                          setRotation(value as number);
-                        }}
+                    <div className="space-y-5">
+                      <div className="flex justify-between items-center space-x-14">
+                        <label className="text-light-fg-primary">Zoom</label>
+                        <Slider
+                          step={0.01}
+                          min={1}
+                          max={5}
+                          value={zoom}
+                          onChange={(value) => {
+                            setZoom(value as number);
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between items-center space-x-9">
+                        <label className="text-light-fg-primary">
+                          Rotation
+                        </label>
+                        <Slider
+                          step={1}
+                          min={1}
+                          max={360}
+                          value={rotation}
+                          onChange={(value) => {
+                            setRotation(value as number);
+                          }}
+                        />
+                      </div>
+                      <Button
+                        text="Save"
+                        loading={props.isPending}
+                        disabled={props.isPending}
+                        isSuccess={props.isSuccess}
+                        onClick={showCroppedImage}
                       />
                     </div>
-                    <Button text="Save" onClick={showCroppedImage} />
                   </div>
-                </div>
+                )}
               </Dialog.Panel>
             </Transition.Child>
           </div>

@@ -14,13 +14,16 @@ function EditImage(props: EditImageProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const mutation = useAvatarMutation(props.jwt);
+  const { mutate, isError, isSuccess, isPending, error, reset } =
+    useAvatarMutation(props.jwt);
 
+  console.log(error?.response?.status);
   function onClose() {
     setIsOpen(false);
     if (inputRef.current) {
       inputRef.current.value = "";
     }
+    reset();
   }
 
   function handleClick() {
@@ -55,12 +58,15 @@ function EditImage(props: EditImageProps) {
       />
       {file && (
         <ImageCroper
+          isSuccess={isSuccess}
+          isError={isError}
+          isPending={isPending}
           isOpen={isOpen}
           onClose={onClose}
           file={file}
           onCropComplete={(cropped) => {
             if (cropped) {
-              mutation.mutate(cropped);
+              mutate(cropped);
             }
           }}
         />
