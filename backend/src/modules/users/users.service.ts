@@ -153,9 +153,9 @@ export class UsersService {
     FROM (SELECT RANK() OVER (ORDER BY rating DESC) as ranking, id FROM users) ranked_users
     WHERE id = ${id}`;
 
-    const data = await this.prisma.$queryRaw<{ ranking: string }[]>(sqlQuery);
+    const data = await this.prisma.$queryRaw<{ ranking: number }[]>(sqlQuery);
 
-    return data.at(0).ranking;
+    return Number(data.at(0).ranking);
   }
 
   findOneByGoogleId(googleId: string) {

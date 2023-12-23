@@ -16,6 +16,7 @@ export default class Player {
   public rating: number;
   public avatar: string;
   public username: string;
+  public ranking: number;
 
   public paddle: Paddle;
   public side: PaddleSide;
@@ -28,6 +29,7 @@ export default class Player {
     rating: number,
     avatar: string,
     username: string,
+    ranking: number,
     socketId: string,
   ) {
     this.initPaddle(side);
@@ -36,6 +38,7 @@ export default class Player {
     this.rating = rating;
     this.avatar = avatar;
     this.username = username;
+    this.ranking = ranking;
   }
 
   moveUp() {

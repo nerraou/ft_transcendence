@@ -7,10 +7,12 @@ export class CreateGametDto {
     id: number;
     score: number;
     rating: number;
+    ranking: number;
   };
   opponent: {
     id: number;
     score: number;
     rating: number;
+    ranking: number;
   };
 }
