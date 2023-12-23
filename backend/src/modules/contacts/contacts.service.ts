@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
-import { User as UserEntity } from "@prisma/client";
+import { Contact, Prisma, User, User as UserEntity } from "@prisma/client";
 
 @Injectable()
 export class ContactsService {
@@ -65,55 +65,39 @@ export class ContactsService {
     };
   }
 
-  getUserContactsCount(userId: number, page: number, limit: number) {
-    return this.prisma.contact.count({
-      where: {
-        OR: [
-          {
-            followerId: userId,
-          },
-          {
-            followingId: userId,
-          },
-        ],
-      },
-      skip: (page - 1) * page,
-      take: limit,
-    });
-  }
+  async getUserContacts(userId: number, page: number, limit: number) {
+    const getContactsQuery = Prisma.sql`
+    SELECT id, status, follower_id as "followerId", following_id as "followingId",
+          created_at as "createdAt", updated_at as "updatedAt"
+    FROM contacts
+    WHERE follower_id = ${userId} OR following_id = ${userId}`;
+    const contacts = await this.prisma.$queryRaw<Contact[]>(getContactsQuery);
 
-  getUserContacts(userId: number, page: number, limit: number) {
-    const selectFields = {
-      id: true,
-      username: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      avatarPath: true,
-      status: true,
-    };
+    const usersContactsIds = contacts.reduce<number[]>((ids, contact) => {
+      if (contact.followerId != userId) {
+        ids.push(contact.followerId);
+      }
 
-    return this.prisma.contact.findMany({
-      where: {
-        OR: [
-          {
-            followerId: userId,
-          },
-          {
-            followingId: userId,
-          },
-        ],
-      },
-      skip: (page - 1) * page,
-      take: limit,
-      include: {
-        follower: {
-          select: selectFields,
-        },
-        following: {
-          select: selectFields,
-        },
-      },
-    });
+      if (contact.followingId != userId) {
+        ids.push(contact.followingId);
+      }
+
+      return ids;
+    }, []);
+
+    const getContactsUsersQuery = Prisma.sql`
+    SELECT id, username, email, status, rating,
+      RANK() OVER (ORDER BY rating DESC) as ranking,
+      first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+      created_at as "createdAt", updated_at as "updatedAt"
+    FROM users
+    WHERE id IN (${Prisma.join(usersContactsIds)})
+    OFFSET ${(page - 1) * limit} 
+    LIMIT ${limit}
+    `;
+
+    const users = await this.prisma.$queryRaw<User[]>(getContactsUsersQuery);
+
+    return users;
   }
 }

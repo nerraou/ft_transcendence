@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Prisma, UserStatus } from "@prisma/client";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 
@@ -6,7 +7,6 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateUserWithGoogleDto } from "./dto/create-user-with-google.dto";
 import { CreateUserWithFortyTwoDto } from "./dto/create-user-with-forty-two.dto";
-import { UserStatus } from "@prisma/client";
 
 @Injectable()
 export class UsersService {
@@ -146,6 +146,16 @@ export class UsersService {
         email,
       },
     });
+  }
+
+  async getUserRanking(id: number) {
+    const sqlQuery = Prisma.sql`SELECT ranking
+    FROM (SELECT RANK() OVER (ORDER BY rating DESC) as ranking, id FROM users) ranked_users
+    WHERE id = ${id}`;
+
+    const data = await this.prisma.$queryRaw<{ ranking: string }[]>(sqlQuery);
+
+    return data.at(0).ranking;
   }
 
   findOneByGoogleId(googleId: string) {

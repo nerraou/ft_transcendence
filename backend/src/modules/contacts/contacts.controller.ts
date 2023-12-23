@@ -127,35 +127,15 @@ export class ContactsController {
     @User("id") userId: number,
     @Query() query: GetContactsDto,
   ) {
-    const contactsCount = await this.contactsService.getUserContactsCount(
-      userId,
-      query.page,
-      query.limit,
-    );
     const contacts = await this.contactsService.getUserContacts(
       userId,
       query.page,
       query.limit,
     );
 
-    if (contactsCount == 0) {
-      return {
-        count: contactsCount,
-        contacts: [],
-      };
-    }
-
-    const mappedContacts = contacts.map((contact) => {
-      if (userId == contact.followerId) {
-        return contact.following;
-      } else {
-        return contact.follower;
-      }
-    });
-
     return {
-      count: contactsCount,
-      contacts: mappedContacts,
+      count: contacts.length,
+      contacts: contacts,
     };
   }
 }
