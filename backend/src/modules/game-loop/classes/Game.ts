@@ -220,6 +220,7 @@ export default class Game {
       player.rating,
       player.avatar,
       player.username,
+      player.ranking,
       player.socketId,
     );
 
@@ -229,6 +230,7 @@ export default class Game {
       opponent.rating,
       opponent.avatar,
       opponent.username,
+      player.ranking,
       opponent.socketId,
     );
   }

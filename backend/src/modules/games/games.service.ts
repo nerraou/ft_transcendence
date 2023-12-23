@@ -1,12 +1,16 @@
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 import { Injectable } from "@nestjs/common";
 import { CreateGametDto } from "./dto/create-game.dto";
+import { UsersService } from "@modules/users/users.service";
 
 @Injectable()
 export class GamesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
-  createGame(createGametDto: CreateGametDto) {
+  async createGame(createGametDto: CreateGametDto) {
     const { startedAt, winner, player, opponent } = createGametDto;
     let playerNewRating: number;
     let opponentNewRating: number;
@@ -19,39 +23,53 @@ export class GamesService {
       opponentNewRating = opponent.rating + 10;
     }
 
-    return this.prisma.$transaction([
-      this.prisma.user.update({
+    this.prisma.$transaction(async (prisma) => {
+      await prisma.user.update({
         data: {
           rating: playerNewRating,
         },
         where: {
           id: player.id,
         },
-      }),
-      this.prisma.user.update({
+      });
+
+      await prisma.user.update({
         data: {
           rating: opponentNewRating,
         },
         where: {
           id: opponent.id,
         },
-      }),
-      this.prisma.game.create({
+      });
+
+      const playerNewRanking = await this.usersService.getUserRanking(
+        player.id,
+      );
+      const opponentNewRanking = await this.usersService.getUserRanking(
+        opponent.id,
+      );
+
+      return prisma.game.create({
         data: {
           duration: Date.now() - startedAt,
+
           playerId: player.id,
           playerOldRating: player.rating,
           playerNewRating: playerNewRating,
           playerScore: player.score,
+          playerOldRanking: player.ranking,
+          playerNewRanking,
 
           opponentId: opponent.id,
           opponentOldRating: opponent.rating,
           opponentNewRating: opponentNewRating,
           opponentScore: opponent.score,
+          opponentOldRanking: opponent.ranking,
+          opponentNewRanking,
 
           winner: winner,
         },
-      }),
-    ]);
+      });
+    });
   }
 }

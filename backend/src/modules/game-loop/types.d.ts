@@ -4,6 +4,7 @@ export interface PlayerEntity {
   socketId: string;
   avatar: string;
   username: string;
+  ranking: number;
 }
 
 export type PaddleSide = "left" | "right";

@@ -10,16 +10,17 @@ import {
 import { UseGuards } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { User as UserEntity } from "@prisma/client";
+import { Mutex } from "async-mutex";
 
 import { User } from "@modules/users/decorators/user.decorators";
 import { GameLoopService } from "@modules/game-loop/game-loop.service";
 import { GamesService } from "@modules/games/games.service";
 import { PlayerEntity } from "@modules/game-loop/types";
+import { UsersService } from "@modules/users/users.service";
+import Game from "@modules/game-loop/classes/Game";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
-import Game from "@modules/game-loop/classes/Game";
-import { Mutex } from "async-mutex";
 
 type EventName = "message" | "player-join-queue" | "player-moved";
 
@@ -33,6 +34,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly eventsService: EventsService,
     private readonly gameLoopService: GameLoopService,
     private readonly gamesService: GamesService,
+    private readonly usersService: UsersService,
   ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -126,12 +128,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const playersQueue = this.playersQueue.get(scoreToWin);
 
+      const ranking = await this.usersService.getUserRanking(user.id);
+
       const incommingPlayer: PlayerEntity = {
         id: user.id,
         rating: user.rating,
         socketId: client.id,
         avatar: user.avatarPath,
         username: user.username,
+        ranking,
       };
 
       if (!playersQueue) {
@@ -146,6 +151,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           socketId: client.id,
           avatar: user.avatarPath,
           username: user.username,
+          ranking,
         };
 
         const game = this.gameLoopService.createGame(
@@ -190,11 +196,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 id: game.player.id,
                 rating: game.player.rating,
                 score: game.player.score,
+                ranking: game.player.ranking,
               },
               opponent: {
                 id: game.opponent.id,
                 rating: game.opponent.rating,
                 score: game.opponent.score,
+                ranking: game.opponent.ranking,
               },
             })
             .catch((e) => {

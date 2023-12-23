@@ -71,21 +71,26 @@ model Message {
 }
 
 model Game {
-  id         Int        @id @default(autoincrement()) @map("id")
-  playerId   Int        @map("player_id")
-  opponentId Int        @map("opponent_id")
-  winner     GameWinner @map("winner")
-  duration   Int        @map("duration")
+  id       Int        @id @default(autoincrement()) @map("id")
+  winner   GameWinner @map("winner")
+  duration Int        @map("duration")
 
-  playerScore     Int @map("player_score")
-  playerOldRating Int @map("player_old_rating")
-  playerNewRating Int @map("player_new_rating")
+  playerId         Int @map("player_id")
+  playerScore      Int @map("player_score")
+  playerOldRating  Int @map("player_old_rating")
+  playerNewRating  Int @map("player_new_rating")
+  playerOldRanking Int @map("player_old_ranking")
+  playerNewRanking Int @map("player_new_ranking")
 
-  opponentScore     Int      @map("opponent_score")
-  opponentOldRating Int      @map("opponent_old_rating")
-  opponentNewRating Int      @map("opponent_new_rating")
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamp()
-  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamp()
+  opponentId         Int @map("opponent_id")
+  opponentScore      Int @map("opponent_score")
+  opponentOldRating  Int @map("opponent_old_rating")
+  opponentNewRating  Int @map("opponent_new_rating")
+  opponentOldRanking Int @map("opponent_old_ranking")
+  opponentNewRanking Int @map("opponent_new_ranking")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
 
   player   User @relation("player", fields: [playerId], references: [id])
   opponent User @relation("opponent", fields: [opponentId], references: [id])
