@@ -7,6 +7,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiPayloadTooLargeResponse,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
@@ -212,6 +213,49 @@ export function UpdateAvatarApiDocumentation() {
     }),
     ApiUnauthorizedResponse({
       description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function GetLeaderboardApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiQuery({
+      name: "page",
+      type: "number",
+    }),
+    ApiQuery({
+      name: "limit",
+      type: "number",
+    }),
+    ApiOkResponse({
+      description: "players list",
+      schema: {
+        example: {
+          count: 100,
+          players: [
+            {
+              id: 1,
+              username: null,
+              email: "jdoe@example.com",
+              firstName: "string",
+              lastName: null,
+              avatarPath: "7e3b2ca3-cb75-4857-b0d4-66174f1b9a32.png",
+              status: "ONLINE | OFFLINE | IN_GAME",
+            },
+          ],
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
       schema: {
         example: {
           message: "Unauthorized",

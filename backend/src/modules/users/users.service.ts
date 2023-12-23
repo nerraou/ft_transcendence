@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Prisma, UserStatus } from "@prisma/client";
+import { Prisma, User, UserStatus } from "@prisma/client";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 
@@ -172,5 +172,26 @@ export class UsersService {
         googleAccountId: fortyTwoId,
       },
     });
+  }
+
+  async getLeaderboard(page: number, limit: number) {
+    const getUsersQuery = Prisma.sql`
+    SELECT id, username, email, status, rating,
+      RANK() OVER (ORDER BY rating DESC) as ranking,
+      first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+      created_at as "createdAt", updated_at as "updatedAt"
+    FROM users
+    ORDER BY ranking ASC
+    OFFSET ${(page - 1) * limit} 
+    LIMIT ${limit}
+    `;
+
+    const users = await this.prisma.$queryRaw<User[]>(getUsersQuery);
+
+    return users;
+  }
+
+  usersCount() {
+    return this.prisma.user.count();
   }
 }
