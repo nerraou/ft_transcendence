@@ -26,6 +26,7 @@ import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
 import { redirect } from "next/navigation";
 import RankingModal from "@components/molecules/feed/RankingModal";
+import { useUserProfileQuery } from "@services/useUserProfileQuery";
 
 interface FullPostData {
   id: number;
@@ -45,15 +46,16 @@ interface FullPostData {
 
 interface FeedProps {
   posts: FullPostData[];
+  newPosts: FullPostData[];
   onLike: (id: number) => Promise<Response>;
 }
 
 const Feed = (props: FeedProps) => {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
-  const { posts, onLike } = props;
+  const { posts, newPosts, onLike } = props;
   return (
     <div className="flex flex-col items-center justify-center w-full gap-4">
-      {posts.map((post) => (
+      {[...newPosts, ...posts].map((post) => (
         <Post
           key={post.id}
           post={{
@@ -199,9 +201,10 @@ function FeedPage(props: FeedPageProps) {
   const [query, setQuery] = useState("");
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
   const [rankingPage, setRankingPage] = useState(1);
+  const [newPosts, setNewPosts] = useState<FullPostData[]>([]);
 
   const { ref, inView } = useInView();
-
+  const { data: currentUser } = useUserProfileQuery(token);
   const {
     data: postPages,
     isFetchingNextPage: isFetchingPostsNextPage,
@@ -248,13 +251,37 @@ function FeedPage(props: FeedPageProps) {
         />
         <div className="flex flex-col items-center justify-center w-full gap-8 lg:w-3/4">
           <CreatePost
+            avatar={
+              currentUser &&
+              process.env.NEXT_PUBLIC_API_BASE_URL +
+                "/assets/images/" +
+                currentUser.avatarPath
+            }
             onPost={async (content, image) => {
-              return await postPost(content, image, token).then(() => {
-                fetchNextPagePosts();
+              return await postPost(content, image, token).then((res) => {
+                setNewPosts([
+                  {
+                    id: res.id,
+                    content: res.content,
+                    imagePath: res.imagePath,
+                    likesCount: 0,
+                    createdAt: res.createdAt,
+                    likedByUser: false,
+                    owner: {
+                      id: currentUser.id,
+                      username: currentUser.username,
+                      avatarPath: currentUser.avatarPath,
+                      firstName: currentUser.firstName,
+                      lastName: currentUser.lastName,
+                    },
+                  },
+                  ...newPosts,
+                ]);
               });
             }}
           />
           <Feed
+            newPosts={newPosts}
             posts={posts || []}
             onLike={async (id) => {
               return await likePost(id, token);
