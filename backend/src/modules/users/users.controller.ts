@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Get,
   Patch,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -25,6 +26,7 @@ import {
   UpdateEmailApiDocumentation,
   UpdatePasswordApiDocumentation,
   UpdateAvatarApiDocumentation,
+  GetLeaderboardApiDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -32,6 +34,7 @@ import { UsersService } from "./users.service";
 import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { FileSizeValidationPipe } from "./pipes/file-size-validation.pipe";
+import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
 
 @Controller("users")
 export class UsersController {
@@ -60,6 +63,23 @@ export class UsersController {
       status: user.status,
       rating: user.rating,
       ranking,
+    };
+  }
+
+  @Get("/leaderboard")
+  @GetLeaderboardApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getLeaderboard(@Query() getLeaderboardDto: GetLeaderboardDto) {
+    const count = await this.usersService.usersCount();
+
+    const players = await this.usersService.getLeaderboard(
+      getLeaderboardDto.page,
+      getLeaderboardDto.limit,
+    );
+
+    return {
+      count,
+      players,
     };
   }
 
