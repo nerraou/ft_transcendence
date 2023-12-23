@@ -108,7 +108,7 @@ const RightSide = ({ rankingProps, communitiesProps }: RightSideProps) => {
  * @returns An object containing the fetched posts and the next page number, if available.
  */
 async function fetchPosts(page: number, token: string | unknown) {
-  const limit = 2;
+  const limit = 10;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL + `/posts?limit=${limit}&page=${page}`;
 
