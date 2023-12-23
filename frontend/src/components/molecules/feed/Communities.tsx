@@ -27,7 +27,9 @@ const Communities = ({
   return (
     <div className="flex flex-col align-start w-full gap-8 p-8 rounded-lg border border-light-fg-link bg-light-bg-tertiary dark:bg-dark-fg-tertiary dark:border-dark-fg-primary">
       <div className="flex flex-row justify-between w-full">
-        <p className="text-light-fg-primary text-xl lg:text-lg md:text-md sm:text-lg">#Communities</p>
+        <p className="text-light-fg-primary text-xl lg:text-lg md:text-md sm:text-base">
+          #Communities
+        </p>
       </div>
       <InputSearch
         placeholder="Search..."
@@ -38,7 +40,7 @@ const Communities = ({
         width="w-full"
       />
       <div className="flex flex-col align-start w-full min-h-[300px] gap-8">
-        {channels.map((channel, index) =>  (
+        {channels.map((channel, index) => (
           <div
             key={index}
             className="flex flex-row justify-between w-full gap-12 lg:gap-4 sm:flex-col sm:gap-2 sm:justify-center sm:items-center min-w-min"

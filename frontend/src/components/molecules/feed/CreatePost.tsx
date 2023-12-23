@@ -24,21 +24,21 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
   };
 
   return (
-    <div className="flex flex-col items-start justify-center gap-8 rounded-lg px-8 py-4 border-2 shadow-light-lg border-light-fg-link dark:border-dark-bg-primary4 bg-light-bg-tertiary dark:bg-dark-fg-primary w-full">
-      <div className="flex flex-row items-start justify-center gap-4 w-full">
+    <div className="flex flex-col items-start justify-center gap-8 rounded-lg px-8 sm:px-2 sm:py-2 py-4 border-2 shadow-light-lg border-light-fg-link dark:border-dark-bg-primary4 bg-light-bg-tertiary dark:bg-dark-fg-primary w-full">
+      <div className="flex flex-row items-start justify-center gap-4 w-full sm:flex-col">
         <Image
           src={avatar || "/default/user-circle.png"}
           alt="user avatar"
           width={0}
           height={0}
           sizes="50px"
-          className="rounded-full object-cover h-[50px] w-[50px]"
+          className="rounded-full object-cover h-12 w-12"
         />
         <div className="flex flex-col items-start justify-center gap-8 w-full">
           <textarea
             cols={10}
             value={content}
-            className="w-full rounded-[10px] bg-light-fg-tertiary py-2 px-4 min-h-[50px] text-light-fg-link text-[18px] placeholder-light-fg-link"
+            className="w-full rounded-base bg-light-fg-tertiary py-2 px-4 min-h-[50px] text-light-fg-link text-base placeholder-light-fg-link"
             placeholder="What are you thinking?"
             onChange={(e) => setContent(e.target.value)}
           />
@@ -59,7 +59,7 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
                 width={0}
                 height={0}
                 sizes="100vw"
-                className="rounded-[8px] w-full h-auto min-w-[150px]"
+                className="rounded-base w-full h-auto min-w-full"
               />
             </>
           )}

@@ -89,7 +89,7 @@ const Post = ({ post, onLike, liked }: PostProps) => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="inline-flex flex-col items-start gap-4 border-2 rounded-lg border-light-fg-link dark:border-dark-fg-primary bg-light-bg-primary dark:bg-dark-bg-primary px-8 py-4 shadow-light-lg w-full text-light-fg-primary dark:text-light-bg-tertiary">
+    <div className="inline-flex flex-col items-start gap-4 border-2 rounded-lg border-light-fg-link dark:border-dark-fg-primary bg-light-bg-primary dark:bg-dark-bg-primary px-8 sm:px-2 sm:py-2 py-4 shadow-light-lg w-full text-light-fg-primary dark:text-light-bg-tertiary">
       <UserCard user={post.user} />
       <p className="text-xs">{new Date(post.createdAt)?.toLocaleString()}</p>
       <p className="text-lg">{post.content}</p>
