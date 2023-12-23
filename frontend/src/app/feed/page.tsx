@@ -24,6 +24,8 @@ import CreatePost from "@components/molecules/feed/CreatePost";
 import clsx from "clsx";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
+import { redirect } from "next/navigation";
+import RankingModal from "@components/molecules/feed/RankingModal";
 
 interface FullPostData {
   id: number;
@@ -43,13 +45,12 @@ interface FullPostData {
 
 interface FeedProps {
   posts: FullPostData[];
-  ref: (node?: Element | null | undefined) => void;
-  onLike: (id: number) => Promise<void>;
+  onLike: (id: number) => Promise<Response>;
 }
 
 const Feed = (props: FeedProps) => {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
-  const { posts, ref } = props;
+  const { posts, onLike } = props;
   return (
     <div className="flex flex-col items-center justify-center w-full gap-4">
       {posts.map((post) => (
@@ -68,11 +69,10 @@ const Feed = (props: FeedProps) => {
             likes: post.likesCount,
             createdAt: post.createdAt,
           }}
-          onLike={() => props.onLike(post.id)}
+          onLike={onLike}
           liked={post.likedByUser}
         />
       ))}
-      <div ref={ref}></div>
     </div>
   );
 };
@@ -99,8 +99,14 @@ const RightSide = ({ rankingProps, communitiesProps }: RightSideProps) => {
   );
 };
 
+/**
+ * Fetches posts from the API based on the specified page number and token.
+ * @param page - The page number of the posts to fetch.
+ * @param token - The authentication token used for authorization.
+ * @returns An object containing the fetched posts and the next page number, if available.
+ */
 async function fetchPosts(page: number, token: string | unknown) {
-  const limit = 10;
+  const limit = 2;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL + `/posts?limit=${limit}&page=${page}`;
 
@@ -110,28 +116,43 @@ async function fetchPosts(page: number, token: string | unknown) {
 
   let nextPage: number | null = page + 1;
   const response = await res.json();
-  if (response.count == 0) {
+  if (response.posts?.length == 0) {
     nextPage = null;
   }
   return { ...response, nextPage: nextPage };
 }
 
-// a function that post a new post with content and image(string($binaray)) to the server
+/**
+ * Posts a new post to the server.
+ * @param {string} content - The content of the post.
+ * @param {string} image - The image associated with the post.
+ * @param {string | unknown} token - The authentication token.
+ * @returns {Promise<any>} - A promise that resolves to the server response.
+ */
 async function postPost(
   content: string,
-  image: string,
+  image: File | undefined,
   token: string | unknown,
 ) {
+  const formData = new FormData();
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/posts";
+  formData.append("content", content);
+  formData.append("image", image || "");
   const res = await baseQuery(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ content: content, image: image }),
+    body: formData,
   });
   const response = await res.json();
   return response;
 }
 
+/**
+ * Like a post.
+ * @param id - The ID of the post to like.
+ * @param token - The user's authentication token.
+ * @returns A Promise that resolves to the result of the like operation.
+ */
 async function likePost(id: number, token: string | unknown) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/posts/like/${id}`;
   return await baseQuery(url, {
@@ -170,23 +191,32 @@ interface UserProps {
   nextPage: number;
 }
 
-function FeedPage() {
+interface FeedPageProps {
+  token: string | unknown;
+}
+function FeedPage(props: FeedPageProps) {
+  const { token } = props;
   const [query, setQuery] = useState("");
+  const [rankingModalOpen, setRankingModalOpen] = useState(false);
+  const [rankingPage, setRankingPage] = useState(1);
 
-  const { data: session } = useSession();
   const { ref, inView } = useInView();
 
   const {
     data: postPages,
     isFetchingNextPage: isFetchingPostsNextPage,
     fetchNextPage: fetchNextPagePosts,
+    hasNextPage,
   } = useSuspenseInfiniteQuery<UserProps>({
     queryKey: ["posts"],
     queryFn: ({ pageParam }) => {
-      return fetchPosts(pageParam as number, session?.user.accessToken);
+      return fetchPosts(pageParam as number, token);
     },
     initialPageParam: 1,
-    getNextPageParam: (_, pages) => {
+    getNextPageParam: (lastPage, pages) => {
+      if (lastPage.nextPage === null) {
+        return null;
+      }
       return pages.length + 1;
     },
   });
@@ -200,55 +230,89 @@ function FeedPage() {
   }, [fetchNextPagePosts, inView]);
 
   return (
-    <div
-      className={clsx(
-        "flex flex-row justify-center items-start w-full gap-8 py-16 px-8",
-        "md:flex-col-reverse md:items-center md:gap-4",
-        "sm:flex-col-reverse md:items-center",
-      )}
-    >
-      <div className="flex flex-col items-center justify-center w-full gap-8 lg:w-3/4">
-        <CreatePost
-          onPost={async (content, image) => {
-            await postPost(content, image, session?.user.accessToken);
+    <div className="flex flex-col justify-center">
+      <div
+        className={clsx(
+          "flex flex-row justify-center items-start w-full gap-8 py-16 px-8",
+          "md:flex-col-reverse md:items-center md:gap-4",
+          "sm:flex-col-reverse md:items-center",
+        )}
+      >
+        <RankingModal
+          isOpen={rankingModalOpen}
+          onClose={() => setRankingModalOpen(false)}
+          page={rankingPage}
+          onPageChange={(page) => setRankingPage(page)}
+          total={0}
+          users={[]}
+        />
+        <div className="flex flex-col items-center justify-center w-full gap-8 lg:w-3/4">
+          <CreatePost
+            onPost={async (content, image) => {
+              return await postPost(content, image, token).then(() => {
+                fetchNextPagePosts();
+              });
+            }}
+          />
+          <Feed
+            posts={posts || []}
+            onLike={async (id) => {
+              return await likePost(id, token);
+            }}
+          />
+          {isFetchingPostsNextPage && <Loading />}
+        </div>
+        <RightSide
+          rankingProps={{
+            users: [],
+            onViewMore: () => {
+              setRankingModalOpen(true);
+            },
+          }}
+          communitiesProps={{
+            channels: [],
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            onJoin: (_id) => {
+              // TODO: implement join
+            },
+            query: query,
+            onSearchChange: (e) => {
+              setQuery(e?.target?.value || "");
+            },
+            onSearchClear: () => {
+              setQuery("");
+            },
           }}
         />
-        <Feed
-          posts={posts || []}
-          ref={ref}
-          onLike={async (id) => {
-            await likePost(id, session?.user.accessToken);
-          }}
-        />
-        {isFetchingPostsNextPage && <Loading />}
       </div>
-      <RightSide
-        rankingProps={{
-          users: [],
-          onViewMore: () => {
-            // TODO: implement view more
-          },
-        }}
-        communitiesProps={{
-          channels: [],
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          onJoin: (_id) => {
-            // TODO: implement join
-          },
-          query: query,
-          onSearchChange: (e) => {
-            setQuery(e?.target?.value || "");
-          },
-          onSearchClear: () => {
-            setQuery("");
-          },
-        }}
-      />
+      {hasNextPage ? (
+        <div className="inline-flex justify-center sm:mb-16 mt-8" ref={ref}>
+          {isFetchingPostsNextPage ? (
+            <Loading width="w-16" height="w-16" />
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export default function SuspendedFeedPage() {
+  const { data: session, status: sessionStatus } = useSession();
+
+  if (sessionStatus === "unauthenticated") {
+    redirect("/sign-in");
+  }
+
+  if (sessionStatus === "loading") {
+    return (
+      <LoadingPage
+        bgColor=" bg-light-bg-tertiary dark:bg-dark-bg-primary"
+        width="w-screen"
+        height="h-screen"
+      />
+    );
+  }
+
   return (
     <Layout>
       <QueryErrorResetBoundary>
@@ -271,7 +335,7 @@ export default function SuspendedFeedPage() {
             onReset={reset}
           >
             <Suspense fallback={<LoadingPage />}>
-              <FeedPage />
+              <FeedPage token={session?.user.accessToken} />
             </Suspense>
           </ErrorBoundary>
         )}

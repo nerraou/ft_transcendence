@@ -35,9 +35,16 @@ interface LikeSectionProps {
   liked: boolean;
   onLike: (id: number) => void;
   postId: number;
+  disabled?: boolean;
 }
 
-const LikeSection = ({ count, liked, onLike, postId }: LikeSectionProps) => {
+const LikeSection = ({
+  count,
+  liked,
+  onLike,
+  postId,
+  disabled = false,
+}: LikeSectionProps) => {
   const formatCount = (formattedCount: number) => {
     if (formattedCount > 999) {
       return `${(formattedCount / 1000).toFixed(1)}k`;
@@ -50,7 +57,7 @@ const LikeSection = ({ count, liked, onLike, postId }: LikeSectionProps) => {
   return (
     <div className="flex px-8 justify-between items-center rounded-full border border-light-fg-link bg-light-fg-secondary w-28 h-10 text-light-fg-tertiary">
       <p>{formatCount(count)}</p>
-      <button onClick={() => onLike(postId)}>
+      <button onClick={() => onLike(postId)} disabled={disabled}>
         {liked ? (
           <LikeFilled className="w-4 h-4" />
         ) : (
@@ -72,12 +79,14 @@ export interface PostData {
 
 interface PostProps {
   post: PostData;
-  onLike: (id: number) => Promise<void>;
+  onLike: (id: number) => Promise<Response>;
   liked: boolean;
 }
 
 const Post = ({ post, onLike, liked }: PostProps) => {
   const [isLiked, setIsLiked] = useState(liked);
+  const [count, setCount] = useState(post.likes);
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="inline-flex flex-col items-start gap-4 border-2 rounded-lg border-light-fg-link dark:border-dark-fg-primary bg-light-bg-primary dark:bg-dark-bg-primary px-8 py-4 shadow-light-lg w-full text-light-fg-primary dark:text-light-bg-tertiary">
@@ -97,10 +106,17 @@ const Post = ({ post, onLike, liked }: PostProps) => {
         </div>
       )}
       <LikeSection
-        count={post.likes}
-        liked={liked}
+        count={count}
+        liked={isLiked}
+        disabled={loading}
         onLike={(id) => {
-          onLike(id).then(() => setIsLiked(!isLiked));
+          setLoading(true);
+          onLike(id)
+            .then(() => {
+              setIsLiked(!isLiked);
+              setCount(isLiked ? count - 1 : count + 1);
+            })
+            .finally(() => setLoading(false));
         }}
         postId={post.id}
       />

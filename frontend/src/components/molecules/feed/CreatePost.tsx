@@ -6,28 +6,21 @@ import X from "@components/atoms/icons/outline/X";
 
 interface CreatePostProps {
   avatar?: string;
-  onPost: (content: string, image: string) => void;
+  onPost: (content: string, image: File | undefined) => Promise<void>;
 }
 
 const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
   const [content, setContent] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState<File>();
+  const [loading, setLoading] = useState(false);
 
   const hiddenFileInput = useRef<HTMLInputElement>(null);
 
-  const handleFile = (file: File | undefined) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileUploaded: File | undefined = event?.target?.files?.[0];
-    handleFile(fileUploaded);
+    if (fileUploaded) {
+      setImage(fileUploaded);
+    }
   };
 
   return (
@@ -44,6 +37,7 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
         <div className="flex flex-col items-start justify-center gap-8 w-full">
           <textarea
             cols={10}
+            value={content}
             className="w-full rounded-[10px] bg-light-fg-tertiary py-2 px-4 min-h-[50px] text-light-fg-link text-[18px] placeholder-light-fg-link"
             placeholder="What are you thinking?"
             onChange={(e) => setContent(e.target.value)}
@@ -52,14 +46,15 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
             <>
               <div className="flex items-end w-full justify-end">
                 <button
-                  onClick={() => setImage("")}
+                  disabled={loading}
+                  onClick={() => setImage(undefined)}
                   className="text-light-fg-primary dark:text-dark-fg-primary flex"
                 >
                   clear <X />
                 </button>
               </div>
               <Image
-                src={image}
+                src={URL.createObjectURL(image)}
                 alt={"post image"}
                 width={0}
                 height={0}
@@ -70,6 +65,7 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
           )}
           <div className="flex flex-row items-center justify-between w-full">
             <button
+              disabled={loading}
               onClick={() => hiddenFileInput.current?.click()}
               className="flex flex-row items-center justify-center gap-2 rounded-2xl bg-light-fg-secondary text-light-fg-tertiary h-10 w-24 border border-light-fg-link dark:border-dark-bg-primary4 dark:bg-dark-fg-primary"
             >
@@ -83,7 +79,16 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
               />
             </button>
             <button
-              onClick={() => onPost(content, image)}
+              disabled={loading}
+              onClick={() => {
+                setLoading(true);
+                onPost(content, image)
+                  .then(() => {
+                    setContent("");
+                    setImage(undefined);
+                  })
+                  .finally(() => setLoading(false));
+              }}
               className="flex flex-row items-center justify-center gap-2 rounded-2xl bg-light-bg-secondary text-light-fg-tertiary h-10 w-24 border border-light-fg-link "
             >
               <Send className="w-4 h-4" />

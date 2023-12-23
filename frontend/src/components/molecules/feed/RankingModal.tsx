@@ -113,12 +113,21 @@ const RankingModal = ({
                   {users.map((user, index) => (
                     <RankingPlayerCard key={index} user={user} />
                   ))}
+                  {total === 0 && (
+                    <div className="flex flex-col items-center justify-center w-full gap-4">
+                      <label className="text-light-fg-primary dark:text-dark-fg-tertiary text-xl sm:text-lg md:text-lg lg:text-lg sm:text-center">
+                        No users found.
+                      </label>
+                    </div>
+                  )}
 
-                  <Pagination
-                    page={page}
-                    total={total}
-                    onChange={onPageChange}
-                  />
+                  {total > 0 && (
+                    <Pagination
+                      page={page}
+                      total={total}
+                      onChange={onPageChange}
+                    />
+                  )}
                 </div>
               </Dialog.Panel>
             </Transition.Child>
