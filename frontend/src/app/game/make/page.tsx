@@ -27,7 +27,11 @@ export default function MakeGame() {
   const [boardColor, setBoardColor] = useState("#EF9935");
 
   useWindowEvent("keydown", (e) => {
-    e.preventDefault();
+    const cancelKeys = ["ArrowDown", "ArrowUp"];
+
+    if (cancelKeys.includes(e.code)) {
+      e.preventDefault();
+    }
   });
 
   if (sessionStatus === "unauthenticated") {
