@@ -17,7 +17,7 @@ const InputChat = forwardRef<HTMLTextAreaElement, InputChatProps>(
           name={props.name}
           placeholder="Write something..."
           value={props.value}
-          className="text-light-fg-primary max-h-32 min-h-[80px]bg-light-fg-tertiary focus-within:border-dark-useless rounded-lg outline-none w-full pt-4 pb-2 px-4 overflow-hidden border-2 border-light-fg-primary placeholder:translate-y-1"
+          className="text-light-fg-primary max-h-32 min-h-[80px] bg-light-fg-tertiary focus-within:border-dark-useless rounded-lg outline-none w-full pt-4 pb-2 px-4 overflow-hidden border-2 border-light-fg-primary placeholder:translate-y-1"
           onChange={props.onChange}
         />
         <Send className="stroke-light-fg-primary" />

@@ -6,11 +6,11 @@ interface LableImageProps {
   image: string;
 }
 
-function LableImage(props: LableImageProps) {
+function LabelImage(props: LableImageProps) {
   return (
-    <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
-      <div className="w-40 md:w-60">
-        <label className="text-dark-bg-primary text-base">
+    <div className="flex lg:flex-col md:flex-col sm:flex-col space-x-32 lg:space-x-0 md:space-x-0 sm:space-x-0">
+      <div className="w-56 xl:w-60">
+        <label className="text-dark-bg-primary text-lg ">
           {props.labelValue}
         </label>
       </div>
@@ -19,4 +19,4 @@ function LableImage(props: LableImageProps) {
   );
 }
 
-export default LableImage;
+export default LabelImage;

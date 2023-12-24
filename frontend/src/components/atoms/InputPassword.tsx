@@ -11,6 +11,7 @@ interface InputPasswordProps {
   placeholder: string;
   width?: string;
   height?: "base" | "large";
+  isDisabled?: boolean;
   isPasswordVisible?: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onPasswordVisibilityChange?: () => void;
@@ -49,6 +50,7 @@ const InputPassword = forwardRef<HTMLInputElement, InputPasswordProps>(
           value={props.value}
           onChange={props.onChange}
           className="bg-light-bg-tertiary w-full outline-none"
+          disabled={props.isDisabled}
         />
 
         {props.isPasswordVisible && (

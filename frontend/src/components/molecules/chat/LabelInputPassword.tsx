@@ -10,6 +10,7 @@ interface LabelInputPasswordProps {
   errors?: FieldErrors<any>;
   placeholder: string;
   borderColor: string;
+  isDisabled?: boolean;
   isPasswordVisible: boolean;
   onPasswordVisibilityChange?: () => void;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -20,12 +21,13 @@ const LabelInputPassword = forwardRef<
   LabelInputPasswordProps
 >(function LabelInputPassword(props, ref) {
   return (
-    <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
-      <div className="w-40 md:w-60">
-        <label className="text-dark-bg-primary text-base">
+    <div className="flex lg:flex-col md:flex-col sm:flex-col space-x-32 lg:space-x-0 md:space-x-0 sm:space-x-0">
+      <div className="w-56 xl:w-60">
+        <label className="text-dark-bg-primary text-lg ">
           {props.labelValue}
         </label>
       </div>
+
       <div className="border-solid border-light-fg-tertiary">
         <InputPassword
           ref={ref}
@@ -36,7 +38,8 @@ const LabelInputPassword = forwardRef<
           onChange={props.onChange}
           onPasswordVisibilityChange={props.onPasswordVisibilityChange}
           isPasswordVisible={props.isPasswordVisible}
-          width="w-96 sm:w-full"
+          width="w-96 sm:w-full md:w-full"
+          isDisabled={props.isDisabled}
         />
         {/* <ErrorMessage
           errors={props.errors}

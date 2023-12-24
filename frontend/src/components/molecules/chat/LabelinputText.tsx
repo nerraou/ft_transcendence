@@ -16,9 +16,9 @@ interface LabelInputTextProps {
 const LabelInputText = forwardRef<HTMLInputElement, LabelInputTextProps>(
   function LabelInputText(props, ref) {
     return (
-      <div className="flex sm:flex-col space-x-32 xl:space-x-28 lg:space-x-20 md:space-x-0 sm:space-x-0">
-        <div className="w-40 md:w-60">
-          <label className="text-dark-bg-primary text-base dark:text-light-fg-tertiary">
+      <div className="flex lg:flex-col md:flex-col sm:flex-col space-x-32 lg:space-x-0 md:space-x-0 sm:space-x-0">
+        <div className="w-56 xl:w-64">
+          <label className="text-dark-bg-primary text-lg ">
             {props.labelValue}
           </label>
         </div>
@@ -29,7 +29,7 @@ const LabelInputText = forwardRef<HTMLInputElement, LabelInputTextProps>(
             value={props.value}
             placeholder={props.placeholder}
             borderColor={props.borderColor}
-            width="w-96 sm:w-full"
+            width="w-96 sm:w-full md:w-full"
             height="base"
             onChange={props.onChange}
           />
