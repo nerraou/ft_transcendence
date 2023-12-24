@@ -22,7 +22,7 @@ import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User } from "@modules/users/decorators/user.decorators";
 import {
   FileSizeValidationPipe,
-  ONE_MEGA,
+  TWO_MEGA,
 } from "@modules/users/pipes/file-size-validation.pipe";
 
 import {
@@ -71,7 +71,7 @@ export class PostsController {
     @User("id") userId: number,
     @Body() createPostDto: CreatePostDto,
     @UploadedFile(
-      new FileSizeValidationPipe({ isOptional: true, maxSize: ONE_MEGA }),
+      new FileSizeValidationPipe({ isOptional: true, maxSize: TWO_MEGA }),
     )
     file: Express.Multer.File | undefined,
   ) {
