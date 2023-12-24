@@ -6,11 +6,7 @@ import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import Loading from "@components/atoms/icons/outline/Loading";
 import LoadingPage from "../loading";
-import baseQuery from "@utils/baseQuery";
-import {
-  useSuspenseInfiniteQuery,
-  QueryErrorResetBoundary,
-} from "@tanstack/react-query";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { Suspense, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useInView } from "react-intersection-observer";
@@ -27,8 +23,9 @@ import Button from "@components/atoms/Button";
 import { redirect } from "next/navigation";
 import RankingModal from "@components/molecules/feed/RankingModal";
 import { useUserProfileQuery } from "@services/useUserProfileQuery";
+import { postPost, useFeedQuery } from "./feedApiService";
 
-interface FullPostData {
+export interface FullPostData {
   id: number;
   content: string | null;
   imagePath: string | null;
@@ -47,12 +44,13 @@ interface FullPostData {
 interface FeedProps {
   posts: FullPostData[];
   newPosts: FullPostData[];
-  onLike: (id: number) => Promise<Response>;
+  token: string | unknown;
 }
 
 const Feed = (props: FeedProps) => {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
-  const { posts, newPosts, onLike } = props;
+  const { posts, newPosts, token } = props;
+
   return (
     <div className="flex flex-col items-center justify-center w-full gap-4">
       {[...newPosts, ...posts].map((post) => (
@@ -71,8 +69,8 @@ const Feed = (props: FeedProps) => {
             likes: post.likesCount,
             createdAt: post.createdAt,
           }}
-          onLike={onLike}
           liked={post.likedByUser}
+          token={token}
         />
       ))}
     </div>
@@ -101,98 +99,6 @@ const RightSide = ({ rankingProps, communitiesProps }: RightSideProps) => {
   );
 };
 
-/**
- * Fetches posts from the API based on the specified page number and token.
- * @param page - The page number of the posts to fetch.
- * @param token - The authentication token used for authorization.
- * @returns An object containing the fetched posts and the next page number, if available.
- */
-async function fetchPosts(page: number, token: string | unknown) {
-  const limit = 10;
-  const url =
-    process.env.NEXT_PUBLIC_API_BASE_URL + `/posts?limit=${limit}&page=${page}`;
-
-  const res = await baseQuery(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  let nextPage: number | null = page + 1;
-  const response = await res.json();
-  if (response.posts?.length == 0) {
-    nextPage = null;
-  }
-  return { ...response, nextPage: nextPage };
-}
-
-/**
- * Posts a new post to the server.
- * @param {string} content - The content of the post.
- * @param {string} image - The image associated with the post.
- * @param {string | unknown} token - The authentication token.
- * @returns {Promise<any>} - A promise that resolves to the server response.
- */
-async function postPost(
-  content: string,
-  image: File | undefined,
-  token: string | unknown,
-) {
-  const formData = new FormData();
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/posts";
-  formData.append("content", content);
-  formData.append("image", image || "");
-  const res = await baseQuery(url, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: formData,
-  });
-  const response = await res.json();
-  return response;
-}
-
-/**
- * Like a post.
- * @param id - The ID of the post to like.
- * @param token - The user's authentication token.
- * @returns A Promise that resolves to the result of the like operation.
- */
-async function likePost(id: number, token: string | unknown) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/posts/like/${id}`;
-  return await baseQuery(url, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function fetchRanking(token: string | unknown) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/users/ranking";
-
-  const res = await baseQuery(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const response = await res.json();
-  return response;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function fetchCommunities(token: string | unknown) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels";
-
-  const res = await baseQuery(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const response = await res.json();
-  return response;
-}
-
-interface UserProps {
-  count: number;
-  posts: FullPostData[];
-  nextPage: number;
-}
-
 interface FeedPageProps {
   token: string | unknown;
 }
@@ -206,23 +112,11 @@ function FeedPage(props: FeedPageProps) {
   const { ref, inView } = useInView();
   const { data: currentUser } = useUserProfileQuery(token);
   const {
-    data: postPages,
-    isFetchingNextPage: isFetchingPostsNextPage,
-    fetchNextPage: fetchNextPagePosts,
+    postPages,
+    isFetchingPostsNextPage,
+    fetchNextPagePosts,
     hasNextPage,
-  } = useSuspenseInfiniteQuery<UserProps>({
-    queryKey: ["posts"],
-    queryFn: ({ pageParam }) => {
-      return fetchPosts(pageParam as number, token);
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) => {
-      if (lastPage.nextPage === null) {
-        return null;
-      }
-      return pages.length + 1;
-    },
-  });
+  } = useFeedQuery(token);
 
   const posts = postPages?.pages.flatMap((page) => page.posts) || [];
 
@@ -280,13 +174,7 @@ function FeedPage(props: FeedPageProps) {
               });
             }}
           />
-          <Feed
-            newPosts={newPosts}
-            posts={posts || []}
-            onLike={async (id) => {
-              return await likePost(id, token);
-            }}
-          />
+          <Feed newPosts={newPosts} posts={posts || []} token={token} />
           {isFetchingPostsNextPage && <Loading />}
         </div>
         <RightSide

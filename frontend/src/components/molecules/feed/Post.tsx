@@ -3,6 +3,7 @@ import Image from "next/image";
 import Like from "@icons/outline/Like";
 import LikeFilled from "@icons/outline/LikeFilled";
 import { useState } from "react";
+import { useLikePost } from "@app/feed/feedApiService";
 
 interface User {
   name: string;
@@ -79,14 +80,20 @@ export interface PostData {
 
 interface PostProps {
   post: PostData;
-  onLike: (id: number) => Promise<Response>;
   liked: boolean;
+  token?: string | unknown;
 }
 
-const Post = ({ post, onLike, liked }: PostProps) => {
+const Post = ({ post, liked, token }: PostProps) => {
   const [isLiked, setIsLiked] = useState(liked);
   const [count, setCount] = useState(post.likes);
-  const [loading, setLoading] = useState(false);
+
+  const onError = () => {
+    setIsLiked(!isLiked);
+    setCount(isLiked ? count - 1 : count + 1);
+  };
+
+  const onLikeMutation = useLikePost(token, onError);
 
   return (
     <div className="inline-flex flex-col items-start gap-4 border-2 rounded-lg border-light-fg-link dark:border-dark-fg-primary bg-light-bg-primary dark:bg-dark-bg-primary px-8 sm:px-2 sm:py-2 py-4 shadow-light-lg w-full text-light-fg-primary dark:text-light-bg-tertiary">
@@ -108,15 +115,11 @@ const Post = ({ post, onLike, liked }: PostProps) => {
       <LikeSection
         count={count}
         liked={isLiked}
-        disabled={loading}
+        disabled={onLikeMutation.status === "pending"}
         onLike={(id) => {
-          setLoading(true);
-          onLike(id)
-            .then(() => {
-              setIsLiked(!isLiked);
-              setCount(isLiked ? count - 1 : count + 1);
-            })
-            .finally(() => setLoading(false));
+          setIsLiked(!isLiked);
+          setCount(isLiked ? count - 1 : count + 1);
+          onLikeMutation.mutate(id);
         }}
         postId={post.id}
       />
