@@ -1,25 +1,30 @@
 "use client";
 
-import { ReactNode, useState, Fragment, useRef } from "react";
+import { ReactNode, Fragment, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 interface ModalProps {
   title: string;
   description: string;
   action?: ReactNode | ReactNode[];
+  isOpen: boolean;
+  onClose?: () => void;
+}
+
+function noOp() {
+  // no operation
 }
 
 function Modal(props: ModalProps) {
-  const [isOpen, setIsOpen] = useState(true);
   const completeDevRef = useRef(null);
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
+    <Transition appear show={props.isOpen} as={Fragment}>
       <Dialog
         as="div"
         initialFocus={completeDevRef}
         className="relative z-10"
-        onClose={() => setIsOpen(false)}
+        onClose={props.onClose || noOp}
       >
         <Transition.Child
           as={Fragment}

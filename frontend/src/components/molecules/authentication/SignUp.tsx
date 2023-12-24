@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { SubmitHandler } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ErrorMessage } from "@hookform/error-message";
 import clsx from "clsx";
 
@@ -14,9 +14,9 @@ import Button from "@atoms/Button";
 import ButtonOAuth from "./ButtonOAuth";
 import useSignUpForm from "./useSignUpForm";
 import useSignUpMutation from "./useSignUpMutation";
-import { RequestError } from "@utils/baseQuery";
 import Modal from "@components/atoms/Modal";
 import Link from "next/link";
+import { useBoolean } from "@hooks/useBoolean";
 
 export interface FormInput {
   email: string;
@@ -35,40 +35,42 @@ function SingInRedirect() {
   );
 }
 
-function callModal(
-  isError: boolean,
-  error: RequestError | null,
-  isSuccess: boolean,
-) {
-  if (isError) {
-    if (error?.response?.status == 409) {
-      return <Modal title="Error" description="Email already exists!" />;
-    } else {
-      return <Modal title="Error" description="Something went wrong!" />;
-    }
-  } else if (isSuccess) {
-    return (
-      <Modal
-        title="Success"
-        description="Sign up completed successfully!"
-        action={<SingInRedirect />}
-      />
-    );
-  }
-}
-
 function SignUpForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { register, handleSubmit, formState, getFieldState } = useSignUpForm();
 
+  const {
+    value: isErrorModalVisible,
+    setTrue: showErrorModal,
+    setFalse: hideErrorModal,
+  } = useBoolean();
+
   const { mutate, isPending, isError, isSuccess, error } = useSignUpMutation();
   const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
+
+  useEffect(() => {
+    if (isError) {
+      showErrorModal();
+    }
+  }, [isError, showErrorModal]);
 
   function changePasswordVisibility() {
     if (isPasswordVisible == false) {
       setPasswordVisibility(true);
     } else {
       setPasswordVisibility(false);
+    }
+  }
+
+  function getErrorModalDescription() {
+    if (!isError) {
+      return "";
+    }
+
+    if (error.response?.status == 409) {
+      return "Email already exists!";
+    } else {
+      return "Something went wrong!";
     }
   }
 
@@ -80,7 +82,20 @@ function SignUpForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col w-full items-center"
     >
-      {callModal(isError, error, isSuccess)}
+      <Modal
+        isOpen={isErrorModalVisible}
+        onClose={hideErrorModal}
+        title="Error"
+        description={getErrorModalDescription()}
+      />
+
+      <Modal
+        isOpen={isSuccess}
+        title="Success"
+        description="Sign up completed successfully!"
+        action={<SingInRedirect />}
+      />
+
       <div className="space-y-4">
         <div>
           <InputText
