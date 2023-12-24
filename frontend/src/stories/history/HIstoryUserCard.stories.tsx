@@ -1,6 +1,7 @@
-import HistoryUserCard from "@components/molecules/history/HistoryUserCard";
+import HistoryUserCard, {
+  HistoryUserCardProps,
+} from "@components/molecules/history/HistoryUserCard";
 import { Meta, StoryObj } from "@storybook/react";
-import { HistoryUserCardProps } from "../../types/history";
 
 const meta: Meta<typeof HistoryUserCard> = {
   title: "History/UserCard",

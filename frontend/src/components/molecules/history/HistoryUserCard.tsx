@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { HistoryUserCardProps } from "../../../types/history";
 import Image from "next/image";
 import React from "react";
 
@@ -35,6 +34,12 @@ const UserImage = (props: UserImageProps) => {
   );
 };
 
+export interface HistoryUserCardProps {
+  avatarPath: string;
+  username: string;
+  ratingChange: number;
+  side: string;
+}
 const HistoryUserCard = (props: HistoryUserCardProps) => {
   return (
     <div className="flex flex-col gap-2 bg-inherit items-center">
