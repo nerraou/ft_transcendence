@@ -23,13 +23,15 @@ const UserImage = (props: UserImageProps) => {
         {props.ratingChange >= 0 ? "+" : ""}
         {props.ratingChange}
       </div>
-      <Image
-        src={props.image}
-        alt="Player Avatar"
-        width="30"
-        height="30"
-        className="custom-position object-cover w-12 h-12 rounded-full p-2 pb-0 pt-3"
-      />
+      <div className="pt-3">
+        <Image
+          src={props.image}
+          alt="Player Avatar"
+          width="30"
+          height="30"
+          className="object-cover w-12 h-12 rounded-full"
+        />
+      </div>
     </div>
   );
 };
