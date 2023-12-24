@@ -94,11 +94,16 @@ const Post = ({ post, liked, token }: PostProps) => {
   };
 
   const onLikeMutation = useLikePost(token, onError);
+  const date = new Date(post.createdAt);
+  const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString(
+    [],
+    { hour: "2-digit", minute: "2-digit" },
+  )}`;
 
   return (
     <div className="inline-flex flex-col items-start gap-4 border-2 rounded-lg border-light-fg-link dark:border-dark-fg-primary bg-light-bg-primary dark:bg-dark-bg-primary px-8 sm:px-2 sm:py-2 py-4 shadow-light-lg w-full text-light-fg-primary dark:text-light-bg-tertiary">
       <UserCard user={post.user} />
-      <p className="text-xs">{new Date(post.createdAt)?.toLocaleString()}</p>
+      <p className="text-xs">{formattedDate}</p>
       <p className="text-lg">{post.content}</p>
       {post.image && (
         <div>
