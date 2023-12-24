@@ -1,12 +1,21 @@
 import Post from "@components/molecules/feed/Post";
 import { Meta, StoryObj } from "@storybook/react";
-import { action } from "@storybook/addon-actions";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const meta: Meta<typeof Post> = {
   title: "Feed/Post",
   component: Post,
+  decorators: [
+    (Story) => (
+      <QueryClientProvider client={queryClient}>
+        <Story />
+      </QueryClientProvider>
+    ),
+  ],
   tags: ["autodocs"],
-};
+} as Meta;
 
 export default meta;
 
@@ -26,10 +35,6 @@ export const Default: Story = {
       image: "/default/user-circle.png",
     },
     liked: false,
-    onLike: () => {
-      action("onLike");
-      return Promise.resolve();
-    },
   },
 };
 
@@ -47,9 +52,5 @@ export const LikedNoImage: Story = {
       image: null,
     },
     liked: true,
-    onLike: () => {
-      action("onLike");
-      return Promise.resolve();
-    },
   },
 };

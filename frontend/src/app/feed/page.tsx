@@ -23,7 +23,8 @@ import Button from "@components/atoms/Button";
 import { redirect } from "next/navigation";
 import RankingModal from "@components/molecules/feed/RankingModal";
 import { useUserProfileQuery } from "@services/useUserProfileQuery";
-import { postPost, useFeedQuery } from "./feedApiService";
+import { CreatePostResponse, useFeedQuery } from "./feedApiService";
+import CustomModal from "@components/atoms/CustomModal";
 
 export interface FullPostData {
   id: number;
@@ -43,17 +44,16 @@ export interface FullPostData {
 
 interface FeedProps {
   posts: FullPostData[];
-  newPosts: FullPostData[];
   token: string | unknown;
 }
 
 const Feed = (props: FeedProps) => {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
-  const { posts, newPosts, token } = props;
+  const { posts, token } = props;
 
   return (
     <div className="flex flex-col items-center justify-center w-full gap-4">
-      {[...newPosts, ...posts].map((post) => (
+      {posts.map((post) => (
         <Post
           key={post.id}
           post={{
@@ -107,7 +107,35 @@ function FeedPage(props: FeedPageProps) {
   const [query, setQuery] = useState("");
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
   const [rankingPage, setRankingPage] = useState(1);
-  const [newPosts, setNewPosts] = useState<FullPostData[]>([]);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [message, setMessage] = useState("Something went wrong");
+  const [posts, setPosts] = useState<FullPostData[]>([]);
+
+  const onPostSuccess = (post: CreatePostResponse) => {
+    setPosts([
+      {
+        id: post.id,
+        content: post.content,
+        imagePath: post.imagePath,
+        likesCount: 0,
+        createdAt: post.createdAt,
+        likedByUser: false,
+        owner: {
+          id: currentUser?.id,
+          username: currentUser?.username,
+          avatarPath: currentUser?.avatarPath,
+          firstName: currentUser?.firstName,
+          lastName: currentUser?.lastName,
+        },
+      },
+      ...posts,
+    ]);
+  };
+
+  const onPostError = (error: string) => {
+    setMessage(error);
+    setErrorModalOpen(true);
+  };
 
   const { ref, inView } = useInView();
   const { data: currentUser } = useUserProfileQuery(token);
@@ -118,7 +146,21 @@ function FeedPage(props: FeedPageProps) {
     hasNextPage,
   } = useFeedQuery(token);
 
-  const posts = postPages?.pages.flatMap((page) => page.posts) || [];
+  useEffect(() => {
+    const tmpPosts: FullPostData[] = [];
+    const set = new Set();
+    if (postPages) {
+      postPages.pages.forEach((page) => {
+        page.posts.forEach((post) => {
+          if (!set.has(post.id)) {
+            set.add(post.id);
+            tmpPosts.push(post);
+          }
+        });
+      });
+      setPosts(tmpPosts);
+    }
+  }, [postPages]);
 
   useEffect(() => {
     if (inView) {
@@ -135,6 +177,12 @@ function FeedPage(props: FeedPageProps) {
           "sm:flex-col-reverse md:items-center",
         )}
       >
+        <CustomModal
+          isOpen={errorModalOpen}
+          onClose={() => setErrorModalOpen(false)}
+          title="Error"
+          description={message}
+        />
         <RankingModal
           isOpen={rankingModalOpen}
           onClose={() => setRankingModalOpen(false)}
@@ -151,31 +199,11 @@ function FeedPage(props: FeedPageProps) {
                 "/assets/images/" +
                 currentUser.avatarPath
             }
-            onPost={async (content, image) => {
-              return await postPost(content, image, token).then((res) => {
-                setNewPosts([
-                  {
-                    id: res.id,
-                    content: res.content,
-                    imagePath: res.imagePath,
-                    likesCount: 0,
-                    createdAt: res.createdAt,
-                    likedByUser: false,
-                    owner: {
-                      id: currentUser.id,
-                      username: currentUser.username,
-                      avatarPath: currentUser.avatarPath,
-                      firstName: currentUser.firstName,
-                      lastName: currentUser.lastName,
-                    },
-                  },
-                  ...newPosts,
-                ]);
-              });
-            }}
+            token={token}
+            onPostSuccess={onPostSuccess}
+            onPostError={onPostError}
           />
-          <Feed newPosts={newPosts} posts={posts || []} token={token} />
-          {isFetchingPostsNextPage && <Loading />}
+          <Feed posts={posts || []} token={token} />
         </div>
         <RightSide
           rankingProps={{

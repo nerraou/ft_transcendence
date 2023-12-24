@@ -26,6 +26,36 @@ async function fetchPosts(page: number, token: string | unknown) {
 }
 
 /**
+ * Validates the content and image size of a post.
+ * @param content - The content of the post.
+ * @param image - The image file attached to the post (optional).
+ * @returns An object indicating whether there is an error and the corresponding error message.
+ */
+const PostValidation = (content: string, image: File | undefined) => {
+  if (content.length > 500) {
+    return {
+      error: true,
+      message: "Content should not be more than 500 characters",
+    };
+  } else if (image && image.size > 2 * 1024 * 1024) {
+    return {
+      error: true,
+      message: "Image should not be more than 2MB",
+    };
+  } else if (content.length === 0 && !image) {
+    return {
+      error: true,
+      message: "Post should have content or image",
+    };
+  } else {
+    return {
+      error: false,
+      message: "",
+    };
+  }
+};
+
+/**
  * Posts a new post to the server.
  * @param {string} content - The content of the post.
  * @param {string} image - The image associated with the post.
@@ -37,10 +67,18 @@ async function postPost(
   image: File | undefined,
   token: string | unknown,
 ) {
+  const { error, message } = PostValidation(content, image);
+  if (error) {
+    throw new Error(message);
+  }
   const formData = new FormData();
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/posts";
-  formData.append("content", content);
-  formData.append("image", image || "");
+  if (image) {
+    formData.append("image", image || "");
+  }
+  if (content) {
+    formData.append("content", content);
+  }
   const res = await baseQuery(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
@@ -48,6 +86,31 @@ async function postPost(
   });
   const response = await res.json();
   return response;
+}
+
+export interface CreatePostResponse {
+  id: number;
+  content: string | null;
+  imagePath: string | null;
+  createdAt: string;
+}
+
+export function useCreatePost(
+  token: string | unknown,
+  onError: (error: string) => void,
+  onSuccess: (response: CreatePostResponse) => void,
+) {
+  return useMutation<
+    CreatePostResponse,
+    RequestError,
+    { content: string; image: File | undefined }
+  >({
+    mutationFn: ({ content, image }) => postPost(content, image, token),
+    onError: (response) => {
+      onError(response?.message || "Something went wrong");
+    },
+    onSuccess: (response) => onSuccess(response as CreatePostResponse),
+  });
 }
 
 /**
