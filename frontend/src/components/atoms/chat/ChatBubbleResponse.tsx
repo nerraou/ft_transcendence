@@ -1,11 +1,11 @@
 import Image from "next/image";
 
-interface ChatBubbelResponseProps {
+interface ChatBubbleResponseProps {
   image: string;
   message: string;
 }
 
-function ChatBubbelResponse(props: ChatBubbelResponseProps) {
+function ChatBubbleResponse(props: ChatBubbleResponseProps) {
   return (
     <div className="relative max-h-max w-full p-1">
       <div className="absolute top-0 right-0">
@@ -20,12 +20,12 @@ function ChatBubbelResponse(props: ChatBubbelResponseProps) {
         </div>
       </div>
       <div className="flex justify-end ">
-        <div className="top-4 right-4 mr-8 mt-2 w-80 text-light-fg-tertiary border-2 bg-dark-bg-primary border-light-bg-tertiary rounded-l-lg rounded-br-lg p-4">
+        <p className="top-4 right-4 mr-8 mt-2 w-80 text-light-fg-tertiary border-2 bg-dark-bg-primary border-light-bg-tertiary rounded-l-lg rounded-br-lg p-4">
           {props.message}
-        </div>
+        </p>
       </div>
     </div>
   );
 }
 
-export default ChatBubbelResponse;
+export default ChatBubbleResponse;

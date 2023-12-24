@@ -1,4 +1,4 @@
-import ChatBubbleMessage from "@atoms/chat/ChatBubbelMessage";
+import ChatBubbleMessage from "@components/atoms/chat/ChatBubbleMessage";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof ChatBubbleMessage> = {
