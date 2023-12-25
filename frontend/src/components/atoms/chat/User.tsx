@@ -15,12 +15,12 @@ function User(props: userProps) {
 
   return (
     <div className="flex  items-center space-x-4">
-      <div className="relative shrink-0 w-20 h-20">
+      <div className="relative shrink-0 w-16 h-16">
         <Image
           src={props.image}
           alt="user image"
           fill
-          sizes="w-20 h-20"
+          sizes="w-16 h-16"
           className="rounded-full object-cover appearance-none"
         />
         <div
