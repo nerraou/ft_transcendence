@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import Image from "next/image";
 
-interface UserProps {
+export interface UserProps {
   status: "ONLINE" | "OFFLINE";
   username: string;
   image: string;
