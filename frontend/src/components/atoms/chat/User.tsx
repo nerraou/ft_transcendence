@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import Image from "next/image";
 
-interface userProps {
+interface UserProps {
   status: "ONLINE" | "OFFLINE";
   username: string;
   image: string;
 }
 
-function User(props: userProps) {
+function User(props: UserProps) {
   let statusColor = "bg-light-fg-secondary";
   if (props.status == "ONLINE") {
     statusColor = " bg-light-bg-primary";
