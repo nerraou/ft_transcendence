@@ -19,6 +19,78 @@ export class MessagesService {
     });
   }
 
+  getMessagesByUsernames(
+    username1: string,
+    username2: string,
+    page: number,
+    limit: number,
+  ) {
+    return this.prisma.message.findMany({
+      include: {
+        sender: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            avatarPath: true,
+            status: true,
+          },
+        },
+      },
+      where: {
+        OR: [
+          {
+            sender: {
+              username: username1,
+            },
+            receiver: {
+              username: username2,
+            },
+          },
+          {
+            sender: {
+              username: username2,
+            },
+            receiver: {
+              username: username1,
+            },
+          },
+        ],
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
+
+  getMessagesByUsernamesCount(username1: string, username2: string) {
+    return this.prisma.message.count({
+      where: {
+        OR: [
+          {
+            sender: {
+              username: username1,
+            },
+            receiver: {
+              username: username2,
+            },
+          },
+          {
+            sender: {
+              username: username2,
+            },
+            receiver: {
+              username: username1,
+            },
+          },
+        ],
+      },
+    });
+  }
+
   getMessagesByIds(messagesIds: number[]) {
     return this.prisma.message.findMany({
       where: {
