@@ -8,13 +8,17 @@ interface InputSearchProps {
   placeholder: string;
   textColor: string;
   width?: string;
+  bgColor?: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
 }
 
 const InputSearch = (props: InputSearchProps) => {
   const defaultWidth = "w-64";
+  const defaultBgColor = "bg-light-bg-tertiary";
+
   const width = props.width || defaultWidth;
+  const color = props.bgColor || defaultBgColor;
 
   return (
     <div className={clsx("relative", width)}>
@@ -26,9 +30,9 @@ const InputSearch = (props: InputSearchProps) => {
         placeholder={props.placeholder}
         value={props.value}
         className={clsx(
+          color,
           props.textColor,
-          width,
-          "h-10 border-2 rounded-full bg-light-bg-tertiary outline-none focus:border-dark-useless px-5 pl-12 pr-10 border-light-fg-primary dark:border-dark-bg-primary",
+          "h-10 border-2 rounded-full outline-none focus:border-dark-useless px-5 pl-12 pr-10 border-light-fg-primary dark:border-dark-bg-primary w-full",
         )}
         onChange={props.onChange}
       />
