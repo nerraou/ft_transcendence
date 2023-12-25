@@ -1,8 +1,15 @@
-function ChevronLeft({ className }: { className?: string }) {
+import clsx from "clsx";
+
+interface ChevronLeftProps {
+  className?: string;
+  color?: string;
+}
+
+function ChevronLeft(props: ChevronLeftProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      className={clsx(props.className, props.color)}
       width="24"
       height="24"
       viewBox="0 0 24 24"
