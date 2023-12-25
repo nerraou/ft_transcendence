@@ -14,8 +14,9 @@ export class CreateChannelDto {
   @IsEnum(ChannelType)
   type: ChannelType;
 
-  @IsString()
   @ValidateIf((object) => object.type == "PROTECTED")
+  @IsString()
+  @Length(4, 16)
   @RequireIf((object) => {
     if (object.type == "PROTECTED") {
       return typeof object.password != "string";

@@ -41,6 +41,35 @@ export class ChannelsService {
     });
   }
 
+  joinChannel(userId: number, channelId: number) {
+    return this.prisma.channelMember.create({
+      data: {
+        channelId: channelId,
+        memberId: userId,
+        role: "MEMBER",
+      },
+    });
+  }
+
+  async isChannelMember(channelId: number, userId: number) {
+    const count = await this.prisma.channelMember.count({
+      where: {
+        channelId: channelId,
+        memberId: userId,
+      },
+    });
+
+    return count != 0;
+  }
+
+  findChannelById(channelId: number) {
+    return this.prisma.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+    });
+  }
+
   findUserChannels(userId: number) {
     return this.prisma.channel.findMany({
       where: {
