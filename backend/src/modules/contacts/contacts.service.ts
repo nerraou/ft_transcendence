@@ -73,6 +73,10 @@ export class ContactsService {
     WHERE follower_id = ${userId} OR following_id = ${userId}`;
     const contacts = await this.prisma.$queryRaw<Contact[]>(getContactsQuery);
 
+    if (contacts.length == 0) {
+      return [];
+    }
+
     const usersContactsIds = contacts.reduce<number[]>((ids, contact) => {
       if (contact.followerId != userId) {
         ids.push(contact.followerId);
