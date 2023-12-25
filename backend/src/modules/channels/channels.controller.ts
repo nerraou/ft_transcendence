@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseGuards,
@@ -19,7 +20,10 @@ import { AppEnv } from "@config/env-configuration";
 
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { ChannelsService } from "./channels.service";
-import { CreateChannelApiDocumentation } from "./decorators/docs.decorator";
+import {
+  CreateChannelApiDocumentation,
+  GetChannelsApiDocumentation,
+} from "./decorators/docs.decorator";
 
 @Controller("channels")
 export class ChannelsController {
@@ -50,6 +54,17 @@ export class ChannelsController {
 
     return {
       id: channel.id,
+    };
+  }
+
+  @Get()
+  @GetChannelsApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getChannels(@User("id") userId: number) {
+    const channels = await this.channelsService.findUserChannels(userId);
+
+    return {
+      channels,
     };
   }
 }

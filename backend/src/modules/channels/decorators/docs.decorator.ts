@@ -89,3 +89,36 @@ export function CreateChannelApiDocumentation() {
     }),
   );
 }
+
+export function GetChannelsApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          channels: [
+            {
+              id: 4,
+              name: "Hi",
+              description: "greeting channel",
+              imagePath: "80188ab1-b599-4c9b-b452-aeafda41b995.png",
+              type: "PUBLIC",
+              membersCount: 1,
+            },
+          ],
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}

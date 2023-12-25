@@ -1,6 +1,6 @@
 import { RequireIf } from "@common/decorators/RequireIf";
 import { ChannelType } from "@prisma/client";
-import { IsEnum, IsString, Length } from "class-validator";
+import { IsEnum, IsString, Length, ValidateIf } from "class-validator";
 
 export class CreateChannelDto {
   @IsString()
@@ -15,8 +15,13 @@ export class CreateChannelDto {
   type: ChannelType;
 
   @IsString()
+  @ValidateIf((object) => object.type == "PROTECTED")
   @RequireIf((object) => {
-    return object.type == "PROTECTED";
+    if (object.type == "PROTECTED") {
+      return typeof object.password != "string";
+    }
+
+    return false;
   })
   password?: string;
 }
