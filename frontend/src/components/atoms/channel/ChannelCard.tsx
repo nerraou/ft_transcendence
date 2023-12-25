@@ -12,7 +12,7 @@ const ChannelImage = (props: ChannelImageProps) => {
       alt="channel image"
       width="50"
       height="50"
-      className="custom-position object-cover w-16 h-16 rounded-lg"
+      className="object-cover w-16 h-16 rounded-lg"
     />
   );
 };
@@ -27,13 +27,13 @@ const ChannelCard = (props: ChannelCardProps) => {
   const defaultImage = "/default/users-group.png";
 
   return (
-    <div className="flex gap-4 max-w-max bg-inherit">
+    <div className="flex gap-4 max-w-max bg-inherit lg:flex-col lg:align-center lg:gap-2 lg:justify-center sm:flex-col sm:align-center sm:gap-2 sm:justify-center">
       <ChannelImage image={props.channelImage ?? defaultImage} />
       <div className="flex flex-col gap-2">
-        <label className="text-light-fg-link text-lg">
+        <label className="sm:max-w-[150px] md:max-w-xs lg:max-w-[150px] xl:max-w-[100px] 2xl:w-[180px] text-light-fg-link text-lg lg:text-sm md:text-sm sm:text-sm overflow-hidden overflow-ellipsis whitespace-nowrap" title={props.channelName}>
           #{props.channelName}
         </label>
-        <label className="text-light-fg-link text-xs leading-none">
+        <label className="text-light-fg-link text-xs leading-none overflow-hidden overflow-ellipsis whitespace-nowrap">
           {props.chnnelMembers} members
         </label>
       </div>
