@@ -24,11 +24,14 @@ function formatOutput(value: DateValue) {
 
 export default function DatePicker(props: DatePickerProps) {
   const headerClassName =
-    "inline-flex items-center h-9 rounded-md px-2 bg-light-bg-tertiary text-light-fg-primary dark:bg-dark-bg-primary dark:text-dark-fg-tertiary";
+    "inline-flex items-center h-9 rounded-md px-2 bg-light-bg-tertiary text-light-fg-primary dark:bg-dark-bg-primary";
 
   return (
     <Datepicker value={props.value} onChange={props.onChange}>
-      <Datepicker.Button action="open" className={props.buttonHeight}>
+      <Datepicker.Button
+        action="open"
+        className={clsx("text-light-fg-primary", props.buttonHeight)}
+      >
         {formatOutput(props.value)}
       </Datepicker.Button>
 
