@@ -1,0 +1,46 @@
+import { ChannelType } from "@prisma/client";
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Length,
+  ValidateIf,
+} from "class-validator";
+
+import { RequireIf } from "@common/decorators/RequireIf";
+import { Type } from "class-transformer";
+
+export class UpdateChannelDto {
+  @IsInt()
+  @Type(() => Number)
+  @IsPositive()
+  channeldId: number;
+
+  @IsString()
+  @Length(1, 255)
+  @IsOptional()
+  name: string;
+
+  @IsString()
+  @Length(10, 500)
+  @IsOptional()
+  description: string;
+
+  @IsEnum(ChannelType)
+  @IsOptional()
+  type: ChannelType;
+
+  @ValidateIf((object) => object.type == "PROTECTED")
+  @IsString()
+  @Length(4, 16)
+  @RequireIf((object) => {
+    if (object.type == "PROTECTED") {
+      return typeof object.password != "string";
+    }
+
+    return false;
+  })
+  password?: string;
+}

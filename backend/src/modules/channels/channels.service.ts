@@ -4,6 +4,7 @@ import { PrismaService } from "@common/modules/prisma/prisma.service";
 import { HashService } from "@common/services/hash.service";
 
 import { CreateChannelDto } from "./dto/create-channel.dto";
+import { UpdateChannelDto } from "./dto/update-channel.dto";
 
 @Injectable()
 export class ChannelsService {
@@ -41,6 +42,31 @@ export class ChannelsService {
     });
   }
 
+  async updateChannel(updateChannelDto: UpdateChannelDto, imagePath?: string) {
+    let hashedPassword: string | undefined;
+
+    console.log(updateChannelDto);
+
+    if (updateChannelDto.type == "PROTECTED") {
+      hashedPassword = await this.hashService.hash(updateChannelDto.password);
+    } else {
+      hashedPassword = null;
+    }
+
+    return this.prisma.channel.update({
+      data: {
+        name: updateChannelDto.name,
+        description: updateChannelDto.description,
+        type: updateChannelDto.type,
+        password: hashedPassword,
+        imagePath: imagePath,
+      },
+      where: {
+        id: updateChannelDto.channeldId,
+      },
+    });
+  }
+
   joinChannel(userId: number, channelId: number) {
     return this.prisma.channelMember.create({
       data: {
@@ -66,6 +92,21 @@ export class ChannelsService {
     return this.prisma.channel.findUnique({
       where: {
         id: channelId,
+      },
+    });
+  }
+
+  findChannelByIdWithOwner(channelId: number) {
+    return this.prisma.channel.findUnique({
+      where: {
+        id: channelId,
+      },
+      include: {
+        members: {
+          where: {
+            role: "OWNER",
+          },
+        },
       },
     });
   }
