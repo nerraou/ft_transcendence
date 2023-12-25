@@ -4,6 +4,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Param,
   Patch,
   Query,
   UploadedFile,
@@ -27,6 +28,7 @@ import {
   UpdatePasswordApiDocumentation,
   UpdateAvatarApiDocumentation,
   GetLeaderboardApiDocumentation,
+  GetUserByUsernameDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -59,6 +61,32 @@ export class UsersController {
       avatarPath: user.avatarPath,
       is2faEnabled: user.is2faEnabled,
       isEmailVerified: user.isEmailVerified,
+      createdAt: user.createdAt,
+      status: user.status,
+      rating: user.rating,
+      ranking,
+    };
+  }
+
+  @Get("/:username")
+  @GetUserByUsernameDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getUserByUsername(@Param("username") username: string) {
+    const user = await this.usersService.findOneByUsername(username);
+
+    if (!user) {
+      throw new ForbiddenException();
+    }
+
+    const ranking = await this.usersService.getUserRanking(user.id);
+
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarPath: user.avatarPath,
       createdAt: user.createdAt,
       status: user.status,
       rating: user.rating,
