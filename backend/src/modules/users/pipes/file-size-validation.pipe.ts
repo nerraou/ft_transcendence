@@ -2,6 +2,8 @@ import {
   PipeTransform,
   Injectable,
   PayloadTooLargeException,
+  UnprocessableEntityException,
+  HttpStatus,
 } from "@nestjs/common";
 
 export const ONE_MEGA = 1024 * 1024;
@@ -24,6 +26,14 @@ export class FileSizeValidationPipe implements PipeTransform {
   transform(value: Express.Multer.File) {
     if (!value && this.options.isOptional) {
       return value;
+    }
+
+    if (!value) {
+      throw new UnprocessableEntityException({
+        message: ["image is a required field"],
+        error: "Unprocessable Entity",
+        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      });
     }
 
     if (value.size > this.options.maxSize) {

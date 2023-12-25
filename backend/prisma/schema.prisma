@@ -28,14 +28,16 @@ model User {
   createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamp()
   updatedAt         DateTime   @updatedAt @map("updated_at") @db.Timestamp()
 
-  followedBy Contact[]  @relation("following")
-  following  Contact[]  @relation("follower")
-  sent       Message[]  @relation("sent")
-  received   Message[]  @relation("received")
-  player     Game[]     @relation("player")
-  opponent   Game[]     @relation("opponent")
-  posts      Post[]
-  PostLike   PostLike[]
+  followedBy       Contact[]       @relation("following")
+  following        Contact[]       @relation("follower")
+  sent             Message[]       @relation("sent")
+  received         Message[]       @relation("received")
+  player           Game[]          @relation("player")
+  opponent         Game[]          @relation("opponent")
+  posts            Post[]
+  postLikes        PostLike[]
+  channels         Channel[]
+  memberOfChannels ChannelMember[]
 
   @@map("users")
 }
@@ -98,6 +100,41 @@ model Game {
   @@map("games")
 }
 
+model Channel {
+  id           Int         @id @default(autoincrement()) @map("id")
+  name         String      @map("name") @db.VarChar(255)
+  description  String      @map("description") @db.Text
+  imagePath    String      @map("image_path") @db.VarChar(255)
+  membersCount Int         @default(1) @map("members_count")
+  type         ChannelType @map("type")
+  password     String?     @map("password") @db.VarChar(72)
+  creatorId    Int         @map("creator_id")
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt    DateTime    @updatedAt @map("updated_at") @db.Timestamp()
+
+  creator User @relation(fields: [creatorId], references: [id])
+
+  members ChannelMember[]
+
+  @@map("channels")
+}
+
+model ChannelMember {
+  id         Int                 @id @default(autoincrement()) @map("id")
+  memberId   Int                 @map("memeber_id")
+  channelId  Int                 @map("channel_id")
+  role       ChannelMemberRole   @map("role")
+  state      ChannelMemberState? @map("state")
+  mutedUntil DateTime?           @map("muted_until") @db.Timestamp()
+  createdAt  DateTime            @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt  DateTime            @updatedAt @map("updated_at") @db.Timestamp()
+
+  member  User    @relation(fields: [memberId], references: [id])
+  channel Channel @relation(fields: [channelId], references: [id])
+
+  @@map("channels_members")
+}
+
 model Post {
   id         Int      @id @default(autoincrement()) @map("id")
   content    String?  @map("text")
@@ -139,4 +176,21 @@ enum UserStatus {
 enum GameWinner {
   PLAYER
   OPPONENT
+}
+
+enum ChannelType {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
+enum ChannelMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ChannelMemberState {
+  BANNED
+  KICKED
 }
