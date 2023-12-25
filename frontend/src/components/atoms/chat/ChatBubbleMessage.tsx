@@ -19,9 +19,11 @@ function ChatBubbleMessage(props: ChatBubbleMessageProps) {
           />
         </div>
       </div>
-      <p className="ml-8 mt-2 w-80 text-light-fg-tertiary border-2 bg-dark-fg-primary border-light-bg-tertiary rounded-r-lg rounded-bl-lg p-4">
-        {props.message}
-      </p>
+      <div className="flex justify-start">
+        <p className="ml-8 mt-2 w-80 text-light-fg-tertiary border-2 bg-dark-fg-primary border-light-bg-tertiary rounded-r-lg rounded-bl-lg p-4">
+          {props.message}
+        </p>
+      </div>
     </div>
   );
 }
