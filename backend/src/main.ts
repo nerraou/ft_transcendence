@@ -3,6 +3,7 @@ import "@polyfills";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { HttpStatus, ValidationPipe } from "@nestjs/common";
+import * as morgan from "morgan";
 
 import { RedisIoAdapter } from "@modules/events/adapters/redis-io-adapter";
 
@@ -10,6 +11,8 @@ import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  app.use(morgan("dev"));
 
   const redisIoAdapter = new RedisIoAdapter(app);
   await redisIoAdapter.connectToRedis();
