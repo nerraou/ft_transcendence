@@ -10,6 +10,7 @@ import ChevronUp from "@components/atoms/icons/outline/ChevronUp";
 import Selector from "@components/atoms/icons/outline/Selector";
 import { Column } from "react-table";
 import { Game } from "./HistoryTable";
+import { HistoryFilters } from "./UseFilters";
 
 // eslint-disable-next-line no-shadow
 export enum SortEnum {
@@ -65,11 +66,6 @@ const getRankingIcon = (oldRanking: number, newRanking: number) => {
   return (
     <RankStable className="text-xl text-light-fg-primary dark:text-dark-fg-primary" />
   );
-};
-
-type HistoryFilters = {
-  dateSort: SortEnum | undefined;
-  timeSort: SortEnum | undefined;
 };
 
 export function getColumns(
