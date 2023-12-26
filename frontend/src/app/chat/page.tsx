@@ -41,7 +41,7 @@ function ChatPage() {
         <div className="w-1/3 lg:hidden md:hidden sm:hidden">
           <SidePanel image="/totoro.jpg" />
         </div>
-        <div className="xl:hidden lg:visible md:visible sm:visible">
+        <div className="2xl:hidden xl:hidden lg:visible md:visible sm:visible">
           <SidePanelPopover image="/totoro.jpg" />
         </div>
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">

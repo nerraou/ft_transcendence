@@ -19,14 +19,14 @@ function UserHeader(props: SidePanelProps) {
           className="rounded-md object-cover appearance-none"
         />
       </div>
-      <MenuDots color=" stroke-light-bg-tertiary" />
+      <MenuDots color="stroke-light-bg-tertiary" />
     </div>
   );
 }
 
 function SidePanel(props: SidePanelProps) {
   return (
-    <section className="space-y-10 h-full w-full flex flex-col px-5 pt-3 pb-14 bg-light-bg-primary border-4 border-light-bg-tertiary rounded-bl-2xl rounded-tl-xl">
+    <section className="scrollbar-thin scrollbar-track-light-fg-tertiary scrollbar-thumb-light-fg-primary space-y-10 h-full sm:h-[80vh] overflow-auto sm:w-5/6 w-full flex flex-col px-5 pt-3 pb-14 bg-light-bg-primary border-4 border-light-bg-tertiary rounded-bl-2xl rounded-tl-xl">
       <UserHeader image={props.image} />
       <SearchFriendsList />
       <SearchChannelsList />
