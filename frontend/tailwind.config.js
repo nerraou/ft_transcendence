@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     // work with Fixed-range breakpoints instead of min-width: desktop first
     screens: {
-      "2xl": { min: "1280px", max: "1536px" },
+      "2xl": { min: "1280px", max: "1969px" },
       xl: { min: "1025px", max: "1279px" },
       lg: { min: "770px", max: "1024px" },
       md: { min: "640px", max: "769px" },
@@ -121,5 +121,5 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/stories/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  plugins: [require("@headlessui/tailwindcss")],
+  plugins: [require("@headlessui/tailwindcss"), require("tailwind-scrollbar")],
 };
