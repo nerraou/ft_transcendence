@@ -152,6 +152,7 @@ function FriendsPage() {
               onReset={reset}
               fallbackRender={({ resetErrorBoundary }) => (
                 <Modal
+                  isOpen
                   title="Error"
                   description="Something went wrong"
                   action={

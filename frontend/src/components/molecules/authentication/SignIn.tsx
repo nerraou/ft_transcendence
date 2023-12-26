@@ -12,6 +12,7 @@ import InputText from "@atoms/InputText";
 import Bar from "@atoms/decoration/Bar";
 import Button from "@atoms/Button";
 import Modal from "@atoms/Modal";
+import { useBoolean } from "@hooks/useBoolean";
 
 import ButtonOAuth from "./ButtonOAuth";
 import useSignInForm from "./useSignInForm";
@@ -39,35 +40,19 @@ function Redirect(props: redirectProps) {
   );
 }
 
-function callModal(res: SignInResponse | undefined) {
-  if (res?.error) {
-    if (res?.status == 401) {
-      return (
-        <Modal
-          title="Error"
-          description="The Email/password combination is not valid"
-          action={<Redirect path="sign-up" text="Create account" />}
-        />
-      );
-    } else {
-      return <Modal title="Error" description="Something went wrong!" />;
-    }
-  } else if (res?.ok) {
-    return (
-      <Modal
-        title="Welcom to BongBoy"
-        description="Complete your acount from here"
-        action={<Redirect path="/profile/settings" text="Settings" />}
-      />
-    );
-  }
-}
-
 function SignInForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { register, formState, getFieldState, handleSubmit } = useSignInForm();
+  const [res, setRes] = useState<SignInResponse | undefined>();
   const [isLoading, setLoading] = useState(false);
-  const [res, setRes] = useState<undefined | SignInResponse>();
+
+  const { value: isSuccessModalVisible, setTrue: showSuccessModal } =
+    useBoolean();
+  const {
+    value: isErrorModalVisible,
+    setTrue: showErrorModal,
+    setFalse: hideErrorModal,
+  } = useBoolean();
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     try {
@@ -78,8 +63,14 @@ function SignInForm() {
         password: data.password,
         redirect: false,
       });
-      setRes(response);
       setLoading(false);
+
+      if (response?.ok) {
+        showSuccessModal();
+      } else {
+        setRes(response);
+        showErrorModal();
+      }
     } catch (error) {
       setLoading(false);
     }
@@ -93,6 +84,23 @@ function SignInForm() {
     }
   }
 
+  function onErrorModalClose() {
+    hideErrorModal();
+  }
+
+  function getErrorModalProps() {
+    if (res?.status == 401) {
+      return {
+        description: "The Email/password combination is not valid",
+        action: <Redirect path="sign-up" text="Create account" />,
+      };
+    }
+
+    return {
+      description: "Something went wrong!",
+    };
+  }
+
   const email = getFieldState("email");
   const password = getFieldState("password");
 
@@ -101,7 +109,19 @@ function SignInForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col items-center w-full"
     >
-      {callModal(res)}
+      <Modal
+        isOpen={isErrorModalVisible}
+        onClose={onErrorModalClose}
+        title="Error"
+        {...getErrorModalProps()}
+      />
+
+      <Modal
+        isOpen={isSuccessModalVisible}
+        title="Welcom to BongBoy"
+        description="Complete your acount from here"
+        action={<Redirect path="/profile/settings" text="Settings" />}
+      />
 
       <div className="space-y-4">
         <div>
