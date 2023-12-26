@@ -263,6 +263,7 @@ export default function SuspendedFeedPage() {
           <ErrorBoundary
             fallbackRender={({ resetErrorBoundary }) => (
               <Modal
+                isOpen
                 title="Error"
                 description="Something went wrong"
                 action={
