@@ -6,10 +6,12 @@ import {
   ApiConsumes,
   ApiForbiddenResponse,
   ApiOkResponse,
+  ApiParam,
   ApiPayloadTooLargeResponse,
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiUnsupportedMediaTypeResponse,
 } from "@nestjs/swagger";
 
 export function MeApiDocumentation() {
@@ -30,6 +32,7 @@ export function MeApiDocumentation() {
           isEmailVerified: true,
           status: "ONLINE | OFFLINE | IN_GAME",
           createdAt: 1692017290161,
+          ranking: 2,
         },
       },
     }),
@@ -220,6 +223,15 @@ export function UpdateAvatarApiDocumentation() {
         },
       },
     }),
+    ApiUnsupportedMediaTypeResponse({
+      description: "Unsupported Media Type",
+      schema: {
+        example: {
+          message: "Unsupported Media Type",
+          statusCode: 415,
+        },
+      },
+    }),
   );
 }
 
@@ -260,6 +272,51 @@ export function GetLeaderboardApiDocumentation() {
         example: {
           message: "Unauthorized",
           statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function GetUserByUsernameDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiParam({
+      name: "username",
+      type: "string",
+    }),
+    ApiOkResponse({
+      description: "user",
+      schema: {
+        example: {
+          id: 1,
+          username: null,
+          email: "jdoe@example.com",
+          firstName: null,
+          lastName: null,
+          avatarPath: "7e3b2ca3-cb75-4857-b0d4-66174f1b9a32.png",
+          status: "ONLINE | OFFLINE | IN_GAME",
+          createdAt: 1692017290161,
+          ranking: 2,
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
         },
       },
     }),

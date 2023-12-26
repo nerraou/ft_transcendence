@@ -14,6 +14,7 @@ import { MessagesModule } from "@modules/messages/messages.module";
 import { GamesModule } from "@modules/games/games.module";
 import { GameLoopModule } from "@/modules/game-loop/game-loop.module";
 import { PostsModule } from "@modules/posts/posts.module";
+import { ChannelsModule } from "@modules/channels/channels.module";
 
 import { AppController } from "./app.controller";
 
@@ -27,6 +28,7 @@ import { AppController } from "./app.controller";
     GamesModule,
     GameLoopModule,
     PostsModule,
+    ChannelsModule,
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,

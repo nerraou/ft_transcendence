@@ -4,10 +4,13 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseFilePipeBuilder,
   ParseIntPipe,
+  PayloadTooLargeException,
   Post,
   Query,
   UnprocessableEntityException,
+  UnsupportedMediaTypeException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -20,10 +23,8 @@ import { v4 as uuid4 } from "uuid";
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User } from "@modules/users/decorators/user.decorators";
-import {
-  FileSizeValidationPipe,
-  ONE_MEGA,
-} from "@modules/users/pipes/file-size-validation.pipe";
+import { TWO_MEGA } from "@common/constants";
+import { ImageValidator } from "@common/ImageValidator";
 
 import {
   CreatePostApiDocumentation,
@@ -33,6 +34,25 @@ import {
 import { CreatePostDto } from "./dto/create-post.dto";
 import { PostsService } from "./posts.service";
 import { GetPostsDto } from "./dto/get-posts.dto";
+
+const ImageValidatorPipe = new ParseFilePipeBuilder()
+  .addMaxSizeValidator({
+    maxSize: TWO_MEGA,
+    message: "size",
+  })
+  .addValidator(new ImageValidator())
+  .build({
+    fileIsRequired: true,
+    exceptionFactory(error) {
+      if (error == "size") {
+        return new PayloadTooLargeException();
+      } else if (error == "type") {
+        return new UnsupportedMediaTypeException();
+      } else if (error == "File is required") {
+        return new UnprocessableEntityException();
+      }
+    },
+  });
 
 @Controller("posts")
 export class PostsController {
@@ -70,9 +90,7 @@ export class PostsController {
   async createPost(
     @User("id") userId: number,
     @Body() createPostDto: CreatePostDto,
-    @UploadedFile(
-      new FileSizeValidationPipe({ isOptional: true, maxSize: ONE_MEGA }),
-    )
+    @UploadedFile(ImageValidatorPipe)
     file: Express.Multer.File | undefined,
   ) {
     let filename: string | undefined;
