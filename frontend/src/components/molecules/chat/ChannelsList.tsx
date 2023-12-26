@@ -50,7 +50,7 @@ function ChannelsList() {
           }}
         />
       </div>
-      <div className="space-y-4 px-6">
+      <div className="space-y-4 px-3">
         {Channels.map((channel, index) => {
           return (
             <ChannelAddUser
