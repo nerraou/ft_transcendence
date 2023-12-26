@@ -1,4 +1,4 @@
-import ChatBox from "@components/organisms/ChatBox";
+import ChatBox from "@organisms/ChatBox";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof ChatBox> = {
