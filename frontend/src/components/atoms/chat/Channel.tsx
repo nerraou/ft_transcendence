@@ -15,7 +15,7 @@ function Channel(props: ChannelProps) {
   }
 
   return (
-    <div className="flex  items-center space-x-4">
+    <div className="flex items-center space-x-2">
       <div className="relative shrink-0 w-16 h-16">
         <Image
           src={props.image}

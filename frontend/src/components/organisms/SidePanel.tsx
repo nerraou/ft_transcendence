@@ -26,7 +26,7 @@ function UserHeader(props: SidePanelProps) {
 
 function SidePanel(props: SidePanelProps) {
   return (
-    <section className="space-y-10 h-full flex flex-col px-5 pt-3 pb-14 bg-light-bg-primary border-t-4 border-b-8 border-x-4 border-light-bg-tertiary rounded-bl-2xl rounded-tl-xl">
+    <section className="space-y-10 h-full w-full flex flex-col px-5 pt-3 pb-14 bg-light-bg-primary border-4 border-light-bg-tertiary rounded-bl-2xl rounded-tl-xl">
       <UserHeader image={props.image} />
       <SearchFriendsList />
       <SearchChannelsList />

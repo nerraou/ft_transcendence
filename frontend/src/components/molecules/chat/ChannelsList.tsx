@@ -22,7 +22,7 @@ const Channels: ChannelProps[] = [
 
 function ChannelAddUser(props: ChannelProps) {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center space-x-10">
       <Channel
         name={props.name}
         image={props.image}

@@ -11,7 +11,7 @@ interface ChatBoxProps {
 
 function ChatBox(props: ChatBoxProps) {
   return (
-    <div className="flex flex-col bg-dark-bg-primary h-screen border-8 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
+    <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
       <section className="h-5/6">
         <ChatBubbleMessage image={props.userImage} message={props.message} />
         <ChatBubbleResponse
