@@ -11,6 +11,7 @@ import {
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiUnsupportedMediaTypeResponse,
 } from "@nestjs/swagger";
 
 export function MeApiDocumentation() {
@@ -219,6 +220,15 @@ export function UpdateAvatarApiDocumentation() {
         example: {
           message: "Unauthorized",
           statusCode: 401,
+        },
+      },
+    }),
+    ApiUnsupportedMediaTypeResponse({
+      description: "Unsupported Media Type",
+      schema: {
+        example: {
+          message: "Unsupported Media Type",
+          statusCode: 415,
         },
       },
     }),

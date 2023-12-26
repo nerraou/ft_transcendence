@@ -5,8 +5,12 @@ import {
   ForbiddenException,
   Get,
   Param,
+  ParseFilePipeBuilder,
   Patch,
+  PayloadTooLargeException,
   Query,
+  UnprocessableEntityException,
+  UnsupportedMediaTypeException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -35,8 +39,28 @@ import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UsersService } from "./users.service";
 import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
-import { FileSizeValidationPipe } from "./pipes/file-size-validation.pipe";
 import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
+import { ONE_MEGA } from "@common/constants";
+import { ImageValidator } from "@common/ImageValidator";
+
+const ImageValidatorPipe = new ParseFilePipeBuilder()
+  .addMaxSizeValidator({
+    maxSize: ONE_MEGA,
+    message: "size",
+  })
+  .addValidator(new ImageValidator())
+  .build({
+    fileIsRequired: true,
+    exceptionFactory(error) {
+      if (error == "size") {
+        return new PayloadTooLargeException();
+      } else if (error == "type") {
+        return new UnsupportedMediaTypeException();
+      } else if (error == "File is required") {
+        return new UnprocessableEntityException();
+      }
+    },
+  });
 
 @Controller("users")
 export class UsersController {
@@ -199,7 +223,7 @@ export class UsersController {
   @UseInterceptors(FileInterceptor("image"))
   async updateAvatar(
     @User() user: UserEntity,
-    @UploadedFile(new FileSizeValidationPipe())
+    @UploadedFile(ImageValidatorPipe)
     file: Express.Multer.File,
   ) {
     const oldAvatarPath = `${this.configService.get("imagesPath")}/${

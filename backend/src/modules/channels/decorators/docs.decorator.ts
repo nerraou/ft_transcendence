@@ -9,6 +9,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
+  ApiUnsupportedMediaTypeResponse,
 } from "@nestjs/swagger";
 import { ChannelType } from "@prisma/client";
 
@@ -87,6 +88,15 @@ export function CreateChannelApiDocumentation() {
         },
       },
     }),
+    ApiUnsupportedMediaTypeResponse({
+      description: "Unsupported Media Type",
+      schema: {
+        example: {
+          message: "Unsupported Media Type",
+          statusCode: 415,
+        },
+      },
+    }),
   );
 }
 
@@ -162,6 +172,15 @@ export function UpdateChannelApiDocumentation() {
           ],
           error: "Unprocessable Entity",
           statusCode: 422,
+        },
+      },
+    }),
+    ApiUnsupportedMediaTypeResponse({
+      description: "Unsupported Media Type",
+      schema: {
+        example: {
+          message: "Unsupported Media Type",
+          statusCode: 415,
         },
       },
     }),
