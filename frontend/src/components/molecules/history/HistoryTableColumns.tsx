@@ -8,10 +8,10 @@ import Minus from "@components/atoms/icons/outline/Minus";
 import ChevronDown from "@components/atoms/icons/outline/ChevronDown";
 import ChevronUp from "@components/atoms/icons/outline/ChevronUp";
 import Selector from "@components/atoms/icons/outline/Selector";
-import { Column } from "react-table";
-import { Game } from "./HistoryTable";
 import { HistoryFilters } from "./UseFilters";
 import { clsx } from "clsx";
+import { ColumnDef } from "@tanstack/react-table";
+import { Game } from "./HistoryTable";
 
 // eslint-disable-next-line no-shadow
 export enum SortEnum {
@@ -74,10 +74,10 @@ export function getColumns(
   setFilters: (newFilters: HistoryFilters) => void,
   xs: boolean,
   xxs: boolean,
-): Column<Game>[] {
+): ColumnDef<Game>[] {
   return [
     {
-      Header: () => (
+      header: () => (
         <div className="sm:hidden">
           <SortButton
             title="Time"
@@ -86,13 +86,14 @@ export function getColumns(
           />
         </div>
       ),
-      accessor: "createdAt",
-      Cell: ({ value }) => {
-        const date = new Date(value);
+      accessorKey: "duration",
+      cell: ({ getValue }) => {
+        // convert seconds to Date
+        const duration = new Date((getValue() as number) * 1000);
         return (
           <div className="flex justify-center items-center gap-2 lg:gap-1 md:gap-1 sm:gap-1 xs:gap-1 sm:hidden">
             <div className="text-light-fg-primary dark:text-dark-fg-primary">
-              {date.toLocaleTimeString([], {
+              {duration.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -103,62 +104,70 @@ export function getColumns(
       },
     },
     {
-      Header: "Player 1",
-      accessor: "player",
-      Cell: ({ value }) => (
-        <HistoryUserCard
-          avatarPath={
-            process.env.NEXT_PUBLIC_API_BASE_URL +
-            "/assets/images/" +
-            value.avatarPath
-          }
-          username={value.username}
-          ratingChange={value.newRating - value.oldRating}
-          side="player"
-        />
-      ),
+      header: "Player 1",
+      accessorKey: "player",
+      cell: ({ getValue }) => {
+        const player = getValue() as Game["player"];
+        return (
+          <HistoryUserCard
+            avatarPath={
+              process.env.NEXT_PUBLIC_API_BASE_URL +
+              "/assets/images/" +
+              player.avatarPath
+            }
+            username={player.username}
+            ratingChange={player.newRating - player.oldRating}
+            side="player"
+          />
+        );
+      },
     },
     {
-      Header: "Result",
-      accessor: (row) => ({
+      header: "Result",
+      accessorFn: (row) => ({
         score: row.player.score + "-" + row.opponent.score,
         isWinner: row.player.isWinner,
       }),
-      Cell: ({ value: { score, isWinner } }: Result) => (
-        <div className="flex flex-col gap-2 items-center">
-          <div className="text-light-fg-primary dark:text-dark-fg-primary">
-            {score}
+      cell: ({ getValue }) => {
+        const { score, isWinner } = getValue() as Result["value"];
+        return (
+          <div className="flex flex-col gap-2 items-center">
+            <div className="text-light-fg-primary dark:text-dark-fg-primary">
+              {score}
+            </div>
+            {isWinner ? (
+              <Plus className="text-light-bg-primary" />
+            ) : (
+              <Minus className="text-light-fg-secondary" />
+            )}
           </div>
-          {isWinner ? (
-            <Plus className="text-light-bg-primary" />
-          ) : (
-            <Minus className="text-light-fg-secondary" />
-          )}
-        </div>
-      ),
+        );
+      },
     },
     {
-      Header: "Player 2",
-      accessor: "opponent",
-      Cell: ({ value }) => (
-        <HistoryUserCard
-          avatarPath={
-            process.env.NEXT_PUBLIC_API_BASE_URL +
-            "/assets/images/" +
-            value.avatarPath
-          }
-          username={value.username}
-          ratingChange={value.newRating - value.oldRating}
-          side="opponent"
-        />
-      ),
+      header: "Player 2",
+      accessorKey: "opponent",
+      cell: ({ getValue }) => {
+        const opponent = getValue() as Game["opponent"];
+        return (
+          <HistoryUserCard
+            avatarPath={
+              process.env.NEXT_PUBLIC_API_BASE_URL +
+              "/assets/images/" +
+              opponent.avatarPath
+            }
+            username={opponent.username}
+            ratingChange={opponent.newRating - opponent.oldRating}
+            side="opponent"
+          />
+        );
+      },
     },
     {
-      Header: () => <p className={clsx(xxs ? "hidden" : "")}>Ranking</p>,
-      id: "ranking",
-      accessor: "player",
-      Cell: ({ value }) => {
-        const { oldRanking, newRanking } = value;
+      header: () => <p className={clsx(xxs ? "hidden" : "")}>Ranking</p>,
+      accessorKey: "player",
+      cell: ({ getValue }) => {
+        const { oldRanking, newRanking } = getValue() as Game["player"];
         return (
           <div className={clsx(xxs ? "hidden" : "", "flex gap-2 items-center")}>
             {getRankingIcon(oldRanking, newRanking)}
@@ -170,7 +179,7 @@ export function getColumns(
       },
     },
     {
-      Header: () => (
+      header: () => (
         <div className={clsx(xs ? "hidden" : "")}>
           <SortButton
             title="Date"
@@ -179,10 +188,9 @@ export function getColumns(
           />
         </div>
       ),
-      id: "createdAtTime",
-      accessor: "createdAt",
-      Cell: ({ value }) => {
-        const date = new Date(value);
+      accessorKey: "createdAtTime",
+      cell: ({ getValue }) => {
+        const date = new Date(getValue() as number);
         return (
           <div
             className={clsx(
