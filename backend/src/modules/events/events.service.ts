@@ -26,8 +26,19 @@ export class EventsService {
       return client.disconnect();
     }
 
+    client.data.userId = payload.sub;
+
     await this.redisService.set(`user-${payload.sub}`, client.id);
-    await this.usersService.updateStatusById(payload.sub, "ONLINE");
+    this.usersService.updateStatusById(payload.sub, "ONLINE").catch(() => {
+      console.log("couldn't update user status");
+    });
+
+    const channels = await this.usersService.finsChannelsIds(payload.sub);
+
+    channels.forEach((channel) => {
+      const channeRoomName = `chat-channel-${channel.channelId}`;
+      client.join(channeRoomName);
+    });
   }
 
   async userDisonnected(client: Socket) {

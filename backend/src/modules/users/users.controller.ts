@@ -6,8 +6,10 @@ import {
   Get,
   Param,
   ParseFilePipeBuilder,
+  ParseIntPipe,
   Patch,
   PayloadTooLargeException,
+  Post,
   Query,
   UnprocessableEntityException,
   UnsupportedMediaTypeException,
@@ -33,6 +35,8 @@ import {
   UpdateAvatarApiDocumentation,
   GetLeaderboardApiDocumentation,
   GetUserByUsernameDocumentation,
+  BlockUserApiDocumentation,
+  UnblockUserApiDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -135,6 +139,46 @@ export class UsersController {
     };
   }
 
+  @Post("/:id([0-9]{1,11})/block")
+  @BlockUserApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async blockUser(
+    @User() user: UserEntity,
+    @Param("id", ParseIntPipe) userToBlock: number,
+  ) {
+    if (user.id == userToBlock) {
+      throw new ForbiddenException();
+    }
+
+    try {
+      await this.usersService.blockUser(userToBlock, user.id);
+    } catch (error) {
+      // fk doesn't exists(userToBlock doesn't exists)
+      if (error.code == "P2003") {
+        throw new ForbiddenException();
+      }
+    }
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Post("/:id([0-9]{1,11})/unblock")
+  @UnblockUserApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async unblockUser(
+    @User() user: UserEntity,
+    @Param("id", ParseIntPipe) userToUnblock: number,
+  ) {
+    if (user.id != userToUnblock) {
+      await this.usersService.unblockUser(userToUnblock, user.id);
+    }
+
+    return {
+      message: "success",
+    };
+  }
   @Patch("/profile")
   @UpdateProfileApiDocumentation()
   @UseGuards(JwtAuthGuard)

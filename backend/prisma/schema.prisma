@@ -38,6 +38,8 @@ model User {
   postLikes        PostLike[]
   channels         Channel[]
   memberOfChannels ChannelMember[]
+  blocking         Block[]         @relation("blocking")
+  blocked          Block[]         @relation("blocked")
 
   @@map("users")
 }
@@ -114,7 +116,8 @@ model Channel {
 
   creator User @relation(fields: [creatorId], references: [id])
 
-  members ChannelMember[]
+  members  ChannelMember[]
+  messages ChannelMessage[]
 
   @@map("channels")
 }
@@ -129,10 +132,26 @@ model ChannelMember {
   createdAt  DateTime            @default(now()) @map("created_at") @db.Timestamp()
   updatedAt  DateTime            @updatedAt @map("updated_at") @db.Timestamp()
 
-  member  User    @relation(fields: [memberId], references: [id])
-  channel Channel @relation(fields: [channelId], references: [id])
+  member   User             @relation(fields: [memberId], references: [id])
+  channel  Channel          @relation(fields: [channelId], references: [id])
+  messages ChannelMessage[]
 
+  @@unique([channelId, memberId])
   @@map("channels_members")
+}
+
+model ChannelMessage {
+  id        Int      @id @default(autoincrement()) @map("id")
+  message   String   @map("message")
+  senderId  Int      @map("sender_id")
+  channelId Int      @map("channel_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  sender  ChannelMember @relation(fields: [senderId], references: [id])
+  channel Channel       @relation(fields: [channelId], references: [id])
+
+  @@map("channels_messages")
 }
 
 model Post {
@@ -160,6 +179,17 @@ model PostLike {
 
   @@id([userId, postId])
   @@map("posts_likes")
+}
+
+model Block {
+  blocked   Int @map("user_id")
+  blockedBy Int @map("blocked_by")
+
+  user          User @relation("blocked", fields: [blocked], references: [id])
+  blockedByUser User @relation("blocking", fields: [blockedBy], references: [id])
+
+  @@id([blocked, blockedBy])
+  @@map("blockes")
 }
 
 enum ContactStatus {

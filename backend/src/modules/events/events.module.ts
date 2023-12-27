@@ -8,6 +8,7 @@ import { GamesModule } from "@modules/games/games.module";
 
 import { EventsService } from "./events.service";
 import { EventsGateway } from "./events.gateway";
+import { ChannelsModule } from "@modules/channels/channels.module";
 
 @Module({
   providers: [EventsGateway, EventsService, JwtService],
@@ -17,6 +18,7 @@ import { EventsGateway } from "./events.gateway";
     RedisModule,
     GameLoopModule,
     GamesModule,
+    ChannelsModule,
   ],
 })
 export class EventsModule {}

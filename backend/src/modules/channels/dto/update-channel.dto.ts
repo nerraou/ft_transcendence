@@ -8,9 +8,9 @@ import {
   Length,
   ValidateIf,
 } from "class-validator";
+import { Type } from "class-transformer";
 
 import { RequireIf } from "@common/decorators/RequireIf";
-import { Type } from "class-transformer";
 
 export class UpdateChannelDto {
   @IsInt()

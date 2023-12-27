@@ -147,7 +147,7 @@ export class ChannelsController {
     };
   }
 
-  @Post("join")
+  @Post("/join")
   @JoinChannelApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async joinChannel(
