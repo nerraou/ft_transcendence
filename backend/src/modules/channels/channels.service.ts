@@ -155,4 +155,45 @@ export class ChannelsService {
       },
     });
   }
+
+  findChannelMessages(channelId: number, page: number, limit: number) {
+    return this.prisma.channelMessage.findMany({
+      where: {
+        channelId: channelId,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [
+        {
+          updatedAt: "desc",
+        },
+      ],
+      include: {
+        sender: {
+          select: {
+            id: true,
+            state: true,
+            mutedUntil: true,
+            createdAt: true,
+            member: {
+              select: {
+                id: true,
+                avatarPath: true,
+                username: true,
+                rating: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  findChannelMessagesCount(channelId: number) {
+    return this.prisma.channelMessage.count({
+      where: {
+        channelId: channelId,
+      },
+    });
+  }
 }
