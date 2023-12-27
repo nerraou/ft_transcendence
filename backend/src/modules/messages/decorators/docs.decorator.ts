@@ -9,44 +9,6 @@ import {
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 
-export function CreateMessageApiDocumentation() {
-  return applyDecorators(
-    ApiTags("Messages"),
-    ApiBearerAuth(),
-    ApiBody({
-      description: "send message",
-      schema: {
-        properties: {
-          receiverId: { type: "number" },
-          text: { type: "string" },
-        },
-        example: {
-          receiverId: 1,
-          text: "some-password",
-        },
-      },
-    }),
-    ApiOkResponse({
-      description: "Successful",
-      schema: {
-        example: {
-          message: "success",
-          messageId: 1,
-        },
-      },
-    }),
-    ApiUnauthorizedResponse({
-      description: "Unauthorized",
-      schema: {
-        example: {
-          message: "Unauthorized",
-          statusCode: 401,
-        },
-      },
-    }),
-  );
-}
-
 export function ReadMessagesApiDocumentation() {
   return applyDecorators(
     ApiTags("Messages"),

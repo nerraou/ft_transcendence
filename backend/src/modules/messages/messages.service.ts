@@ -3,18 +3,16 @@ import { Message, User } from "@prisma/client";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 
-import { CreateMessageDto } from "./dto/create-message.dto";
-
 @Injectable()
 export class MessagesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(senderId: number, createMessageDto: CreateMessageDto) {
+  create(senderId: number, receiverId: number, text: string) {
     return this.prisma.message.create({
       data: {
         senderId: senderId,
-        receiverId: createMessageDto.receiverId,
-        text: createMessageDto.text,
+        receiverId: receiverId,
+        text: text,
       },
     });
   }

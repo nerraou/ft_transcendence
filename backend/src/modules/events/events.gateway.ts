@@ -127,7 +127,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @User() user: UserEntity,
   ) {
-    const receiver = this.usersService.findOneById(createMessageDto.receiverId);
+    const receiver = await this.usersService.findOneByUsername(
+      createMessageDto.username,
+    );
 
     if (!receiver) {
       throw new WsException("receiver not found");
@@ -135,12 +137,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const message = await this.messagesService.create(
       user.id,
-      createMessageDto,
+      receiver.id,
+      createMessageDto.text,
     );
 
-    const socketId = await this.redisService.get(
-      `user-${createMessageDto.receiverId}`,
-    );
+    const socketId = await this.redisService.get(`user-${receiver.id}`);
 
     if (socketId) {
       client
