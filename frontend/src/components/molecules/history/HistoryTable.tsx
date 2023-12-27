@@ -1,7 +1,5 @@
-/* eslint-disable react/jsx-key */
 import React from "react";
-import { Column, useTable } from "react-table";
-import clsx from "clsx";
+import { Column, HeaderGroup, Row, useTable } from "react-table";
 
 interface Player {
   id: number;
@@ -23,69 +21,84 @@ export interface Game {
   opponent: Player;
 }
 
+const TableHeader = ({
+  headerGroups,
+}: {
+  headerGroups: HeaderGroup<Game>[];
+}) => {
+  return (
+    <thead className="h-16">
+      {headerGroups.map((headerGroup, id1) => (
+        <tr
+          {...headerGroup.getHeaderGroupProps()}
+          key={`${id1}-headerGroup`}
+          className="bg-light-fg-primary dark:bg-dark-bg-primary texte-base"
+        >
+          {headerGroup.headers.map((column, id2) => (
+            <th {...column.getHeaderProps()} key={`${id2}-column`}>
+              {column.render("Header")}
+            </th>
+          ))}
+        </tr>
+      ))}
+    </thead>
+  );
+};
+
+const TableRows = ({
+  rows,
+  prepareRow,
+  getTableBodyProps,
+}: {
+  rows: Row<Game>[];
+  prepareRow: (row: Row<Game>) => void;
+  getTableBodyProps: () => any;
+}) => {
+  return (
+    <tbody {...getTableBodyProps()} className="">
+      {rows.map((row, id1) => {
+        prepareRow(row);
+        return (
+          // padding 16px 30px
+          <tr
+            {...row.getRowProps()}
+            key={`${id1}-row`}
+            className="border-t border-light-fg-primary dark:border-dark-fg-primary"
+          >
+            {row.cells.map((cell, id2) => (
+              <td
+                {...cell.getCellProps()}
+                key={`${id2}-cell`}
+                className="px-5 py-2 lg:px-2 md:px-0 sm:px-0 xs:px-10"
+              >
+                {cell.render("Cell")}
+              </td>
+            ))}
+          </tr>
+        );
+      })}
+    </tbody>
+  );
+};
+
 interface HistoryTableProps {
   games: Game[];
   columns: Column<Game>[];
 }
 
 const HistoryTable = ({ games, columns }: HistoryTableProps) => {
-  // react-table
-
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data: games });
 
   return (
-    <div>
-      <table
-        {...getTableProps()}
-        className="rounded-lg bg-light-bg-tertiary dark:bg-dark-fg-primary border-light-fg-primary dark:border-dark-fg-primary"
-      >
-        <thead className="rounded-t-lg">
-          {headerGroups.map((headerGroup) => (
-            <tr
-              {...headerGroup.getHeaderGroupProps()}
-              className="bg-light-fg-primary dark:bg-dark-bg-primary"
-            >
-              {headerGroup.headers.map((column, index) => (
-                <th
-                  {...column.getHeaderProps()}
-                  className={clsx(
-                    index === 0 ? "rounded-tl-lg" : "",
-                    index === headerGroup.headers.length - 1
-                      ? "rounded-tr-lg"
-                      : "",
-                    "text-light-fg-tertiary",
-                    "px-4 py-2",
-                  )}
-                >
-                  {column.render("Header")}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody
-          {...getTableBodyProps()}
-          className="bg-light-bg-tertiary rounded-lg border-light-fg-primary dark:border-dark-fg-primary"
-        >
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td
-                      {...cell.getCellProps()}
-                      className="px-4 py-2 rounded-lg"
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
+    <div className="w-full border-4 text-light-bg-tertiary text-base bg-light-bg-tertiary border-light-fg-primary dark:border-dark-fg-primary rounded-lg rounded-b-xxl pb-3">
+      <table {...getTableProps()} className="w-full rounded-lg text-sm">
+        <TableHeader headerGroups={headerGroups} />
+        <TableRows
+          rows={rows}
+          prepareRow={prepareRow}
+          getTableBodyProps={getTableBodyProps}
+        />
       </table>
     </div>
   );

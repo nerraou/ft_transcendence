@@ -51,7 +51,7 @@ const HistoryUserCard = (props: HistoryUserCardProps) => {
         side={props.side}
       />
       <div className="flex flex-col gap-[2px] items-center w-full">
-        <label className="text-light-fg-tertiary text-sm border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-base bg-light-fg-link px-1 min-w-full flex flex-col items-center">
+        <label className="text-light-fg-tertiary text-sm border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-base bg-light-fg-link px-1 flex flex-col items-center min-w-[50px] max-w-[160px]">
           {props.username}
         </label>
         <div className="w-8 h-[6px] bg-light-fg-primary dark:bg-dark-fg-primary"></div>

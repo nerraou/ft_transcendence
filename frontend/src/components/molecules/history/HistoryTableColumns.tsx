@@ -11,6 +11,7 @@ import Selector from "@components/atoms/icons/outline/Selector";
 import { Column } from "react-table";
 import { Game } from "./HistoryTable";
 import { HistoryFilters } from "./UseFilters";
+import { clsx } from "clsx";
 
 // eslint-disable-next-line no-shadow
 export enum SortEnum {
@@ -71,24 +72,25 @@ const getRankingIcon = (oldRanking: number, newRanking: number) => {
 export function getColumns(
   filters: HistoryFilters,
   setFilters: (newFilters: HistoryFilters) => void,
+  xs: boolean,
+  xxs: boolean,
 ): Column<Game>[] {
   return [
     {
       Header: () => (
-        <SortButton
-          title="Time"
-          sort={filters.timeSort}
-          setSort={(sort) => setFilters({ ...filters, timeSort: sort })}
-        />
+        <div className="sm:hidden">
+          <SortButton
+            title="Time"
+            sort={filters.timeSort}
+            setSort={(sort) => setFilters({ ...filters, timeSort: sort })}
+          />
+        </div>
       ),
       accessor: "createdAt",
       Cell: ({ value }) => {
         const date = new Date(value);
         return (
-          <div
-            className="flex justify-center items-center text-base gap-2"
-            title={date.toLocaleDateString() + " " + date.toLocaleTimeString()}
-          >
+          <div className="flex justify-center items-center gap-2 lg:gap-1 md:gap-1 sm:gap-1 xs:gap-1 sm:hidden">
             <div className="text-light-fg-primary dark:text-dark-fg-primary">
               {date.toLocaleTimeString([], {
                 hour: "2-digit",
@@ -118,7 +120,6 @@ export function getColumns(
     },
     {
       Header: "Result",
-      // player score- opponent score
       accessor: (row) => ({
         score: row.player.score + "-" + row.opponent.score,
         isWinner: row.player.isWinner,
@@ -128,7 +129,11 @@ export function getColumns(
           <div className="text-light-fg-primary dark:text-dark-fg-primary">
             {score}
           </div>
-          {isWinner ? <Plus /> : <Minus />}
+          {isWinner ? (
+            <Plus className="text-light-bg-primary" />
+          ) : (
+            <Minus className="text-light-fg-secondary" />
+          )}
         </div>
       ),
     },
@@ -149,13 +154,13 @@ export function getColumns(
       ),
     },
     {
-      Header: "Rank",
+      Header: () => <p className={clsx(xxs ? "hidden" : "")}>Ranking</p>,
       id: "ranking",
       accessor: "player",
       Cell: ({ value }) => {
         const { oldRanking, newRanking } = value;
         return (
-          <div className="flex gap-2 items-center">
+          <div className={clsx(xxs ? "hidden" : "", "flex gap-2 items-center")}>
             {getRankingIcon(oldRanking, newRanking)}
             <label className="text-xl text-light-fg-primary dark:text-dark-fg-primary">
               {newRanking}
@@ -166,18 +171,25 @@ export function getColumns(
     },
     {
       Header: () => (
-        <SortButton
-          title="Duration"
-          sort={filters.dateSort}
-          setSort={(sort) => setFilters({ ...filters, dateSort: sort })}
-        />
+        <div className={clsx(xs ? "hidden" : "")}>
+          <SortButton
+            title="Date"
+            sort={filters.dateSort}
+            setSort={(sort) => setFilters({ ...filters, dateSort: sort })}
+          />
+        </div>
       ),
       id: "createdAtTime",
       accessor: "createdAt",
       Cell: ({ value }) => {
         const date = new Date(value);
         return (
-          <div className="text-light-fg-primary dark:text-dark-fg-primary">
+          <div
+            className={clsx(
+              xs ? "hidden" : "",
+              "text-light-fg-primary dark:text-dark-fg-primary",
+            )}
+          >
             {date.toLocaleDateString()}
           </div>
         );

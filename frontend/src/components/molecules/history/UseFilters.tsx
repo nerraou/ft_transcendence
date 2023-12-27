@@ -15,18 +15,29 @@ export type HistoryFilters = {
   dateSort: SortEnum | undefined;
   timeSort: SortEnum | undefined;
   dateInterval: DateInterval | null | undefined;
+  page: number;
 };
 
-const useHistory = (token: string | unknown) => {
+const useHistory = (token: string | unknown, username: string) => {
   const [filters, setFilters] = useState<HistoryFilters>({
     query: "",
     dateSort: undefined,
     timeSort: undefined,
     dateInterval: undefined,
+    page: 1,
   });
 
   const fetchData = async () => {
-    const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/history";
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.append(key, value.toString());
+      }
+    });
+    const url =
+      process.env.NEXT_PUBLIC_API_BASE_URL +
+      `users/${username}/history?` +
+      params.toString();
 
     const res = await baseQuery(url, {
       headers: {
