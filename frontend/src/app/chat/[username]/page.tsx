@@ -34,7 +34,7 @@ function SidePanelPopover(props: SidePanelProps) {
   );
 }
 
-function ChatPage() {
+function ChatPage({ params }: { params: { username: string } }) {
   return (
     <Layout>
       <div className="flex p-8 lg:p-4 mb-5 space-x-2 justify-center items-stretch">
@@ -47,6 +47,7 @@ function ChatPage() {
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
           <ChatHeader image="/anime.jpg" status="ONLINE" username="noface" />
           <ChatBox
+            receiver={params.username}
             friendImage="/anime.jpg"
             message="Hello how are you?"
             response="I am fine thnk you"

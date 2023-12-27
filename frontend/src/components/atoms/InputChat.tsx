@@ -4,6 +4,7 @@ import Send from "./icons/outline/Send";
 interface InputChatProps {
   value?: string;
   name?: string;
+  onClick: () => void;
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
@@ -20,7 +21,7 @@ const InputChat = forwardRef<HTMLTextAreaElement, InputChatProps>(
           className="text-light-fg-primary max-h-32 min-h-[80px]bg-light-fg-tertiary focus-within:border-dark-useless rounded-lg outline-none w-full pt-4 pb-2 px-4 overflow-hidden border-2 border-light-fg-primary placeholder:translate-y-1"
           onChange={props.onChange}
         />
-        <Send className="stroke-light-fg-primary" />
+        <Send className="stroke-light-fg-primary" onClick={props.onClick} />
       </div>
     );
   },
