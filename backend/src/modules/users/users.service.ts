@@ -255,4 +255,46 @@ export class UsersService {
       },
     });
   }
+
+  async getUserGamesStats(id: number) {
+    const gamesCount = await this.prisma.game.aggregate({
+      _count: true,
+      where: {
+        OR: [
+          {
+            playerId: id,
+          },
+          {
+            opponentId: id,
+          },
+        ],
+      },
+    });
+
+    const winsCount = await this.prisma.game.aggregate({
+      _count: true,
+      where: {
+        OR: [
+          {
+            playerId: id,
+            winner: "PLAYER",
+          },
+          {
+            opponentId: id,
+            winner: "OPPONENT",
+          },
+        ],
+      },
+    });
+
+    const lossesCount = gamesCount._count - winsCount._count;
+
+    const winsPercent = (winsCount._count * 100) / gamesCount._count;
+    const lossesPercent = (lossesCount * 100) / gamesCount._count;
+
+    return {
+      wins: winsPercent,
+      losses: lossesPercent,
+    };
+  }
 }

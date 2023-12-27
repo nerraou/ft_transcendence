@@ -286,6 +286,10 @@ export function GetUserByUsernameDocumentation() {
       name: "username",
       type: "string",
     }),
+    ApiQuery({
+      name: "include_stats",
+      type: "boolean",
+    }),
     ApiOkResponse({
       description: "user",
       schema: {

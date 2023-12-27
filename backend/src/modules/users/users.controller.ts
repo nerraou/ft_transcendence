@@ -26,6 +26,8 @@ import { v4 as uuid4 } from "uuid";
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { HashService } from "@common/services/hash.service";
+import { ONE_MEGA } from "@common/constants";
+import { ImageValidator } from "@common/ImageValidator";
 
 import {
   MeApiDocumentation,
@@ -44,8 +46,7 @@ import { UsersService } from "./users.service";
 import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
-import { ONE_MEGA } from "@common/constants";
-import { ImageValidator } from "@common/ImageValidator";
+import { GetUserDto } from "./dto/get-user.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -99,7 +100,10 @@ export class UsersController {
   @Get("/:username")
   @GetUserByUsernameDocumentation()
   @UseGuards(JwtAuthGuard)
-  async getUserByUsername(@Param("username") username: string) {
+  async getUserByUsername(
+    @Param("username") username: string,
+    @Query() getUserDto: GetUserDto,
+  ) {
     const user = await this.usersService.findOneByUsername(username);
 
     if (!user) {
@@ -107,6 +111,11 @@ export class UsersController {
     }
 
     const ranking = await this.usersService.getUserRanking(user.id);
+
+    let stats: any = {};
+    if (getUserDto.includeStats) {
+      stats = await this.usersService.getUserGamesStats(user.id);
+    }
 
     return {
       id: user.id,
@@ -119,6 +128,7 @@ export class UsersController {
       status: user.status,
       rating: user.rating,
       ranking,
+      ...stats,
     };
   }
 
