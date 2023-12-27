@@ -10,5 +10,6 @@ import { ChannelsService } from "./channels.service";
   controllers: [ChannelsController],
   providers: [ChannelsService, HashService],
   imports: [PrismaModule],
+  exports: [ChannelsService],
 })
 export class ChannelsModule {}

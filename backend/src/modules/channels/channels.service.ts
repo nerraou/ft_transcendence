@@ -5,6 +5,7 @@ import { HashService } from "@common/services/hash.service";
 
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { UpdateChannelDto } from "./dto/update-channel.dto";
+import { CreateChannelMessageDto } from "./dto/create-channel-message.dto";
 
 @Injectable()
 export class ChannelsService {
@@ -77,6 +78,19 @@ export class ChannelsService {
     });
   }
 
+  createChannelMessage(
+    memberId: number,
+    createChannelMessageDto: CreateChannelMessageDto,
+  ) {
+    return this.prisma.channelMessage.create({
+      data: {
+        senderId: memberId,
+        channelId: createChannelMessageDto.channelId,
+        message: createChannelMessageDto.message,
+      },
+    });
+  }
+
   async isChannelMember(channelId: number, userId: number) {
     const count = await this.prisma.channelMember.count({
       where: {
@@ -127,6 +141,58 @@ export class ChannelsService {
         imagePath: true,
         type: true,
         membersCount: true,
+      },
+    });
+  }
+
+  findChannelMember(channelId: number, userId: number) {
+    return this.prisma.channelMember.findUnique({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId: userId,
+        },
+      },
+    });
+  }
+
+  findChannelMessages(channelId: number, page: number, limit: number) {
+    return this.prisma.channelMessage.findMany({
+      where: {
+        channelId: channelId,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: [
+        {
+          updatedAt: "desc",
+        },
+      ],
+      include: {
+        sender: {
+          select: {
+            id: true,
+            state: true,
+            mutedUntil: true,
+            createdAt: true,
+            member: {
+              select: {
+                id: true,
+                avatarPath: true,
+                username: true,
+                rating: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  findChannelMessagesCount(channelId: number) {
+    return this.prisma.channelMessage.count({
+      where: {
+        channelId: channelId,
       },
     });
   }

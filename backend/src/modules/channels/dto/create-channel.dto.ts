@@ -1,6 +1,7 @@
-import { RequireIf } from "@common/decorators/RequireIf";
 import { ChannelType } from "@prisma/client";
 import { IsEnum, IsString, Length, ValidateIf } from "class-validator";
+
+import { RequireIf } from "@common/decorators/RequireIf";
 
 export class CreateChannelDto {
   @IsString()

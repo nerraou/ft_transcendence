@@ -3,10 +3,13 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Param,
   ParseFilePipeBuilder,
+  ParseIntPipe,
   Patch,
   PayloadTooLargeException,
   Post,
+  Query,
   UnauthorizedException,
   UnprocessableEntityException,
   UnsupportedMediaTypeException,
@@ -30,12 +33,14 @@ import { ImageValidator } from "@common/ImageValidator";
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { JoinChannelDto } from "./dto/join-channel.dto";
 import { UpdateChannelDto } from "./dto/update-channel.dto";
+import { GetChannelMessagesDto } from "./dto/get-channel-messages.dto";
 import { ChannelsService } from "./channels.service";
 import {
   CreateChannelApiDocumentation,
   UpdateChannelApiDocumentation,
   GetChannelsApiDocumentation,
   JoinChannelApiDocumentation,
+  GetChannelsMessagesApiDocumentation,
 } from "./decorators/docs.decorator";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
@@ -147,7 +152,7 @@ export class ChannelsController {
     };
   }
 
-  @Post("join")
+  @Post("/join")
   @JoinChannelApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async joinChannel(
@@ -190,6 +195,43 @@ export class ChannelsController {
 
     return {
       message: "success",
+    };
+  }
+
+  @Get("/:id/messages")
+  @GetChannelsMessagesApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getChannelMessages(
+    @User() user: UserEntity,
+    @Param("id", ParseIntPipe) channelId: number,
+    @Query() getChannelMessagesDto: GetChannelMessagesDto,
+  ) {
+    const channelMember = await this.channelsService.findChannelMember(
+      channelId,
+      user.id,
+    );
+
+    if (
+      !channelMember ||
+      channelMember.state == "KICKED" ||
+      channelMember.state == "BANNED"
+    ) {
+      throw new ForbiddenException();
+    }
+
+    const count = await this.channelsService.findChannelMessagesCount(
+      channelId,
+    );
+
+    const messages = await this.channelsService.findChannelMessages(
+      channelId,
+      getChannelMessagesDto.page,
+      getChannelMessagesDto.limit,
+    );
+
+    return {
+      count,
+      messages: messages.reverse(),
     };
   }
 }

@@ -194,4 +194,65 @@ export class UsersService {
   usersCount() {
     return this.prisma.user.count();
   }
+
+  finsChannelsIds(id: number) {
+    return this.prisma.channelMember.findMany({
+      where: {
+        memberId: id,
+      },
+    });
+  }
+
+  findUserBlockListByIds(userId: number, usersIds: number[]) {
+    return this.prisma.block.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              {
+                blocked: userId,
+              },
+              {
+                blockedBy: userId,
+              },
+            ],
+          },
+          {
+            OR: [
+              {
+                blocked: {
+                  in: usersIds,
+                },
+              },
+              {
+                blockedBy: {
+                  in: usersIds,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+  }
+
+  blockUser(userToBlock: number, blockedBy: number) {
+    return this.prisma.block.create({
+      data: {
+        blocked: userToBlock,
+        blockedBy: blockedBy,
+      },
+    });
+  }
+
+  unblockUser(userToUnblock: number, blockedBy: number) {
+    return this.prisma.block.delete({
+      where: {
+        blocked_blockedBy: {
+          blocked: userToUnblock,
+          blockedBy: blockedBy,
+        },
+      },
+    });
+  }
 }

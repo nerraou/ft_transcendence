@@ -6,8 +6,9 @@ import {
   ConnectedSocket,
   OnGatewayDisconnect,
   WebSocketServer,
+  WsException,
 } from "@nestjs/websockets";
-import { UseGuards } from "@nestjs/common";
+import { UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { User as UserEntity } from "@prisma/client";
 import { Mutex } from "async-mutex";
@@ -17,14 +18,30 @@ import { GameLoopService } from "@modules/game-loop/game-loop.service";
 import { GamesService } from "@modules/games/games.service";
 import { PlayerEntity } from "@modules/game-loop/types";
 import { UsersService } from "@modules/users/users.service";
+import { ChannelsService } from "@modules/channels/channels.service";
 import Game from "@modules/game-loop/classes/Game";
+import { MessagesService } from "@modules/messages/messages.service";
+import { CreateMessageDto } from "@modules/messages/dto/create-message.dto";
+import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-message.dto";
+import { RedisService } from "@common/modules/redis/redis.service";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
 
-type EventName = "message" | "player-join-queue" | "player-moved";
+type EventName =
+  | "direct-message"
+  | "player-join-queue"
+  | "player-moved"
+  | "channel-chat-message";
 
 @WebSocketGateway({ cors: true })
+@UsePipes(
+  new ValidationPipe({
+    exceptionFactory(error) {
+      return new WsException(error);
+    },
+  }),
+)
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private playersQueue: Map<number, PlayerEntity[]> = new Map();
@@ -35,6 +52,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly gameLoopService: GameLoopService,
     private readonly gamesService: GamesService,
     private readonly usersService: UsersService,
+    private readonly channelsService: ChannelsService,
+    private readonly messagesService: MessagesService,
+    private readonly redisService: RedisService,
   ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -100,16 +120,104 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // TODO: broadcast online status using client.broadcast.emit()
   }
 
-  @SubscribeMessage<EventName>("message")
+  @SubscribeMessage<EventName>("direct-message")
   @UseGuards(WSJwtAuthGuard)
-  onMessage(
-    @MessageBody() data: string,
+  async onDirectMessage(
+    @MessageBody() createMessageDto: CreateMessageDto,
     @ConnectedSocket() client: Socket,
     @User() user: UserEntity,
   ) {
-    console.log(user);
+    const receiver = this.usersService.findOneById(createMessageDto.receiverId);
 
-    console.log(data);
+    if (!receiver) {
+      throw new WsException("receiver not found");
+    }
+
+    const message = await this.messagesService.create(
+      user.id,
+      createMessageDto,
+    );
+
+    const socketId = await this.redisService.get(
+      `user-${createMessageDto.receiverId}`,
+    );
+
+    if (socketId) {
+      client
+        .to(socketId)
+        .emit(
+          "message",
+          this.messagesService.composeMessageSocketPayload(message, user),
+        );
+    }
+  }
+
+  @SubscribeMessage<EventName>("channel-chat-message")
+  @UseGuards(WSJwtAuthGuard)
+  async onChatChannelMessage(
+    @MessageBody()
+    createChannelMessageDto: CreateChannelMessageDto,
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+  ) {
+    const { channelId } = createChannelMessageDto;
+
+    const channelMember = await this.channelsService.findChannelMember(
+      channelId,
+      user.id,
+    );
+
+    if (!channelMember) {
+      throw new WsException("not a member");
+    }
+
+    if (channelMember.state == "BANNED" || channelMember.state == "KICKED") {
+      throw new WsException(
+        `can't send send message reason: ${channelMember.state}`,
+      );
+    }
+
+    if (channelMember.mutedUntil) {
+      const now = new Date();
+      if (channelMember.mutedUntil < now) {
+        throw new WsException("member is muted");
+      }
+    }
+
+    await this.channelsService.createChannelMessage(
+      user.id,
+      createChannelMessageDto,
+    );
+
+    const channeRoomName = `chat-channel-${channelId}`;
+
+    const sockets = await this.server.in(channeRoomName).fetchSockets();
+
+    const usersIds = sockets.map((socket) => socket.data.userId);
+
+    const blockedUsers = await this.usersService.findUserBlockListByIds(
+      user.id,
+      usersIds,
+    );
+
+    sockets.forEach((socket) => {
+      const isBlocked = !!blockedUsers.find(
+        (user) =>
+          user.blocked == socket.data.userId ||
+          user.blockedBy == socket.data.userId,
+      );
+
+      if (!isBlocked) {
+        client.to(socket.id).emit("channel-chat-message", {
+          ...createChannelMessageDto,
+          user: {
+            id: user.id,
+            username: user.username,
+            avatarPath: user.avatarPath,
+          },
+        });
+      }
+    });
   }
 
   @SubscribeMessage<EventName>("player-join-queue")
