@@ -34,9 +34,10 @@ const useHistory = (token: string | unknown, username: string) => {
         params.append(key, value.toString());
       }
     });
+    params.append("limit", "10");
     const url =
       process.env.NEXT_PUBLIC_API_BASE_URL +
-      `users/${username}/history?` +
+      `/users/${username}/games?` +
       params.toString();
 
     const res = await baseQuery(url, {
