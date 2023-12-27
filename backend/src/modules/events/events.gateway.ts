@@ -20,13 +20,16 @@ import { PlayerEntity } from "@modules/game-loop/types";
 import { UsersService } from "@modules/users/users.service";
 import { ChannelsService } from "@modules/channels/channels.service";
 import Game from "@modules/game-loop/classes/Game";
+import { MessagesService } from "@modules/messages/messages.service";
+import { CreateMessageDto } from "@modules/messages/dto/create-message.dto";
+import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-message.dto";
+import { RedisService } from "@common/modules/redis/redis.service";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
-import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-message.dto";
 
 type EventName =
-  | "message"
+  | "direct-message"
   | "player-join-queue"
   | "player-moved"
   | "channel-chat-message";
@@ -50,6 +53,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly gamesService: GamesService,
     private readonly usersService: UsersService,
     private readonly channelsService: ChannelsService,
+    private readonly messagesService: MessagesService,
+    private readonly redisService: RedisService,
   ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -115,16 +120,36 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // TODO: broadcast online status using client.broadcast.emit()
   }
 
-  @SubscribeMessage<EventName>("message")
+  @SubscribeMessage<EventName>("direct-message")
   @UseGuards(WSJwtAuthGuard)
-  onMessage(
-    @MessageBody() data: string,
+  async onDirectMessage(
+    @MessageBody() createMessageDto: CreateMessageDto,
     @ConnectedSocket() client: Socket,
     @User() user: UserEntity,
   ) {
-    console.log(user);
+    const receiver = this.usersService.findOneById(createMessageDto.receiverId);
 
-    console.log(data);
+    if (!receiver) {
+      throw new WsException("receiver not found");
+    }
+
+    const message = await this.messagesService.create(
+      user.id,
+      createMessageDto,
+    );
+
+    const socketId = await this.redisService.get(
+      `user-${createMessageDto.receiverId}`,
+    );
+
+    if (socketId) {
+      client
+        .to(socketId)
+        .emit(
+          "message",
+          this.messagesService.composeMessageSocketPayload(message, user),
+        );
+    }
   }
 
   @SubscribeMessage<EventName>("channel-chat-message")
