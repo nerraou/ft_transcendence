@@ -18,7 +18,7 @@ export type HistoryFilters = {
   page: number;
 };
 
-const useHistory = (token: string | unknown, username: string) => {
+const useGameHistory = (token: string | unknown, username: string) => {
   const [filters, setFilters] = useState<HistoryFilters>({
     query: "",
     dateSort: undefined,
@@ -64,4 +64,4 @@ const useHistory = (token: string | unknown, username: string) => {
   };
 };
 
-export default useHistory;
+export default useGameHistory;

@@ -9,7 +9,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import LoadingPage from "../../loading";
 import Layout from "@components/templates/Layout";
 import HistoryTable from "@components/molecules/history/HistoryTable";
-import useHistory from "@components/molecules/history/UseFilters";
+import useGameHistory from "@components/molecules/history/useGameHistory";
 import { getColumns } from "@components/molecules/history/HistoryTableColumns";
 import Pagination from "@components/atoms/Pagination";
 import DatePickerInterval from "@components/atoms/DatePickerInterval";
@@ -29,7 +29,7 @@ interface HistoryPageProps {
 }
 
 const History = ({ token, username }: HistoryProps) => {
-  const { data, filters, setFilters } = useHistory(token, username);
+  const { data, filters, setFilters } = useGameHistory(token, username);
   const rowsPerPage = 4;
   const xs = useMediaQuery("(max-width: 550px)");
   const xxs = useMediaQuery("(max-width: 450px)");

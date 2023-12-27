@@ -8,7 +8,7 @@ import Minus from "@components/atoms/icons/outline/Minus";
 import ChevronDown from "@components/atoms/icons/outline/ChevronDown";
 import ChevronUp from "@components/atoms/icons/outline/ChevronUp";
 import Selector from "@components/atoms/icons/outline/Selector";
-import { HistoryFilters } from "./UseFilters";
+import { HistoryFilters } from "./useGameHistory";
 import { clsx } from "clsx";
 import { ColumnDef } from "@tanstack/react-table";
 import { Game } from "./HistoryTable";
