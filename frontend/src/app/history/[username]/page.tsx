@@ -4,7 +4,7 @@ import Modal from "@components/atoms/Modal";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import React, { Suspense } from "react";
+import React, { Suspense, useCallback } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import LoadingPage from "../../loading";
 import Layout from "@components/templates/Layout";
@@ -34,9 +34,12 @@ const History = ({ token, username }: HistoryProps) => {
   const xs = useMediaQuery("(max-width: 550px)");
   const xxs = useMediaQuery("(max-width: 450px)");
   const columns = getColumns(filters, setFilters, xs, xxs);
-  const debouncedSetQuery = debounce(
-    (query) => setFilters({ ...filters, query }),
-    100,
+  const [query, setQuery] = React.useState<string>("");
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSetQuery = useCallback(
+    debounce((q) => setFilters({ ...filters, query: q }), 1000),
+    [setFilters, filters],
   );
 
   return (
@@ -50,8 +53,15 @@ const History = ({ token, username }: HistoryProps) => {
             }
           />
           <InputSearch
-            onChange={(e) => debouncedSetQuery(e.target.value)}
-            onClear={() => setFilters({ ...filters, query: "" })}
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              debouncedSetQuery(e.target.value);
+            }}
+            onClear={() => {
+              setQuery("");
+              setFilters({ ...filters, query: "" });
+            }}
             placeholder="Search"
             textColor="text-light-fg-primary"
           />

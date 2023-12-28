@@ -4,8 +4,7 @@ import Search from "@icons/outline/Search";
 import X from "@icons/outline/X";
 
 interface InputSearchProps {
-  // TODO: Remove this optional value after refactoring parent components
-  value?: string;
+  value: string;
   placeholder: string;
   textColor: string;
   width?: string;
@@ -23,6 +22,7 @@ const InputSearch = (props: InputSearchProps) => {
         <Search className="text-light-fg-primary dark:text-dark-fg-primary" />
       </div>
       <input
+        value={props.value}
         type="text"
         placeholder={props.placeholder}
         className={clsx(
