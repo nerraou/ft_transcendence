@@ -41,6 +41,7 @@ function ChatBox(props: ChatBoxProps) {
     }
 
     function onDirectMessage(message: ResponseProps) {
+      console.log(message);
       setReceivedMessage(message.message.text);
     }
 
@@ -48,12 +49,12 @@ function ChatBox(props: ChatBoxProps) {
       console.log(error);
     }
 
-    socket?.on("message", onDirectMessage);
-    socket?.on("error", onError);
+    socket.on("message", onDirectMessage);
+    socket.on("error", onError);
 
     return () => {
-      socket?.off("message", onDirectMessage);
-      socket?.off("error", onError);
+      socket.off("message", onDirectMessage);
+      socket.off("error", onError);
     };
   }, [socket]);
 
@@ -61,7 +62,7 @@ function ChatBox(props: ChatBoxProps) {
     if (!socket) {
       return;
     }
-    socket?.emit("direct-message", {
+    socket.emit("direct-message", {
       username: props.receiver,
       text: currentMessage,
     });
@@ -71,14 +72,18 @@ function ChatBox(props: ChatBoxProps) {
   return (
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
       <section className="h-5/6">
-        <ChatBubbleMessage
-          image={props.userImage}
-          message={currentMessage as string}
-        />
-        <ChatBubbleResponse
-          image={props.friendImage}
-          message={receivedMessage as string}
-        />
+        {currentMessage && (
+          <ChatBubbleMessage
+            image={props.userImage}
+            message={currentMessage as string}
+          />
+        )}
+        {receivedMessage && (
+          <ChatBubbleResponse
+            image={props.friendImage}
+            message={receivedMessage as string}
+          />
+        )}
       </section>
 
       <InputChat
@@ -86,8 +91,9 @@ function ChatBox(props: ChatBoxProps) {
         onChange={(e) => {
           setCurrentMessage(e.target.value);
         }}
-        onClick={() => {
-          sendMessage;
+        onClick={(e) => {
+          e.preventDefault();
+          sendMessage();
         }}
       />
     </div>

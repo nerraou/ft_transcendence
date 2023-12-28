@@ -26,9 +26,9 @@ function Channel(props: ChannelProps) {
         />
       </div>
       <div>
-        <p className="text-light-fg-primary text-lg">#{props.name}</p>
+        <p className="text-light-fg-primary text-base">#{props.name}</p>
         {props.usersNumber && (
-          <p className="text-light-fg-link text-base">
+          <p className="text-light-fg-link text-sm">
             {clsx(props.usersNumber, members)}
           </p>
         )}
