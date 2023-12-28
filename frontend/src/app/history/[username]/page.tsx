@@ -56,16 +56,24 @@ const History = ({ token, username }: HistoryProps) => {
             textColor="text-light-fg-primary"
           />
         </div>
-        <div className="flex flex-col gap-4 bg-inherit w-full items-center">
-          <HistoryTable games={data.games} columns={columns} />
-        </div>
-        <div className="w-full flex flex-row justify-center items-center">
-          <Pagination
-            onChange={(page) => setFilters({ ...filters, page })}
-            page={filters.page}
-            total={Math.ceil(data.count / rowsPerPage)}
-          />
-        </div>
+        {data.count > 0 ? (
+          <>
+            <div className="flex flex-col gap-4 bg-inherit w-full items-center">
+              <HistoryTable games={data.games} columns={columns} />
+            </div>
+            <div className="w-full flex flex-row justify-center items-center">
+              <Pagination
+                onChange={(page) => setFilters({ ...filters, page })}
+                page={filters.page}
+                total={Math.ceil(data.count / rowsPerPage)}
+              />
+            </div>
+          </>
+        ) : (
+          <p className="text-xl text-light-fg-primary dark:text-dark-fg-primary text-center">
+            No games found
+          </p>
+        )}
       </div>
     </div>
   );

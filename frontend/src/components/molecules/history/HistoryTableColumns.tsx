@@ -69,6 +69,17 @@ const getRankingIcon = (oldRanking: number, newRanking: number) => {
   );
 };
 
+function msToTime(duration: number) {
+  const minutes = Math.floor((duration / (1000 * 60)) % 60),
+    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+  let res = "";
+  res += hours < 10 ? "0" + hours : hours;
+  res += ":";
+  res += minutes < 10 ? "0" + minutes : minutes;
+
+  return res;
+}
+
 export function getColumns(
   filters: HistoryFilters,
   setFilters: (newFilters: HistoryFilters) => void,
@@ -93,12 +104,9 @@ export function getColumns(
         return (
           <div className="flex justify-center items-center gap-2 lg:gap-1 md:gap-1 sm:gap-1 xs:gap-1 sm:hidden">
             <div className="text-light-fg-primary dark:text-dark-fg-primary">
-              {duration.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {msToTime(duration.getTime())}
             </div>
-            <Clock color="stroke-light-fg-primary dark:stroke-dark-fg-primary" />
+            <Clock color="stroke-light-fg-primary dark:stroke-dark-fg-primary w-5 h-5 " />
           </div>
         );
       },
@@ -169,7 +177,12 @@ export function getColumns(
       cell: ({ getValue }) => {
         const { oldRanking, newRanking } = getValue() as Game["player"];
         return (
-          <div className={clsx(xxs ? "hidden" : "", "flex gap-2 items-center")}>
+          <div
+            className={clsx(
+              xxs ? "hidden" : "",
+              "flex gap-2 items-center justify-center",
+            )}
+          >
             {getRankingIcon(oldRanking, newRanking)}
             <label className="text-xl text-light-fg-primary dark:text-dark-fg-primary">
               {newRanking}
@@ -188,14 +201,14 @@ export function getColumns(
           />
         </div>
       ),
-      accessorKey: "createdAtTime",
+      accessorKey: "createdAt",
       cell: ({ getValue }) => {
         const date = new Date(getValue() as number);
         return (
           <div
             className={clsx(
               xs ? "hidden" : "",
-              "text-light-fg-primary dark:text-dark-fg-primary",
+              "text-light-fg-primary dark:text-dark-fg-primary flex justify-center items-center",
             )}
           >
             {date.toLocaleDateString()}

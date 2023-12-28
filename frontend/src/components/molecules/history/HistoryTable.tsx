@@ -40,8 +40,7 @@ const HistoryTable = ({ games, columns }: HistoryTableProps) => {
 
   return (
     <div className="w-full border-4 text-light-bg-tertiary text-base bg-light-bg-tertiary border-light-fg-primary dark:border-dark-fg-primary rounded-lg rounded-b-xxl pb-3">
-      <table className="w-full rounded-lg text-sm">
-        {/* <TableHeader headerGroups={table.getHeaderGroups()} /> */}
+      <table className="w-full rounded-lg text-base">
         <thead className="h-16">
           {table.getHeaderGroups().map((headerGroup, id1) => (
             <tr
@@ -66,10 +65,7 @@ const HistoryTable = ({ games, columns }: HistoryTableProps) => {
               className="border-t border-light-fg-primary dark:border-dark-fg-primary"
             >
               {row.getVisibleCells().map((cell, id2) => (
-                <td
-                  key={`${id2}-cell`}
-                  className="px-5 py-2 lg:px-2 md:px-0 sm:px-0 xs:px-10"
-                >
+                <td key={`${id2}-cell`} className="py-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
