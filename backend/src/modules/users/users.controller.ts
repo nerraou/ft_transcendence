@@ -103,6 +103,7 @@ export class UsersController {
   async getUserByUsername(
     @Param("username") username: string,
     @Query() getUserDto: GetUserDto,
+    @User("id") connectedUserId: number,
   ) {
     const user = await this.usersService.findOneByUsername(username);
 
@@ -128,7 +129,8 @@ export class UsersController {
       status: user.status,
       rating: user.rating,
       ranking,
-      ...stats,
+      isProfileOwner: connectedUserId == user.id,
+      gamesStats: stats,
     };
   }
 

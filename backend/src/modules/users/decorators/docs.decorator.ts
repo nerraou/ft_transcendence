@@ -291,7 +291,8 @@ export function GetUserByUsernameDocumentation() {
       type: "boolean",
     }),
     ApiOkResponse({
-      description: "user",
+      description:
+        "user, gamesStats will be null if include_stats is false or missing",
       schema: {
         example: {
           id: 1,
@@ -303,6 +304,13 @@ export function GetUserByUsernameDocumentation() {
           status: "ONLINE | OFFLINE | IN_GAME",
           createdAt: 1692017290161,
           ranking: 2,
+          isProfileOwner: true,
+          gamesStats: {
+            wins: 1,
+            losses: 5,
+            winsPercentage: 16.666666666666668,
+            lossesPercentage: 83.33333333333333,
+          },
         },
       },
     }),

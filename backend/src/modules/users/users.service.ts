@@ -271,6 +271,15 @@ export class UsersService {
       },
     });
 
+    if (gamesCount._count == 0) {
+      return {
+        wins: 0,
+        losses: 0,
+        winsPercentage: 0,
+        lossesPercentage: 0,
+      };
+    }
+
     const winsCount = await this.prisma.game.aggregate({
       _count: true,
       where: {
@@ -289,12 +298,14 @@ export class UsersService {
 
     const lossesCount = gamesCount._count - winsCount._count;
 
-    const winsPercent = (winsCount._count * 100) / gamesCount._count;
-    const lossesPercent = (lossesCount * 100) / gamesCount._count;
+    const winsPercentage = (winsCount._count * 100) / gamesCount._count;
+    const lossesPercentage = (lossesCount * 100) / gamesCount._count;
 
     return {
-      wins: winsPercent,
-      losses: lossesPercent,
+      wins: winsCount._count,
+      losses: lossesCount,
+      winsPercentage,
+      lossesPercentage,
     };
   }
 }
