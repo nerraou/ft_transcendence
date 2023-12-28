@@ -87,8 +87,8 @@ function ChatBox(props: ChatBoxProps) {
 
   return (
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
-      <div className="pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
-        <section className="h-5/6">
+      <div className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
+        <section>
           {messages.map((message, index) => {
             if (message.isReceived) {
               return (
