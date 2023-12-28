@@ -1,16 +1,28 @@
-import Headphones from "@atoms/decoration/Headphones";
 import clsx from "clsx";
 import { ReactNode } from "react";
+
+import Headphones from "@atoms/decoration/Headphones";
+import ThemeSwtich from "@components/atoms/ThemeSwitch";
+import useTheme, { Theme } from "@hooks/useTheme";
 
 interface LayoutProps {
   children: ReactNode | ReactNode[];
 }
 
 function DummyNavBar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className="relative h-20 border-b-4 border-b-light-fg-primary dark:border-b-dark-fg-primary">
       <Headphones reverse position="absolute top-0 left-16" />
-      <nav className="h-full border-l-4 border-l-light-fg-tertiary"></nav>
+      <nav className="flex items-center h-full border-l-4 border-l-light-fg-tertiary">
+        <ThemeSwtich
+          margin="ml-20"
+          position="self-end"
+          checked={theme?.value == Theme.DARK}
+          onChange={toggleTheme}
+        />
+      </nav>
     </header>
   );
 }
