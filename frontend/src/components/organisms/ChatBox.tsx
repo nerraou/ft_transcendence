@@ -12,12 +12,12 @@ interface ChatBoxProps {
   response: string;
 }
 
-interface MessageProps {
+interface Message {
   id: number;
   text: string;
 }
 
-interface SenderProps {
+interface Sender {
   id: number;
   avatarPath: string;
   username: string;
@@ -25,14 +25,21 @@ interface SenderProps {
   lastName: string;
 }
 
-interface ResponseProps {
-  message: MessageProps;
-  sender: SenderProps;
+interface Response {
+  message: Message;
+  sender: Sender;
+}
+
+interface Messages {
+  isReceived: boolean;
+  text: string;
 }
 
 function ChatBox(props: ChatBoxProps) {
-  const [currentMessage, setCurrentMessage] = useState<string | undefined>();
-  const [receivedMessage, setReceivedMessage] = useState<string | undefined>();
+  const [messages, setMessages] = useState<Messages[]>([]);
+
+  const [messageText, setMessageText] = useState("");
+
   const socket = useSocket();
 
   useEffect(() => {
@@ -40,9 +47,14 @@ function ChatBox(props: ChatBoxProps) {
       return;
     }
 
-    function onDirectMessage(message: ResponseProps) {
+    function onDirectMessage(message: Response) {
       console.log(message);
-      setReceivedMessage(message.message.text);
+      if (message.sender.username == props.receiver) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: message.message.text, isReceived: true },
+        ]);
+      }
     }
 
     function onError(error: string) {
@@ -56,7 +68,7 @@ function ChatBox(props: ChatBoxProps) {
       socket.off("message", onDirectMessage);
       socket.off("error", onError);
     };
-  }, [socket]);
+  }, [socket, props.receiver, messages]);
 
   function sendMessage() {
     if (!socket) {
@@ -64,32 +76,45 @@ function ChatBox(props: ChatBoxProps) {
     }
     socket.emit("direct-message", {
       username: props.receiver,
-      text: currentMessage,
+      text: messageText,
     });
-    setCurrentMessage("");
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { text: messageText, isReceived: false },
+    ]);
+    setMessageText("");
   }
 
   return (
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
-      <section className="h-5/6">
-        {currentMessage && (
-          <ChatBubbleMessage
-            image={props.userImage}
-            message={currentMessage as string}
-          />
-        )}
-        {receivedMessage && (
-          <ChatBubbleResponse
-            image={props.friendImage}
-            message={receivedMessage as string}
-          />
-        )}
-      </section>
+      <div className="pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
+        <section className="h-5/6">
+          {messages.map((message, index) => {
+            if (message.isReceived) {
+              return (
+                <ChatBubbleResponse
+                  key={index}
+                  image={props.friendImage}
+                  message={message.text}
+                />
+              );
+            } else {
+              return (
+                <ChatBubbleMessage
+                  key={index}
+                  image={props.userImage}
+                  message={message.text}
+                />
+              );
+            }
+          })}
+        </section>
+      </div>
 
       <InputChat
-        value={currentMessage}
+        value={messageText}
         onChange={(e) => {
-          setCurrentMessage(e.target.value);
+          setMessageText(e.target.value);
         }}
         onClick={(e) => {
           e.preventDefault();

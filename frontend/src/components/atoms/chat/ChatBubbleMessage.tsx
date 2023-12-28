@@ -20,7 +20,7 @@ function ChatBubbleResponse(props: ChatBubbleResponseProps) {
         </div>
       </div>
       <div className="flex justify-end ">
-        <p className="top-4 right-4 mr-8 mt-2 w-80 text-light-fg-tertiary border-2 bg-dark-bg-primary border-light-bg-tertiary rounded-l-lg rounded-br-lg p-4">
+        <p className="break-all top-4 right-4 mr-8 mt-2 w-80 text-light-fg-tertiary border-2 bg-dark-bg-primary border-light-bg-tertiary rounded-l-lg rounded-br-lg p-4">
           {props.message}
         </p>
       </div>
