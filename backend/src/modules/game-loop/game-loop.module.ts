@@ -1,7 +1,8 @@
 import { Module, forwardRef } from "@nestjs/common";
 
-import { GameLoopService } from "./game-loop.service";
 import { EventsModule } from "@modules/events/events.module";
+
+import { GameLoopService } from "./game-loop.service";
 
 @Module({
   providers: [GameLoopService],
