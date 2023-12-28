@@ -11,6 +11,10 @@ interface SidePanelProps {
   image: string;
 }
 
+interface ChatPageProps {
+  params: { username: string };
+}
+
 function SidePanelPopover(props: SidePanelProps) {
   return (
     <Popover className="relative">
@@ -34,7 +38,7 @@ function SidePanelPopover(props: SidePanelProps) {
   );
 }
 
-function ChatPage({ params }: { params: { username: string } }) {
+function ChatPage({ params }: ChatPageProps) {
   return (
     <Layout>
       <div className="flex p-8 lg:p-4 mb-5 space-x-2 justify-center items-stretch">

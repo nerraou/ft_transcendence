@@ -48,7 +48,6 @@ function ChatBox(props: ChatBoxProps) {
     }
 
     function onDirectMessage(message: Response) {
-      console.log(message);
       if (message.sender.username == props.receiver) {
         setMessages((prevMessages) => [
           ...prevMessages,
