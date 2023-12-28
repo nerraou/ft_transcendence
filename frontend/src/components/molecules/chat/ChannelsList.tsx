@@ -22,7 +22,7 @@ const Channels: ChannelProps[] = [
 
 function ChannelAddUser(props: ChannelProps) {
   return (
-    <div className="flex justify-between items-center space-x-10">
+    <div className="flex justify-between items-center space-x-2">
       <Channel
         name={props.name}
         image={props.image}
@@ -42,7 +42,7 @@ function ChannelsList() {
   return (
     <div className="bg-light-fg-tertiary border-2 border-light-fg-primary rounded-lg p-4 space-y-4">
       <div className="flex justify-between px-4 py-2 bg-dark-bg-secondary border-2 border-light-fg-primary">
-        <h3 className="text-lg text-light-bg-secondary">#CHANNELS</h3>
+        <h3 className="text-base text-light-bg-secondary">#CHANNELS</h3>
         <Add
           color="stroke-light-fg-primary"
           onClick={() => {

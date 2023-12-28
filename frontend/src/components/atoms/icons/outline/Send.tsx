@@ -1,12 +1,15 @@
+import { MouseEvent } from "react";
+
 interface SendProps {
   className?: string;
+  onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
-function Send({ className }: SendProps) {
+function Send(props: SendProps) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      onClick={props.onClick}
+      className={props.className}
       width="24"
       height="24"
       viewBox="0 0 24 24"
