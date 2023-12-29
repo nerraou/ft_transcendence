@@ -66,7 +66,7 @@ async function getMessages(
   username: string,
   token: string | unknown,
 ) {
-  const limit = 10;
+  const limit = 50;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
     `/users/messages/${username}?limit=${limit}&page=${page}`;
@@ -96,10 +96,10 @@ function MessagesList(props: MessagesListProps) {
       },
       initialPageParam: 1,
       getPreviousPageParam: (_, pages) => {
-        return pages.length + 1;
+        return pages.length + 1 ?? undefined;
       },
       getNextPageParam: (_, pages) => {
-        return pages.length + 1;
+        return pages.length + 1 ?? undefined;
       },
     });
 
