@@ -117,7 +117,7 @@ export class GamesService {
         oldRating: game.playerOldRating,
         newRating: game.playerNewRating,
         oldRanking: game.playerOldRanking,
-        newRanking: game.playerNewRating,
+        newRanking: game.playerNewRanking,
         isWinner: game.winner == "PLAYER",
       };
 
@@ -129,7 +129,7 @@ export class GamesService {
         oldRating: game.opponentOldRating,
         newRating: game.opponentNewRating,
         oldRanking: game.opponentOldRanking,
-        newRanking: game.opponentNewRating,
+        newRanking: game.opponentNewRanking,
         isWinner: game.winner == "OPPONENT",
       };
 

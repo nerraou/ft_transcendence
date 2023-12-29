@@ -72,7 +72,7 @@ export function GetGamesApiDocumentation() {
                 oldRating: 300,
                 newRating: 310,
                 oldRanking: 2,
-                newRanking: 310,
+                newRanking: 1,
                 isWinner: true,
               },
               opponent: {
@@ -83,7 +83,7 @@ export function GetGamesApiDocumentation() {
                 oldRating: 420,
                 newRating: 410,
                 oldRanking: 2,
-                newRanking: 410,
+                newRanking: 3,
                 isWinner: false,
               },
             },
