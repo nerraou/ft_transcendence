@@ -17,6 +17,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
 import { useFriendQuery } from "@services/useFriendQuery";
+
 interface SidePanelProps {
   image: string;
 }
@@ -77,6 +78,7 @@ function ChatDms(props: ChatDmsProps) {
           receiver={props.username}
           userImage={imageUrl + userData.avatarPath}
           friendImage={imageUrl + friendData.avatarPath}
+          token={props.token}
         />
       </div>
     </Fragment>

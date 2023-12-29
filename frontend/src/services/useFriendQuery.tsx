@@ -14,22 +14,6 @@ async function getUserHeader(token: string | unknown, username: string) {
   return response;
 }
 
-// "id": 1,
-// "username": null,
-// "email": "jdoe@example.com",
-// "firstName": null,
-// "lastName": null,
-// "avatarPath": "7e3b2ca3-cb75-4857-b0d4-66174f1b9a32.png",
-// "status": "ONLINE | OFFLINE | IN_GAME",
-// "createdAt": 1692017290161,
-// "ranking": 2,
-// "isProfileOwner": true,
-// "gamesStats": {
-//   "wins": 1,
-//   "losses": 5,
-//   "winsPercentage": 16.666666666666668,
-//   "lossesPercentage": 83.33333333333333
-
 export interface UserHeaderProps {
   id: number;
   username: string;
@@ -37,7 +21,7 @@ export interface UserHeaderProps {
   firstName: string;
   lastName: string;
   avatarPath: string;
-  status: "ONLINE | OFFLINE | IN_GAME";
+  status: "ONLINE" | "OFFLINE" | "IN_GAME";
   createdAt: string;
 }
 
