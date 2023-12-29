@@ -7,9 +7,7 @@ import { useEffect, useState } from "react";
 interface ChatBoxProps {
   receiver: string;
   userImage: string;
-  message: string;
   friendImage: string;
-  response: string;
 }
 
 interface Message {
