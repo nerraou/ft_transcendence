@@ -114,6 +114,7 @@ interface HistoryPageProps {
 
 export default function ProfilePage({ params }: HistoryPageProps) {
   const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
 
   if (sessionStatus === "unauthenticated") {
     redirect("/sign-in");
@@ -134,16 +135,26 @@ export default function ProfilePage({ params }: HistoryPageProps) {
       <QueryErrorResetBoundary>
         {({ reset }) => (
           <ErrorBoundary
-            fallbackRender={({ resetErrorBoundary }) => (
+            fallbackRender={({ error, resetErrorBoundary }) => (
               <Modal
                 isOpen
                 title="Error"
-                description="Something went wrong"
+                description={
+                  error.response?.status === 403
+                    ? `Username "${params.username}" does not exist`
+                    : "Something went wrong"
+                }
                 action={
                   <Button
-                    text="Retry"
+                    text={
+                      error.response?.status === 403 ? "Back to home" : "Retry"
+                    }
                     onClick={() => {
-                      resetErrorBoundary();
+                      if (error.response?.status === 403) {
+                        router.push("/feed");
+                      } else {
+                        resetErrorBoundary();
+                      }
                     }}
                   />
                 }
