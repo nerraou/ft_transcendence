@@ -3,7 +3,7 @@ import DeviceGamePad from "@components/atoms/icons/outline/DeviceGamePad";
 import MenuDots from "@components/atoms/icons/outline/MenuDots";
 
 interface ChatHeaderProps {
-  status: "ONLINE" | "OFFLINE";
+  status: "ONLINE" | "OFFLINE" | "IN_GAME";
   username: string;
   image: string;
 }

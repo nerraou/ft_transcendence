@@ -2,14 +2,14 @@ import clsx from "clsx";
 import Image from "next/image";
 
 export interface UserProps {
-  status: "ONLINE" | "OFFLINE";
+  status: "ONLINE" | "OFFLINE" | "IN_GAME";
   username: string;
   image: string;
 }
 
 function User(props: UserProps) {
   let statusColor = "bg-light-fg-secondary";
-  if (props.status == "ONLINE") {
+  if (props.status == "ONLINE" || props.status == "IN_GAME") {
     statusColor = " bg-light-bg-primary";
   }
 
