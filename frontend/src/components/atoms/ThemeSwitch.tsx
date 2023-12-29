@@ -11,7 +11,7 @@ interface ThemeSwitchProps {
   position?: string;
 }
 
-export default function ThemeSwtich(props: ThemeSwitchProps) {
+export default function ThemeSwitch(props: ThemeSwitchProps) {
   return (
     <Switch
       checked={props.checked}
