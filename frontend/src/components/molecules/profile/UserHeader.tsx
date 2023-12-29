@@ -14,6 +14,9 @@ import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
 import { UserStatus } from "../FriendCard";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useBlockUser } from "@app/profile/[username]/userProfile";
 
 interface UserHeaderProps {
   fullname: string;
@@ -23,18 +26,25 @@ interface UserHeaderProps {
   userStatus: UserStatus;
   isProfileOwner: boolean;
   isFriend: boolean;
+  id: number;
 }
 interface UserHeaderActionsProps {
+  username: string;
   isProfileOwner: boolean;
   isFriend: boolean;
   status: UserStatus;
+  id: number;
 }
 
 interface UserPopoverProps {
   isFriend: boolean;
+  id: number;
 }
 
 function UserPopover(props: UserPopoverProps) {
+  const { data: session } = useSession();
+  const token = session?.user.accessToken;
+  const blockUser = useBlockUser(token, props.id);
   let action = "Add";
 
   if (props.isFriend) {
@@ -61,19 +71,23 @@ function UserPopover(props: UserPopoverProps) {
       >
         <Popover.Panel className="absolute">
           <div className="flex flex-col bg-light-fg-tertiary p-sm rounded-base">
-            <div className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm">
+            <button className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm">
               {!props.isFriend && <UserPlus color="stroke-light-fg-link" />}
               {props.isFriend && <UserMinus color="stroke-light-fg-link" />}
               <label className="text-sm text-light-fg-primary ml-sm">
                 {action}
               </label>
-            </div>
-            <div className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm">
+            </button>
+            <button
+              disabled={blockUser.status === "pending"}
+              className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
+              onClick={() => blockUser.mutate({ token: token, id: props.id })}
+            >
               <UserBlock color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">
                 Block
               </label>
-            </div>
+            </button>
           </div>
         </Popover.Panel>
       </Transition>
@@ -82,11 +96,13 @@ function UserPopover(props: UserPopoverProps) {
 }
 
 function UserHeaderActions(props: UserHeaderActionsProps) {
+  const router = useRouter();
+
   if (props.isProfileOwner) {
     return (
-      <div className="flex">
+      <button className="flex" onClick={() => router.push("/profile/settings")}>
         <Pencil color="stroke-light-fg-link" />
-      </div>
+      </button>
     );
   } else {
     return (
@@ -97,12 +113,17 @@ function UserHeaderActions(props: UserHeaderActionsProps) {
           round="rounded-sm"
           animated={props.status == "ONLINE"}
         />
-        <Email
-          color="stroke-light-fg-link"
-          hover="hover:bg-light-fg-tertiary"
-          round="rounded-sm"
-        />
-        <UserPopover isFriend={props.isFriend} />
+        <button
+          className="flex"
+          onClick={() => router.push(`/chat/${props.username}`)}
+        >
+          <Email
+            color="stroke-light-fg-link"
+            hover="hover:bg-light-fg-tertiary"
+            round="rounded-sm"
+          />
+        </button>
+        <UserPopover isFriend={props.isFriend} id={props.id} />
       </div>
     );
   }
@@ -130,6 +151,8 @@ function UserHeader(props: UserHeaderProps) {
           isFriend={props.isFriend}
           isProfileOwner={props.isProfileOwner}
           status={props.userStatus}
+          username={props.username}
+          id={props.id}
         />
       </div>
     </div>
