@@ -54,6 +54,9 @@ const History = ({ token, username }: HistoryProps) => {
             }
           />
           <InputSearch
+            bgColor="bg-light-fg-tertiary"
+            borderColor="border-light-fg-primary"
+            iconsColor="text-light-fg-primary"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
