@@ -43,7 +43,7 @@ export default function DatePickerInterval(props: DatePickerIntervalProps) {
   }
 
   return (
-    <div className="inline-flex w-80 items-center border-2 border-light-fg-primary bg-light-fg-tertiary rounded-full px-4 h-10">
+    <div className="inline-flex w-80 items-center border-2 border-light-fg-primary bg-light-fg-tertiary rounded-full px-4 h-10 z-20">
       <Calendar color="stroke-light-fg-primary" margin="mr-2" />
       <div className="flex h-full items-center flex-grow justify-evenly">
         <DatePicker

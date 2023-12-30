@@ -3,13 +3,15 @@ import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { Suspense, useCallback } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import LoadingPage from "../../loading";
 import Layout from "@components/templates/Layout";
 import HistoryTable from "@components/molecules/history/HistoryTable";
-import useGameHistory from "@components/molecules/history/useGameHistory";
+import useGameHistory, {
+  ROWS_PER_PAGE,
+} from "@components/molecules/history/useGameHistory";
 import { getColumns } from "@components/molecules/history/HistoryTableColumns";
 import Pagination from "@components/atoms/Pagination";
 import DatePickerInterval from "@components/atoms/DatePickerInterval";
@@ -30,7 +32,6 @@ interface HistoryPageProps {
 
 const History = ({ token, username }: HistoryProps) => {
   const { data, filters, setFilters } = useGameHistory(token, username);
-  const rowsPerPage = 4;
   const xs = useMediaQuery("(max-width: 550px)");
   const xxs = useMediaQuery("(max-width: 450px)");
   const columns = getColumns(filters, setFilters, xs, xxs);
@@ -43,8 +44,8 @@ const History = ({ token, username }: HistoryProps) => {
   );
 
   return (
-    <div className="flex flex-col gap-16 bg-inherit w-full items-center justify-center self-stretch p-8 md:p-4 sm:p-2">
-      <div className="flex flex-col gap-16 bg-inherit w-full items-center justify-center">
+    <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-center self-stretch p-8 md:p-4 sm:p-2">
+      <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-center">
         <div className="flex flex-row gap-6 w-full items-start justify-start sm:flex-col sm:items-center sm:justify-center">
           <DatePickerInterval
             value={filters.dateInterval}
@@ -68,14 +69,14 @@ const History = ({ token, username }: HistoryProps) => {
         </div>
         {data.count > 0 ? (
           <>
-            <div className="flex flex-col gap-4 bg-inherit w-full items-center">
+            <div className="flex flex-col gap-4 bg-inherit h-full w-full items-center">
               <HistoryTable games={data.games} columns={columns} />
             </div>
             <div className="w-full flex flex-row justify-center items-center">
               <Pagination
                 onChange={(page) => setFilters({ ...filters, page })}
                 page={filters.page}
-                total={Math.ceil(data.count / rowsPerPage)}
+                total={Math.ceil(data.count / ROWS_PER_PAGE)}
               />
             </div>
           </>
@@ -91,6 +92,7 @@ const History = ({ token, username }: HistoryProps) => {
 
 export default function HistoryPage({ params }: HistoryPageProps) {
   const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
 
   if (sessionStatus === "unauthenticated") {
     redirect("/sign-in");
@@ -111,16 +113,26 @@ export default function HistoryPage({ params }: HistoryPageProps) {
       <QueryErrorResetBoundary>
         {({ reset }) => (
           <ErrorBoundary
-            fallbackRender={({ resetErrorBoundary }) => (
+            fallbackRender={({ error, resetErrorBoundary }) => (
               <Modal
                 isOpen
                 title="Error"
-                description="Something went wrong"
+                description={
+                  error.response?.status === 403
+                    ? `Username "${params.username}" does not exist`
+                    : "Something went wrong"
+                }
                 action={
                   <Button
-                    text="Retry"
+                    text={
+                      error.response?.status === 403 ? "Back to home" : "Retry"
+                    }
                     onClick={() => {
-                      resetErrorBoundary();
+                      if (error.response?.status === 403) {
+                        router.push("/feed");
+                      } else {
+                        resetErrorBoundary();
+                      }
                     }}
                   />
                 }

@@ -13,11 +13,11 @@ const UserImage = (props: UserImageProps) => {
     <div className="relative">
       <div
         className={clsx(
-          "text-sm font-bold absolute top-0 z-10",
+          "text-sm font-bold absolute top-1 z-10",
           props.ratingChange > 0
             ? "text-light-accent"
             : "text-light-fg-secondary",
-          props.side === "opponent" ? "left-0" : "right-0",
+          props.side === "opponent" ? "right-10" : "left-10",
         )}
       >
         {props.ratingChange >= 0 ? "+" : ""}

@@ -4,7 +4,9 @@ import {
   ColumnDef,
   flexRender,
 } from "@tanstack/react-table";
+import clsx from "clsx";
 import React from "react";
+import { ROWS_PER_PAGE } from "./useGameHistory";
 
 interface Player {
   id: number;
@@ -39,7 +41,7 @@ const HistoryTable = ({ games, columns }: HistoryTableProps) => {
   });
 
   return (
-    <div className="w-full border-4 text-light-bg-tertiary text-base bg-light-bg-tertiary border-light-fg-primary dark:border-dark-fg-primary rounded-lg rounded-b-xxl pb-3">
+    <div className="w-full border-4 h-full text-light-bg-tertiary text-base bg-light-bg-tertiary border-light-fg-primary dark:border-dark-fg-primary rounded-lg rounded-b-xxl">
       <table className="w-full rounded-lg text-base">
         <thead className="h-16">
           {table.getHeaderGroups().map((headerGroup, id1) => (
@@ -62,10 +64,13 @@ const HistoryTable = ({ games, columns }: HistoryTableProps) => {
           {table.getRowModel().rows.map((row, id1) => (
             <tr
               key={`${id1}-row`}
-              className="border-t border-light-fg-primary dark:border-dark-fg-primary"
+              className={clsx({
+                "border-b border-light-fg-primary dark:border-dark-fg-primary":
+                  id1 < ROWS_PER_PAGE - 1,
+              })}
             >
               {row.getVisibleCells().map((cell, id2) => (
-                <td key={`${id2}-cell`} className="py-4">
+                <td key={`${id2}-cell`} className="py-6">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}

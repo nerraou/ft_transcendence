@@ -13,10 +13,9 @@ import { clsx } from "clsx";
 import { ColumnDef } from "@tanstack/react-table";
 import { Game } from "./HistoryTable";
 
-// eslint-disable-next-line no-shadow
 export enum SortEnum {
-  DESC = "DESC",
-  ASC = "ASC",
+  DESC = "desc",
+  ASC = "asc",
 }
 
 interface SortButtonProps {
@@ -70,14 +69,9 @@ const getRankingIcon = (oldRanking: number, newRanking: number) => {
 };
 
 function msToTime(duration: number) {
-  const minutes = Math.floor((duration / (1000 * 60)) % 60),
-    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
-  let res = "";
-  res += hours < 10 ? "0" + hours : hours;
-  res += ":";
-  res += minutes < 10 ? "0" + minutes : minutes;
-
-  return res;
+  const minutes = Math.floor(duration / 60000);
+  const seconds = ((duration % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (parseInt(seconds) < 10 ? "0" : "") + seconds;
 }
 
 export function getColumns(
@@ -99,12 +93,10 @@ export function getColumns(
       ),
       accessorKey: "duration",
       cell: ({ getValue }) => {
-        // convert seconds to Date
-        const duration = new Date((getValue() as number) * 1000);
         return (
           <div className="flex justify-center items-center gap-2 lg:gap-1 md:gap-1 sm:gap-1 xs:gap-1 sm:hidden">
             <div className="text-light-fg-primary dark:text-dark-fg-primary">
-              {msToTime(duration.getTime())}
+              {msToTime(getValue() as number)}
             </div>
             <Clock color="stroke-light-fg-primary dark:stroke-dark-fg-primary w-5 h-5 " />
           </div>

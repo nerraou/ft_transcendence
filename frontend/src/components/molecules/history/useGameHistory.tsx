@@ -18,6 +18,8 @@ export type HistoryFilters = {
   page: number;
 };
 
+export const ROWS_PER_PAGE = 4;
+
 const useGameHistory = (token: string | unknown, username: string) => {
   const [filters, setFilters] = useState<HistoryFilters>({
     query: "",
@@ -29,12 +31,23 @@ const useGameHistory = (token: string | unknown, username: string) => {
 
   const fetchData = async () => {
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        params.append(key, value.toString());
-      }
-    });
-    params.append("limit", "10");
+    if (filters.query) {
+      params.append("search_query", filters.query);
+    }
+    if (filters.dateSort) {
+      params.append("date", filters.dateSort);
+    }
+    if (filters.timeSort) {
+      params.append("duration", filters.timeSort);
+    }
+    if (filters.dateInterval?.[0]) {
+      params.append("start_date", filters.dateInterval[0].toString());
+    }
+    if (filters.dateInterval?.[1]) {
+      params.append("end_date", filters.dateInterval[1].toString());
+    }
+    params.append("page", filters.page.toString());
+    params.append("limit", ROWS_PER_PAGE.toString());
     const url =
       process.env.NEXT_PUBLIC_API_BASE_URL +
       `/users/${username}/games?` +
