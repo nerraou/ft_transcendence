@@ -53,12 +53,24 @@ export class EventsService {
 
     client.data.userId = payload.sub;
 
-    await this.redisService.set(`user-${payload.sub}`, client.id);
-    this.usersService.updateStatusById(payload.sub, "ONLINE").catch(() => {
-      console.log("couldn't update user status");
-    });
+    const redisKey = `user-${payload.sub}`;
 
-    const channels = await this.usersService.finsChannelsIds(payload.sub);
+    const socketsIdsString = await this.redisService.get(redisKey);
+    const userSocketsIds: string[] = socketsIdsString
+      ? JSON.parse(socketsIdsString)
+      : [];
+
+    userSocketsIds.push(client.id);
+
+    await this.redisService.set(redisKey, JSON.stringify(userSocketsIds));
+
+    if (userSocketsIds.length == 1) {
+      this.usersService.updateStatusById(payload.sub, "ONLINE").catch(() => {
+        console.log("couldn't update user status");
+      });
+    }
+
+    const channels = await this.usersService.findChannelsIds(payload.sub);
 
     channels.forEach((channel) => {
       const channeRoomName = `chat-channel-${channel.channelId}`;
@@ -110,15 +122,19 @@ export class EventsService {
       createMessageDto.text,
     );
 
-    const socketId = await this.redisService.get(`user-${receiver.id}`);
+    const socketxIdsString = await this.redisService.get(`user-${receiver.id}`);
 
-    if (socketId) {
-      client
-        .to(socketId)
-        .emit(
-          "message",
-          this.messagesService.composeMessageSocketPayload(message, user),
-        );
+    if (socketxIdsString) {
+      const socketIds: string[] = JSON.parse(socketxIdsString);
+
+      socketIds.forEach((socketId) => {
+        client
+          .to(socketId)
+          .emit(
+            "message",
+            this.messagesService.composeMessageSocketPayload(message, user),
+          );
+      });
     }
   }
 

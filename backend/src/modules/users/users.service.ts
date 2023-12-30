@@ -195,7 +195,7 @@ export class UsersService {
     return this.prisma.user.count();
   }
 
-  finsChannelsIds(id: number) {
+  findChannelsIds(id: number) {
     return this.prisma.channelMember.findMany({
       where: {
         memberId: id,
