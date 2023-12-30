@@ -150,8 +150,7 @@ const Pagination = (props: PaginationProps) => {
         content=">"
         active={false}
         disabled={
-          paginatinInfos.start + paginatinInfos.size - 1 ===
-          paginatinInfos.total
+          paginatinInfos.start + paginatinInfos.size - 1 >= paginatinInfos.total
         }
         slider={true}
       />

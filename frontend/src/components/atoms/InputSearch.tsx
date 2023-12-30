@@ -26,9 +26,9 @@ const InputSearch = (props: InputSearchProps) => {
         <Search className="text-light-fg-primary dark:text-dark-fg-primary" />
       </div>
       <input
+        value={props.value}
         type="text"
         placeholder={props.placeholder}
-        value={props.value}
         className={clsx(
           color,
           props.textColor,

@@ -13,23 +13,25 @@ const UserImage = (props: UserImageProps) => {
     <div className="relative">
       <div
         className={clsx(
-          "text-sm font-bold absolute top-0 z-10",
+          "text-sm font-bold absolute top-1 z-10",
           props.ratingChange > 0
             ? "text-light-accent"
             : "text-light-fg-secondary",
-          props.side === "opponent" ? "left-0" : "right-0",
+          props.side === "opponent" ? "right-10" : "left-10",
         )}
       >
         {props.ratingChange >= 0 ? "+" : ""}
         {props.ratingChange}
       </div>
-      <Image
-        src={props.image}
-        alt="Player Avatar"
-        width="30"
-        height="30"
-        className="custom-position object-cover w-12 h-12 rounded-full p-2 pb-0 pt-3"
-      />
+      <div className="pt-3">
+        <Image
+          src={props.image}
+          alt="Player Avatar"
+          width="30"
+          height="30"
+          className="object-cover w-12 h-12 rounded-full"
+        />
+      </div>
     </div>
   );
 };
@@ -49,9 +51,9 @@ const HistoryUserCard = (props: HistoryUserCardProps) => {
         side={props.side}
       />
       <div className="flex flex-col gap-[2px] items-center w-full">
-        <label className="text-light-fg-tertiary text-sm border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-base bg-light-fg-link px-1 min-w-full flex flex-col items-center">
+        <p className="text-light-fg-tertiary text-sm border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-lg bg-light-fg-link px-1 flex flex-col items-center min-w-[50px] max-w-[160px]">
           {props.username}
-        </label>
+        </p>
         <div className="w-8 h-[6px] bg-light-fg-primary dark:bg-dark-fg-primary"></div>
       </div>
     </div>
