@@ -26,12 +26,14 @@ interface UserHeaderProps {
   userStatus: UserStatus;
   isProfileOwner: boolean;
   isFriend: boolean;
+  noIcons?: boolean;
   id: number;
 }
 interface UserHeaderActionsProps {
   username: string;
   isProfileOwner: boolean;
   isFriend: boolean;
+  noIcons?: boolean;
   status: UserStatus;
   id: number;
 }
@@ -98,7 +100,9 @@ function UserPopover(props: UserPopoverProps) {
 function UserHeaderActions(props: UserHeaderActionsProps) {
   const router = useRouter();
 
-  if (props.isProfileOwner) {
+  if (props.noIcons) {
+    return null;
+  } else if (props.isProfileOwner) {
     return (
       <button className="flex" onClick={() => router.push("/profile/settings")}>
         <Pencil color="stroke-light-fg-link" />
@@ -148,6 +152,7 @@ function UserHeader(props: UserHeaderProps) {
           </label>
         </div>
         <UserHeaderActions
+          noIcons={props.noIcons}
           isFriend={props.isFriend}
           isProfileOwner={props.isProfileOwner}
           status={props.userStatus}
