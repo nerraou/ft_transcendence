@@ -13,7 +13,7 @@ function ChatHeader(props: ChatHeaderProps) {
     <div className="flex items-center justify-between py-3 px-8 sm:px-4 border-4 bg bg-light-fg-tertiary border-light-bg-tertiary rounded-tr-xl">
       <User
         username={props.username}
-        image={props.image}
+        avatarPath={props.image}
         status={props.status}
       />
       <div className="flex items-center space-x-5">

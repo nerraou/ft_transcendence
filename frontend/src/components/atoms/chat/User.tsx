@@ -2,9 +2,10 @@ import clsx from "clsx";
 import Image from "next/image";
 
 export interface UserProps {
+  id?: number;
   status: "ONLINE" | "OFFLINE" | "IN_GAME";
   username: string;
-  image: string;
+  avatarPath: string;
 }
 
 function User(props: UserProps) {
@@ -17,7 +18,7 @@ function User(props: UserProps) {
     <div className="flex items-center space-x-4">
       <div className="relative shrink-0 w-16 h-16">
         <Image
-          src={props.image}
+          src={props.avatarPath}
           alt="user image"
           fill
           sizes="w-16 h-16"

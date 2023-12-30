@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
 
-async function getUserHeader(token: string | unknown) {
+async function getUser(token: string | unknown) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/users/me";
 
   const res = await baseQuery(url, {
@@ -14,7 +14,7 @@ async function getUserHeader(token: string | unknown) {
   return response;
 }
 
-export interface UserHeaderProps {
+export interface UserProps {
   id: number;
   username: string;
   email: string;
@@ -27,10 +27,10 @@ export interface UserHeaderProps {
 }
 
 export function useUserProfileQuery(token: string | unknown) {
-  return useSuspenseQuery<UserHeaderProps>({
+  return useSuspenseQuery<UserProps>({
     queryKey: ["user"],
     queryFn: () => {
-      return getUserHeader(token);
+      return getUser(token);
     },
   });
 }
