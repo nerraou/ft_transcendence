@@ -246,9 +246,19 @@ export class EventsService {
         playerSocket.join(game.getSocketRoomName());
         opponentSocket.join(game.getSocketRoomName());
 
-        game.events.on("game-debug", (data) =>
-          serverSocket.to(game.getSocketRoomName()).emit("game-debug", data),
-        );
+        game.events.on("game-debug", (data) => {
+          this.usersService.updateStatusById(player.id, "IN_GAME").catch(() => {
+            // can't update status
+          });
+
+          this.usersService
+            .updateStatusById(opponent.id, "IN_GAME")
+            .catch(() => {
+              // can't update status
+            });
+
+          serverSocket.to(game.getSocketRoomName()).emit("game-debug", data);
+        });
 
         game.events.on("game-started", (data: any) => {
           serverSocket.to(game.getSocketRoomName()).emit("game-started", data);
@@ -264,6 +274,16 @@ export class EventsService {
 
         game.events.on("game-over", (data: any) => {
           const winner = data.winnerId == player.id ? "PLAYER" : "OPPONENT";
+
+          this.usersService.updateStatusById(player.id, "ONLINE").catch(() => {
+            // can't update status
+          });
+
+          this.usersService
+            .updateStatusById(opponent.id, "ONLINE")
+            .catch(() => {
+              // can't update status
+            });
 
           this.claimAchievements(game, winner, data.winnerId).catch(() => {
             console.error("can't claim achievements");
