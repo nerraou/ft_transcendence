@@ -32,11 +32,13 @@ function Settings(props: SettingsProps) {
       <UserHeader
         fullname={data.firstName + " " + data.lastName}
         image={imageUrl + data.avatarPath}
+        noIcons={true}
         isProfileOwner={true}
-        isFriend
-        level={2}
+        isFriend={false}
+        level={data.ranking}
         userStatus="ONLINE"
         username={data?.username}
+        id={data.id}
       />
 
       <Bar width="w-5/6" />

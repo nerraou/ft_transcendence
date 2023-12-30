@@ -24,6 +24,7 @@ export interface UserProps {
   is2faEnabled: boolean;
   isEmailVerified: boolean;
   createdAt: string;
+  ranking: number;
 }
 
 export function useUserProfileQuery(token: string | unknown) {
