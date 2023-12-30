@@ -2,15 +2,17 @@ import clsx from "clsx";
 import Image from "next/image";
 
 export interface ChannelProps {
+  id?: number;
   name: string;
-  image: string;
+  imagePath: string;
   description?: string;
-  usersNumber?: number;
+  membersCount?: number;
+  type?: "PUBLIC";
 }
 
 function Channel(props: ChannelProps) {
   let members = "members";
-  if (props.usersNumber === 1) {
+  if (props.membersCount === 1) {
     members = "member";
   }
 
@@ -18,7 +20,7 @@ function Channel(props: ChannelProps) {
     <div className="flex items-center space-x-2">
       <div className="relative shrink-0 w-16 h-16">
         <Image
-          src={props.image}
+          src={props.imagePath}
           alt="user image"
           fill
           sizes="w-16 h-16"
@@ -27,9 +29,9 @@ function Channel(props: ChannelProps) {
       </div>
       <div>
         <p className="text-light-fg-primary text-base">#{props.name}</p>
-        {props.usersNumber && (
+        {props.membersCount && (
           <p className="text-light-fg-link text-sm">
-            {clsx(props.usersNumber, members)}
+            {clsx(props.membersCount, members)}
           </p>
         )}
         {props.description && (

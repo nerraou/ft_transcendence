@@ -5,9 +5,14 @@ import Image from "next/image";
 
 interface SidePanelProps {
   image: string;
+  token: string | unknown;
 }
 
-function UserHeader(props: SidePanelProps) {
+interface UserHeaderProps {
+  image: string;
+}
+
+function UserHeader(props: UserHeaderProps) {
   return (
     <div className="flex justify-between items-center border-2 border-light-bg-tertiary rounded-lg bg-light-fg-secondary py-3 px-5">
       <div className="relative shrink-0 w-16 h-16">
@@ -28,8 +33,8 @@ function SidePanel(props: SidePanelProps) {
   return (
     <section className="scrollbar-thin scrollbar-track-light-fg-tertiary scrollbar-thumb-light-fg-primary space-y-10 h-full sm:h-[80vh] overflow-auto sm:w-5/6 w-full flex flex-col px-5 pt-3 pb-14 bg-light-bg-primary border-4 border-light-bg-tertiary rounded-bl-2xl rounded-tl-xl">
       <UserHeader image={props.image} />
-      <SearchFriendsList />
-      <SearchChannelsList />
+      <SearchFriendsList token={props.token} />
+      <SearchChannelsList token={props.token} />
     </section>
   );
 }

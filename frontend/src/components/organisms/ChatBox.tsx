@@ -4,7 +4,7 @@ import ChatBubbleResponse from "@components/atoms/chat/ChatBubbleResponse";
 import { useSocket } from "@contexts/socket";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 import Loading from "@components/atoms/icons/outline/Loading";
@@ -90,7 +90,7 @@ function MessagesList(props: MessagesListProps) {
 
   const { data, isFetchingPreviousPage, fetchPreviousPage } =
     useSuspenseInfiniteQuery<OldMessages>({
-      queryKey: ["messages"],
+      queryKey: ["messages", props.receiver],
       queryFn: ({ pageParam }) => {
         return getMessages(pageParam as number, props.receiver, props.token);
       },
@@ -147,6 +147,7 @@ function ChatBox(props: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
   const socket = useSocket();
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!socket) {
@@ -194,7 +195,7 @@ function ChatBox(props: ChatBoxProps) {
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
       <div className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
         <MessagesList receiver={props.receiver} token={props.token} />
-        <section>
+        <section ref={ref}>
           {messages.map((message, index) => {
             if (message.isReceived) {
               return (
@@ -225,6 +226,11 @@ function ChatBox(props: ChatBoxProps) {
         onClick={(e) => {
           e.preventDefault();
           sendMessage();
+          if (ref.current) {
+            ref.current.scrollIntoView({
+              behavior: "instant",
+            });
+          }
         }}
       />
     </div>
