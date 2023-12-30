@@ -16,7 +16,7 @@ export class UpdateChannelDto {
   @IsInt()
   @Type(() => Number)
   @IsPositive()
-  channeldId: number;
+  channelId: number;
 
   @IsString()
   @Length(1, 255)

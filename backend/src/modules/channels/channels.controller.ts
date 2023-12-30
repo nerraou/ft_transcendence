@@ -3,6 +3,8 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseFilePipeBuilder,
   ParseIntPipe,
@@ -41,7 +43,9 @@ import {
   GetChannelsApiDocumentation,
   JoinChannelApiDocumentation,
   GetChannelsMessagesApiDocumentation,
+  BanChannelMemberApiDocumentation,
 } from "./decorators/docs.decorator";
+import { BanMemberDto } from "./dto/ban-member.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -108,7 +112,7 @@ export class ChannelsController {
     let filename: string | undefined;
 
     const channel = await this.channelsService.findChannelByIdWithOwner(
-      updateChannelDto.channeldId,
+      updateChannelDto.channelId,
     );
 
     if (!channel) {
@@ -232,6 +236,49 @@ export class ChannelsController {
     return {
       count,
       messages: messages.reverse(),
+    };
+  }
+
+  @Post("/members/ban")
+  @BanChannelMemberApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async banMember(
+    @User() user: UserEntity,
+    @Body() banMemberDto: BanMemberDto,
+  ) {
+    const member = await this.channelsService.findChannelMember(
+      banMemberDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER", "ADMIN"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToBan = await this.channelsService.findChannelMember(
+      banMemberDto.channelId,
+      banMemberDto.memberId,
+    );
+
+    if (memberToBan.role == "OWNER") {
+      throw new ForbiddenException();
+    }
+
+    if (!memberToBan) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.updateMemberState(
+      banMemberDto.channelId,
+      banMemberDto.memberId,
+      "BANNED",
+    );
+
+    return {
+      message: "success",
     };
   }
 }
