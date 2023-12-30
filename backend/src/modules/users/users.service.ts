@@ -308,4 +308,44 @@ export class UsersService {
       lossesPercentage,
     };
   }
+
+  async getWinsCount(userId: number) {
+    const winsCount = await this.prisma.game.aggregate({
+      _count: true,
+      where: {
+        OR: [
+          {
+            playerId: userId,
+            winner: "PLAYER",
+          },
+          {
+            opponentId: userId,
+            winner: "OPPONENT",
+          },
+        ],
+      },
+    });
+
+    return winsCount._count;
+  }
+
+  async findLastRankedPlayer() {
+    const getUsersQuery = Prisma.sql`
+    SELECT id, username, email, status, rating,
+      RANK() OVER (ORDER BY rating DESC) as ranking,
+      first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+      created_at as "createdAt", updated_at as "updatedAt"
+    FROM users
+    ORDER BY ranking DESC
+    LIMIT 1
+    `;
+
+    const users = await this.prisma.$queryRaw<User[]>(getUsersQuery);
+
+    if (users.length != 0) {
+      return users[0];
+    }
+
+    return null;
+  }
 }
