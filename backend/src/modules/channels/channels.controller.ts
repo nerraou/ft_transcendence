@@ -3,8 +3,6 @@ import {
   Controller,
   ForbiddenException,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   ParseFilePipeBuilder,
   ParseIntPipe,
@@ -242,9 +240,8 @@ export class ChannelsController {
     };
   }
 
-  @Post("/members/ban")
+  @Patch("/members/ban")
   @UpdateChannelMemberStateApiDocumentation()
-  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   async banMember(
     @User() user: UserEntity,
@@ -285,9 +282,8 @@ export class ChannelsController {
     };
   }
 
-  @Post("/members/kick")
+  @Patch("/members/kick")
   @UpdateChannelMemberStateApiDocumentation()
-  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   async kickMember(
     @User() user: UserEntity,
@@ -328,9 +324,8 @@ export class ChannelsController {
     };
   }
 
-  @Post("/members/mute")
+  @Patch("/members/mute")
   @MuteChannelMemberApiDocumentation()
-  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   async muteMember(
     @User() user: UserEntity,
