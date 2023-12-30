@@ -47,7 +47,7 @@ const HistoryTable = ({ games, columns }: HistoryTableProps) => {
           {table.getHeaderGroups().map((headerGroup, id1) => (
             <tr
               key={`${id1}-headerGroup`}
-              className="bg-light-fg-primary dark:bg-dark-bg-primary texte-base"
+              className="bg-light-fg-primary dark:bg-dark-fg-primary texte-base"
             >
               {headerGroup.headers.map((header, id2) => (
                 <th colSpan={header.colSpan} key={`column.id${id2}-column`}>
