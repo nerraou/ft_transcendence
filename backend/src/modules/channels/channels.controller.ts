@@ -43,10 +43,12 @@ import {
   GetChannelsMessagesApiDocumentation,
   UpdateChannelMemberStateApiDocumentation,
   MuteChannelMemberApiDocumentation,
+  ChangeChannelMemberRoleApiDocumentation,
 } from "./decorators/docs.decorator";
 import { BanMemberDto } from "./dto/ban-member.dto";
 import { KickMemberDto } from "./dto/kick-member.dto";
 import { MuteMemberDto } from "./dto/mute-member.dto";
+import { ChangeMemberRoleDto } from "./dto/change-member-role.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -247,6 +249,10 @@ export class ChannelsController {
     @User() user: UserEntity,
     @Body() banMemberDto: BanMemberDto,
   ) {
+    if (user.id == banMemberDto.memberId) {
+      throw new ForbiddenException();
+    }
+
     const member = await this.channelsService.findChannelMember(
       banMemberDto.channelId,
       user.id,
@@ -289,6 +295,10 @@ export class ChannelsController {
     @User() user: UserEntity,
     @Body() kickMemberDto: KickMemberDto,
   ) {
+    if (user.id == kickMemberDto.memberId) {
+      throw new ForbiddenException();
+    }
+
     const member = await this.channelsService.findChannelMember(
       kickMemberDto.channelId,
       user.id,
@@ -331,6 +341,10 @@ export class ChannelsController {
     @User() user: UserEntity,
     @Body() muteMemberDto: MuteMemberDto,
   ) {
+    if (user.id == muteMemberDto.memberId) {
+      throw new ForbiddenException();
+    }
+
     const member = await this.channelsService.findChannelMember(
       muteMemberDto.channelId,
       user.id,
@@ -359,6 +373,48 @@ export class ChannelsController {
       muteMemberDto.channelId,
       muteMemberDto.memberId,
       muteMemberDto.minutes,
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/members/role")
+  @ChangeChannelMemberRoleApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async changeMemberRole(
+    @User() user: UserEntity,
+    @Body() changeMemberRoleDto: ChangeMemberRoleDto,
+  ) {
+    if (user.id == changeMemberRoleDto.memberId) {
+      throw new ForbiddenException();
+    }
+
+    const member = await this.channelsService.findChannelMember(
+      changeMemberRoleDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToUpdate = await this.channelsService.findChannelMember(
+      changeMemberRoleDto.channelId,
+      changeMemberRoleDto.memberId,
+    );
+
+    if (!memberToUpdate) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.updateMemberRole(
+      changeMemberRoleDto.channelId,
+      changeMemberRoleDto.memberId,
+      changeMemberRoleDto.role,
     );
 
     return {

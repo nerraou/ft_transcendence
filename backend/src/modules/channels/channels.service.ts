@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ChannelMemberState } from "@prisma/client";
+import { ChannelMemberRole, ChannelMemberState } from "@prisma/client";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 import { HashService } from "@common/services/hash.service";
@@ -133,6 +133,24 @@ export class ChannelsService {
       },
       data: {
         mutedUntil,
+      },
+    });
+  }
+
+  updateMemberRole(
+    channelId: number,
+    memberId: number,
+    role: ChannelMemberRole,
+  ) {
+    return this.prisma.channelMember.update({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId,
+        },
+      },
+      data: {
+        role,
       },
     });
   }
