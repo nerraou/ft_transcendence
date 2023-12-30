@@ -30,6 +30,7 @@ interface Friend {
   lastName: string;
   avatarPath: string;
   status: UserStatus;
+  ranking: number;
 }
 
 interface FriendProps {
@@ -96,7 +97,7 @@ function FriendsList(props: FriendsListProps) {
                     image={imageUrl + value.avatarPath}
                     username={value.username}
                     userStatus={value.status}
-                    level={3}
+                    level={value.ranking}
                   />
                 );
               })}
