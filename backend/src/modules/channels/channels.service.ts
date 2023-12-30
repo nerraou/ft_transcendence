@@ -121,6 +121,22 @@ export class ChannelsService {
     });
   }
 
+  muteMember(channelId: number, memberId: number, minutes: number) {
+    const mutedUntil = new Date(Date.now() + minutes * 60 * 1000);
+
+    return this.prisma.channelMember.update({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId,
+        },
+      },
+      data: {
+        mutedUntil,
+      },
+    });
+  }
+
   findChannelById(channelId: number) {
     return this.prisma.channel.findUnique({
       where: {

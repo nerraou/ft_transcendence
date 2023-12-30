@@ -43,9 +43,12 @@ import {
   GetChannelsApiDocumentation,
   JoinChannelApiDocumentation,
   GetChannelsMessagesApiDocumentation,
-  BanChannelMemberApiDocumentation,
+  UpdateChannelMemberStateApiDocumentation,
+  MuteChannelMemberApiDocumentation,
 } from "./decorators/docs.decorator";
 import { BanMemberDto } from "./dto/ban-member.dto";
+import { KickMemberDto } from "./dto/kick-member.dto";
+import { MuteMemberDto } from "./dto/mute-member.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -240,7 +243,7 @@ export class ChannelsController {
   }
 
   @Post("/members/ban")
-  @BanChannelMemberApiDocumentation()
+  @UpdateChannelMemberStateApiDocumentation()
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
   async banMember(
@@ -275,6 +278,92 @@ export class ChannelsController {
       banMemberDto.channelId,
       banMemberDto.memberId,
       "BANNED",
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Post("/members/kick")
+  @UpdateChannelMemberStateApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async kickMember(
+    @User() user: UserEntity,
+    @Body() kickMemberDto: KickMemberDto,
+  ) {
+    const member = await this.channelsService.findChannelMember(
+      kickMemberDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER", "ADMIN"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToKick = await this.channelsService.findChannelMember(
+      kickMemberDto.channelId,
+      kickMemberDto.memberId,
+    );
+
+    if (memberToKick.role == "OWNER") {
+      throw new ForbiddenException();
+    }
+
+    if (!memberToKick) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.updateMemberState(
+      kickMemberDto.channelId,
+      kickMemberDto.memberId,
+      "KICKED",
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Post("/members/mute")
+  @MuteChannelMemberApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async muteMember(
+    @User() user: UserEntity,
+    @Body() muteMemberDto: MuteMemberDto,
+  ) {
+    const member = await this.channelsService.findChannelMember(
+      muteMemberDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER", "ADMIN"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToMute = await this.channelsService.findChannelMember(
+      muteMemberDto.channelId,
+      muteMemberDto.memberId,
+    );
+
+    if (memberToMute.role == "OWNER") {
+      throw new ForbiddenException();
+    }
+
+    if (!memberToMute) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.muteMember(
+      muteMemberDto.channelId,
+      muteMemberDto.memberId,
+      muteMemberDto.minutes,
     );
 
     return {

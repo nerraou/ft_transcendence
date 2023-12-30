@@ -360,7 +360,7 @@ export function GetChannelsMessagesApiDocumentation() {
   );
 }
 
-export function BanChannelMemberApiDocumentation() {
+export function UpdateChannelMemberStateApiDocumentation() {
   return applyDecorators(
     ApiTags("Channels"),
     ApiBearerAuth(),
@@ -372,6 +372,65 @@ export function BanChannelMemberApiDocumentation() {
             type: "number",
           },
           memberId: {
+            type: "number",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["channelId must be a number"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function MuteChannelMemberApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          channelId: {
+            type: "number",
+          },
+          memberId: {
+            type: "number",
+          },
+          minutes: {
             type: "number",
           },
         },
