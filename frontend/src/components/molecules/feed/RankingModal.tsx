@@ -2,14 +2,11 @@ import { Dialog, Transition } from "@headlessui/react";
 import Pagination from "@components/atoms/Pagination";
 import { Fragment } from "react";
 import Image from "next/image";
-
-interface User {
-  fullName: string;
-  username: string;
-  image: string;
-  points: number;
-  rank: number;
-}
+import {
+  RANKING_ROWS_PER_PAGE,
+  useRankingQuery,
+} from "@app/feed/feedApiService";
+import { User } from "./Ranking";
 
 interface RankingPlayerCardProps {
   user: User;
@@ -52,41 +49,37 @@ function UserImage(props: UserImageProps) {
 }
 
 const RankingPlayerCard = ({ user }: RankingPlayerCardProps) => {
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+
   return (
-    // minimum gap between flex items is 4
     <div className="flex items-start justify-between w-full bg-light-fg-tertiary dark:bg-dark-fg-primary p-4 rounded-lg gap-4">
       <div className="text-start">
         <div className="flex sm:flex-col sm:items-center gap-4 sm:gap-1 sm:w-full">
-          <UserImage image={user.image} />
-          <Username username={user.username} fullName={user.fullName} />
+          <UserImage image={imageUrl + user.avatarPath} />
+          <Username
+            username={user.username}
+            fullName={user.firstName + " " + user.lastName}
+          />
         </div>
       </div>
       <div className="flex flex-row items-start justify-start text-light-fg-primary text-lg lg:text-base md:text-base sm:text-base dark:text-dark-fg-tertiary pl-2">
-        <label>{user.points}</label>
+        <label>{user.rating}</label>
         <label className="mx-2"> | </label>
-        <label>#{user.rank}</label>
+        <label>#{user.ranking}</label>
       </div>
     </div>
   );
 };
 
 export interface RankingModalProps {
+  token: string | unknown;
   isOpen: boolean;
   onClose: () => void;
-  users: User[];
-  page: number;
-  onPageChange: (page: number) => void;
-  total: number;
 }
 
-const RankingModal = ({
-  isOpen,
-  onClose,
-  users,
-  page,
-  onPageChange,
-  total,
-}: RankingModalProps) => {
+const RankingModal = ({ token, isOpen, onClose }: RankingModalProps) => {
+  const { data: users, total, page, setPage } = useRankingQuery(token, false);
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -124,8 +117,8 @@ const RankingModal = ({
                   {total > 0 && (
                     <Pagination
                       page={page}
-                      total={total}
-                      onChange={onPageChange}
+                      total={Math.ceil(total / RANKING_ROWS_PER_PAGE)}
+                      onChange={(p) => setPage(p)}
                     />
                   )}
                 </div>

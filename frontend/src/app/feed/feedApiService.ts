@@ -1,6 +1,12 @@
-import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useSuspenseInfiniteQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import baseQuery, { RequestError } from "@utils/baseQuery";
 import { FullPostData } from "./page";
+import { useState } from "react";
+import { User } from "@components/molecules/feed/Ranking";
 
 /**
  * Fetches posts from the API based on the specified page number and token.
@@ -140,17 +146,51 @@ export function useLikePost(token: string | unknown, onError: () => void) {
     onError: () => onError(),
   });
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function fetchRanking(token: string | unknown) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/users/ranking";
 
-  const res = await baseQuery(url, {
-    headers: { Authorization: `Bearer ${token}` },
+export const RANKING_ROWS_PER_PAGE = 4;
+
+export interface RankingResponse {
+  count: number;
+  players: User[];
+}
+export const useRankingQuery = (
+  token: string | unknown,
+  topPlayers: boolean,
+) => {
+  const [page, setPage] = useState(1);
+  const limit = topPlayers ? 3 : RANKING_ROWS_PER_PAGE;
+
+  async function fetchRanking() {
+    const url =
+      process.env.NEXT_PUBLIC_API_BASE_URL +
+      "/users/leaderboard" +
+      "?page=" +
+      page +
+      "&limit=" +
+      limit;
+
+    const res = await baseQuery(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const response = await res.json();
+    return response;
+  }
+
+  const { data, isLoading, isError } = useSuspenseQuery<RankingResponse>({
+    queryKey: ["ranking", topPlayers, page],
+    queryFn: fetchRanking,
   });
 
-  const response = await res.json();
-  return response;
-}
+  return {
+    data: data.players,
+    total: data.count,
+    isLoading,
+    isError,
+    page,
+    setPage,
+  };
+};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchCommunities(token: string | unknown) {
@@ -197,4 +237,4 @@ export function useFeedQuery(token: string | unknown) {
   };
 }
 
-export { postPost, likePost, fetchRanking, fetchCommunities };
+export { postPost, likePost, fetchCommunities };
