@@ -42,7 +42,7 @@ function SearchFriendsList(props: FriendsListProps) {
       return getFriends(props.token);
     },
   });
-  //   console.log(data.friends);
+
   return (
     <section className="flex flex-col space-y-4">
       <InputSearch

@@ -1,5 +1,6 @@
 import User from "@components/atoms/chat/User";
 import { UserProps } from "@components/atoms/chat/User";
+import Link from "next/link";
 
 interface FriendsListProps {
   friends: UserProps[];
@@ -12,16 +13,21 @@ function FriendsList(props: FriendsListProps) {
       <h3 className="px-4 py-2 text-base text-light-bg-secondary bg-dark-bg-secondary border-2 border-light-fg-primary">
         FRIENDS
       </h3>
-      <div className="space-y-3 px-5">
+      <div className="space-y-3 px-2 scrollbar-thin h-56 overflow-auto scrollbar-thumb-light-fg-primary">
         {props.friends.map((friend) => {
-          console.log(friend.avatarPath);
           return (
-            <User
+            <div
               key={friend.id}
-              avatarPath={imageUrl + friend.avatarPath}
-              status={friend.status}
-              username={friend.username}
-            />
+              className="hover:bg-light-bg-tertiary cursor-pointer"
+            >
+              <Link href={`/chat/${friend.username}`}>
+                <User
+                  avatarPath={imageUrl + friend.avatarPath}
+                  status={friend.status}
+                  username={friend.username}
+                />
+              </Link>
+            </div>
           );
         })}
       </div>
