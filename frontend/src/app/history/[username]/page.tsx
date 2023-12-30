@@ -40,12 +40,12 @@ const History = ({ token, username }: HistoryProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetQuery = useCallback(
     debounce((q) => setFilters({ ...filters, query: q }), 1000),
-    [setFilters, filters],
+    [filters.query],
   );
 
   return (
     <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-center self-stretch p-8 md:p-4 sm:p-2">
-      <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-center">
+      <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-start">
         <div className="flex flex-row gap-6 w-full items-start justify-start sm:flex-col sm:items-center sm:justify-center">
           <DatePickerInterval
             value={filters.dateInterval}

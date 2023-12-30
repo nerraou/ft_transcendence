@@ -18,32 +18,56 @@ export enum SortEnum {
   ASC = "asc",
 }
 
+const getSortIcon = (sort: SortEnum | undefined) => {
+  if (sort == SortEnum.ASC) {
+    return <ChevronUp />;
+  }
+  if (sort == SortEnum.DESC) {
+    return <ChevronDown />;
+  }
+  return <Selector />;
+};
+
 interface SortButtonProps {
   title: string;
-  sort: SortEnum | undefined;
-  setSort: (sort: SortEnum | undefined) => void;
+  filters: HistoryFilters;
+  setFilters: (newFilters: HistoryFilters) => void;
+  toSet: "timeSort" | "dateSort";
+  toUnset: "timeSort" | "dateSort";
 }
-const SortButton = ({ title, sort, setSort }: SortButtonProps) => {
+const SortButton = ({
+  title,
+  filters,
+  setFilters,
+  toSet,
+  toUnset,
+}: SortButtonProps) => {
   return (
     <div className="flex flex-row items-center gap-2 w-full justify-center">
-      <label className="align-middle" htmlFor="sort">
-        {title}
-      </label>
+      <p className="align-middle">{title}</p>
       <button
         className="flex flex-col items-center justify-center"
         onClick={() => {
-          if (!sort) {
-            setSort(SortEnum.DESC);
-          } else if (sort === SortEnum.DESC) {
-            setSort(SortEnum.ASC);
+          if (!filters[toSet]) {
+            setFilters({
+              ...filters,
+              [toSet]: SortEnum.DESC,
+              [toUnset]: undefined,
+            });
+          } else if (filters[toSet] === SortEnum.DESC) {
+            setFilters({
+              ...filters,
+              [toSet]: SortEnum.ASC,
+              [toUnset]: undefined,
+            });
           } else {
-            setSort(undefined);
+            setFilters({ ...filters, [toSet]: undefined });
           }
         }}
       >
-        {sort == SortEnum.ASC ? <ChevronUp /> : null}
-        {sort == SortEnum.DESC ? <ChevronDown /> : null}
-        {sort == undefined ? <Selector /> : null}
+        {title === "Time"
+          ? getSortIcon(filters.timeSort)
+          : getSortIcon(filters.dateSort)}
       </button>
     </div>
   );
@@ -86,8 +110,10 @@ export function getColumns(
         <div className="sm:hidden">
           <SortButton
             title="Time"
-            sort={filters.timeSort}
-            setSort={(sort) => setFilters({ ...filters, timeSort: sort })}
+            filters={filters}
+            setFilters={setFilters}
+            toSet="timeSort"
+            toUnset="dateSort"
           />
         </div>
       ),
@@ -176,9 +202,9 @@ export function getColumns(
             )}
           >
             {getRankingIcon(oldRanking, newRanking)}
-            <label className="text-xl text-light-fg-primary dark:text-dark-fg-primary">
+            <p className="text-xl text-light-fg-primary dark:text-dark-fg-primary">
               {newRanking}
-            </label>
+            </p>
           </div>
         );
       },
@@ -188,8 +214,10 @@ export function getColumns(
         <div className={clsx(xs ? "hidden" : "")}>
           <SortButton
             title="Date"
-            sort={filters.dateSort}
-            setSort={(sort) => setFilters({ ...filters, dateSort: sort })}
+            filters={filters}
+            setFilters={setFilters}
+            toSet="dateSort"
+            toUnset="timeSort"
           />
         </div>
       ),
