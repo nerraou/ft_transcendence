@@ -7,6 +7,7 @@ import { GameLoopModule } from "@modules/game-loop/game-loop.module";
 import { GamesModule } from "@modules/games/games.module";
 import { ChannelsModule } from "@modules/channels/channels.module";
 import { MessagesModule } from "@modules/messages/messages.module";
+import { AchievementsModule } from "@modules/achievements/achievements.module";
 
 import { EventsService } from "./events.service";
 import { EventsGateway } from "./events.gateway";
@@ -21,6 +22,7 @@ import { EventsGateway } from "./events.gateway";
     GamesModule,
     ChannelsModule,
     MessagesModule,
+    AchievementsModule,
   ],
 })
 export class EventsModule {}

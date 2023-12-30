@@ -24,6 +24,11 @@ import { MessagesService } from "@modules/messages/messages.service";
 import { CreateMessageDto } from "@modules/messages/dto/create-message.dto";
 import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-message.dto";
 import { RedisService } from "@common/modules/redis/redis.service";
+import {
+  Achievement,
+  AchievementsService,
+} from "@modules/achievements/achievements.service";
+import Player from "@modules/game-loop/classes/Player";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
@@ -33,6 +38,88 @@ type EventName =
   | "player-join-queue"
   | "player-moved"
   | "channel-chat-message";
+
+interface IAchievementRequirement {
+  claim: (
+    player: Player,
+    opponent: Player,
+    winnerId: number,
+    services: { users: UsersService },
+  ) => Promise<Achievement | undefined>;
+}
+
+const achievementsRequirements: IAchievementRequirement[] = [
+  {
+    async claim(player, opponent, winnerId) {
+      if (player.id == winnerId && opponent.score == 0) {
+        return {
+          userId: player.id,
+          name: "CleanSheet",
+        };
+      }
+    },
+  },
+  {
+    async claim(player, opponent, winnerId, services) {
+      if (player.id == winnerId) {
+        const winsCount = await services.users.getWinsCount(player.id);
+
+        if (winsCount >= 100) {
+          return {
+            userId: player.id,
+            name: "OneHundredWins",
+          };
+        } else if (winsCount >= 50) {
+          return {
+            userId: player.id,
+            name: "FiftyWins",
+          };
+        } else if (winsCount >= 5) {
+          return {
+            userId: player.id,
+            name: "FiveWins",
+          };
+        } else {
+          return {
+            userId: player.id,
+            name: "FirstWin",
+          };
+        }
+      }
+    },
+  },
+  {
+    async claim(player, opponent, winnerId, services) {
+      const ranking = await services.users.getUserRanking(player.id);
+
+      if (ranking == 1) {
+        return {
+          userId: player.id,
+          name: "FirstRanked",
+        };
+      } else if (ranking >= 2) {
+        return {
+          userId: player.id,
+          name: "SecondRanked",
+        };
+      } else if (ranking >= 3) {
+        return {
+          userId: player.id,
+          name: "ThirdRanked",
+        };
+      } else {
+        const lastRankedPlayer = await services.users.findLastRankedPlayer();
+
+        if (lastRankedPlayer?.id == player.id) {
+          return {
+            userId: player.id,
+            name: "LastRanked",
+          };
+        }
+      }
+    },
+  },
+];
 
 @WebSocketGateway({ cors: true })
 @UsePipes(
@@ -55,6 +142,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly channelsService: ChannelsService,
     private readonly messagesService: MessagesService,
     private readonly redisService: RedisService,
+    private readonly achievementsService: AchievementsService,
   ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
@@ -297,10 +385,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
 
         game.events.on("game-over", (data: any) => {
+          const winner = data.winnerId == player.id ? "PLAYER" : "OPPONENT";
+
           this.gamesService
             .createGame({
               startedAt: game.startedAt,
-              winner: data.winnerId == player.id ? "PLAYER" : "OPPONENT",
+              winner: winner,
               player: {
                 id: game.player.id,
                 rating: game.player.rating,
@@ -314,9 +404,47 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 ranking: game.opponent.ranking,
               },
             })
+            .then(async () => {
+              const achievementsToInsert: Achievement[] = [];
+
+              for (let i = 0; i < achievementsRequirements.length; i++) {
+                const achievement = await achievementsRequirements[i].claim(
+                  game.player,
+                  game.opponent,
+                  data.winnerId,
+                  {
+                    users: this.usersService,
+                  },
+                );
+
+                if (achievement) {
+                  achievementsToInsert.push(achievement);
+                }
+              }
+
+              for (let i = 0; i < achievementsRequirements.length; i++) {
+                const achievement = await achievementsRequirements[i].claim(
+                  game.opponent,
+                  game.player,
+                  data.winnerId,
+                  {
+                    users: this.usersService,
+                  },
+                );
+
+                if (achievement) {
+                  achievementsToInsert.push(achievement);
+                }
+              }
+
+              this.achievementsService
+                .claimAchievements(achievementsToInsert)
+                .catch((e) => console.error("cannot claim achievements", e));
+            })
             .catch((e) => {
               console.log("cannot create game", e);
             });
+
           this.gameLoopService.removeGame(game.getId());
           this.server.to(game.getSocketRoomName()).emit("game-over", data);
         });

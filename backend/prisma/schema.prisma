@@ -40,6 +40,7 @@ model User {
   memberOfChannels ChannelMember[]
   blocking         Block[]         @relation("blocking")
   blocked          Block[]         @relation("blocked")
+  achievements     Achievement[]
 
   @@map("users")
 }
@@ -190,6 +191,19 @@ model Block {
 
   @@id([blocked, blockedBy])
   @@map("blockes")
+}
+
+model Achievement {
+  id        Int      @id @default(autoincrement()) @map("id")
+  userId    Int      @map("user_id")
+  name      String   @map("name") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, name])
+  @@map("achievements")
 }
 
 enum ContactStatus {
