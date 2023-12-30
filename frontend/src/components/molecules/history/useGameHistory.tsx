@@ -35,10 +35,12 @@ const useGameHistory = (token: string | unknown, username: string) => {
       params.append("search_query", filters.query);
     }
     if (filters.dateSort) {
-      params.append("date", filters.dateSort);
+      params.append("sort_field", "date");
+      params.append("sort_order", filters.dateSort);
     }
     if (filters.timeSort) {
-      params.append("duration", filters.timeSort);
+      params.append("sort_field", "duration");
+      params.append("sort_order", filters.timeSort);
     }
     if (filters.dateInterval?.[0]) {
       params.append("start_date", filters.dateInterval[0].toString());
