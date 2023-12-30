@@ -177,7 +177,7 @@ export class UsersService {
   async getLeaderboard(page: number, limit: number) {
     const getUsersQuery = Prisma.sql`
     SELECT id, username, email, status, rating,
-      RANK() OVER (ORDER BY rating DESC) as ranking,
+      RANK() OVER (ORDER BY rating, created_at, id DESC) as ranking,
       first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
       created_at as "createdAt", updated_at as "updatedAt"
     FROM users
@@ -332,7 +332,7 @@ export class UsersService {
   async findLastRankedPlayer() {
     const getUsersQuery = Prisma.sql`
     SELECT id, username, email, status, rating,
-      RANK() OVER (ORDER BY rating DESC) as ranking,
+      RANK() OVER (ORDER BY rating, created_at, id DESC) as ranking,
       first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
       created_at as "createdAt", updated_at as "updatedAt"
     FROM users
