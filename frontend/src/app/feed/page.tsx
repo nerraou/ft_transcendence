@@ -23,7 +23,11 @@ import Button from "@components/atoms/Button";
 import { redirect } from "next/navigation";
 import RankingModal from "@components/molecules/feed/RankingModal";
 import { useUserProfileQuery } from "@services/useUserProfileQuery";
-import { CreatePostResponse, useFeedQuery } from "./feedApiService";
+import {
+  CreatePostResponse,
+  useFeedQuery,
+  useRankingQuery,
+} from "./feedApiService";
 import CustomModal from "@components/atoms/CustomModal";
 
 export interface FullPostData {
@@ -106,10 +110,12 @@ function FeedPage(props: FeedPageProps) {
   const { token } = props;
   const [query, setQuery] = useState("");
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
-  const [rankingPage, setRankingPage] = useState(1);
+  // const [rankingPage, setRankingPage] = useState(1);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [message, setMessage] = useState("Something went wrong");
   const [posts, setPosts] = useState<FullPostData[]>([]);
+
+  const { data: topPlayers } = useRankingQuery(token, true);
 
   const onPostSuccess = (post: CreatePostResponse) => {
     setPosts([
@@ -186,10 +192,7 @@ function FeedPage(props: FeedPageProps) {
         <RankingModal
           isOpen={rankingModalOpen}
           onClose={() => setRankingModalOpen(false)}
-          page={rankingPage}
-          onPageChange={(page) => setRankingPage(page)}
-          total={0}
-          users={[]}
+          token={token}
         />
         <div className="flex flex-col items-center justify-center w-full gap-8 lg:w-3/4">
           <CreatePost
@@ -207,7 +210,7 @@ function FeedPage(props: FeedPageProps) {
         </div>
         <RightSide
           rankingProps={{
-            users: [],
+            users: topPlayers || [],
             onViewMore: () => {
               setRankingModalOpen(true);
             },

@@ -6,9 +6,13 @@ import SecondRanked from "@components/atoms/achievements/SecondRanked";
 import ThirdRanked from "@components/atoms/achievements/ThirdRanked";
 
 export interface User {
-  fullName: string;
+  id: number;
+  firstName: string;
+  lastName: string;
   username: string;
-  image: string;
+  avatarPath: string;
+  ranking: number;
+  rating: number;
 }
 
 export interface RankingProps {
@@ -18,11 +22,11 @@ export interface RankingProps {
 
 const getRankIcon = (index: number) => {
   switch (index) {
-    case 0:
-      return <FirstRanked />;
     case 1:
-      return <SecondRanked />;
+      return <FirstRanked />;
     case 2:
+      return <SecondRanked />;
+    case 3:
       return <ThirdRanked />;
     default:
       return null;
@@ -30,6 +34,8 @@ const getRankIcon = (index: number) => {
 };
 
 const Ranking = ({ users, onViewMore }: RankingProps) => {
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+
   return (
     <div className="flex flex-col align-start w-full gap-8 p-8 rounded-lg border border-light-fg-link bg-light-bg-tertiary dark:bg-dark-fg-tertiary dark:border-dark-fg-primary">
       <div className="flex flex-row justify-between w-full">
@@ -46,11 +52,11 @@ const Ranking = ({ users, onViewMore }: RankingProps) => {
       {users.map((user, index) => (
         <div key={index} className="flex flex-row justify-between w-full">
           <UserCard
-            fullName={user.fullName}
+            fullName={user.firstName + " " + user.lastName}
             username={user.username}
-            image={user.image}
+            image={imageUrl + user.avatarPath}
           />
-          {getRankIcon(index)}
+          {getRankIcon(user.ranking)}
         </div>
       ))}
     </div>
