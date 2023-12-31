@@ -44,6 +44,7 @@ import {
   UpdateChannelMemberStateApiDocumentation,
   MuteChannelMemberApiDocumentation,
   ChangeChannelMemberRoleApiDocumentation,
+  GetChannelMembersApiDocumentation,
 } from "./decorators/docs.decorator";
 import { BanMemberDto } from "./dto/ban-member.dto";
 import { KickMemberDto } from "./dto/kick-member.dto";
@@ -156,6 +157,29 @@ export class ChannelsController {
 
     return {
       channels,
+    };
+  }
+
+  @Get("/:id([0-9]{1,11})/members")
+  @GetChannelMembersApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getChannelMembers(
+    @User("id") userId: number,
+    @Param("id", ParseIntPipe) channelId: number,
+  ) {
+    const member = await this.channelsService.findChannelMember(
+      channelId,
+      userId,
+    );
+
+    if (!member) {
+      throw new ForbiddenException();
+    }
+
+    const members = await this.channelsService.findChannelMembers(channelId);
+
+    return {
+      members,
     };
   }
 
