@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { ChannelMemberRole, ChannelMemberState } from "@prisma/client";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
 import { HashService } from "@common/services/hash.service";
@@ -63,7 +64,7 @@ export class ChannelsService {
         imagePath: imagePath,
       },
       where: {
-        id: updateChannelDto.channeldId,
+        id: updateChannelDto.channelId,
       },
     });
   }
@@ -100,6 +101,58 @@ export class ChannelsService {
     });
 
     return count != 0;
+  }
+
+  updateMemberState(
+    channelId: number,
+    memberId: number,
+    state: ChannelMemberState,
+  ) {
+    return this.prisma.channelMember.update({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId,
+        },
+      },
+      data: {
+        state,
+      },
+    });
+  }
+
+  muteMember(channelId: number, memberId: number, minutes: number) {
+    const mutedUntil = new Date(Date.now() + minutes * 60 * 1000);
+
+    return this.prisma.channelMember.update({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId,
+        },
+      },
+      data: {
+        mutedUntil,
+      },
+    });
+  }
+
+  updateMemberRole(
+    channelId: number,
+    memberId: number,
+    role: ChannelMemberRole,
+  ) {
+    return this.prisma.channelMember.update({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId,
+        },
+      },
+      data: {
+        role,
+      },
+    });
   }
 
   findChannelById(channelId: number) {

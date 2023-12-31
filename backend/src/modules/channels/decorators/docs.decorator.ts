@@ -12,7 +12,7 @@ import {
   ApiUnprocessableEntityResponse,
   ApiUnsupportedMediaTypeResponse,
 } from "@nestjs/swagger";
-import { ChannelType } from "@prisma/client";
+import { ChannelMemberRole, ChannelType } from "@prisma/client";
 
 export function CreateChannelApiDocumentation() {
   return applyDecorators(
@@ -354,6 +354,181 @@ export function GetChannelsMessagesApiDocumentation() {
         example: {
           message: "Forbidden",
           statusCode: 403,
+        },
+      },
+    }),
+  );
+}
+
+export function UpdateChannelMemberStateApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          channelId: {
+            type: "number",
+          },
+          memberId: {
+            type: "number",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["channelId must be a number"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function MuteChannelMemberApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          channelId: {
+            type: "number",
+          },
+          memberId: {
+            type: "number",
+          },
+          minutes: {
+            type: "number",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["channelId must be a number"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function ChangeChannelMemberRoleApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          channelId: {
+            type: "number",
+          },
+          memberId: {
+            type: "number",
+          },
+          role: {
+            type: "string",
+            example: Object.values(ChannelMemberRole).join("|"),
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["channelId must be a number"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
         },
       },
     }),

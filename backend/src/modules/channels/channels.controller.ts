@@ -41,7 +41,14 @@ import {
   GetChannelsApiDocumentation,
   JoinChannelApiDocumentation,
   GetChannelsMessagesApiDocumentation,
+  UpdateChannelMemberStateApiDocumentation,
+  MuteChannelMemberApiDocumentation,
+  ChangeChannelMemberRoleApiDocumentation,
 } from "./decorators/docs.decorator";
+import { BanMemberDto } from "./dto/ban-member.dto";
+import { KickMemberDto } from "./dto/kick-member.dto";
+import { MuteMemberDto } from "./dto/mute-member.dto";
+import { ChangeMemberRoleDto } from "./dto/change-member-role.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -108,7 +115,7 @@ export class ChannelsController {
     let filename: string | undefined;
 
     const channel = await this.channelsService.findChannelByIdWithOwner(
-      updateChannelDto.channeldId,
+      updateChannelDto.channelId,
     );
 
     if (!channel) {
@@ -232,6 +239,186 @@ export class ChannelsController {
     return {
       count,
       messages: messages.reverse(),
+    };
+  }
+
+  @Patch("/members/ban")
+  @UpdateChannelMemberStateApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async banMember(
+    @User() user: UserEntity,
+    @Body() banMemberDto: BanMemberDto,
+  ) {
+    if (user.id == banMemberDto.memberId) {
+      throw new ForbiddenException();
+    }
+
+    const member = await this.channelsService.findChannelMember(
+      banMemberDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER", "ADMIN"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToBan = await this.channelsService.findChannelMember(
+      banMemberDto.channelId,
+      banMemberDto.memberId,
+    );
+
+    if (memberToBan.role == "OWNER") {
+      throw new ForbiddenException();
+    }
+
+    if (!memberToBan) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.updateMemberState(
+      banMemberDto.channelId,
+      banMemberDto.memberId,
+      "BANNED",
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/members/kick")
+  @UpdateChannelMemberStateApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async kickMember(
+    @User() user: UserEntity,
+    @Body() kickMemberDto: KickMemberDto,
+  ) {
+    if (user.id == kickMemberDto.memberId) {
+      throw new ForbiddenException();
+    }
+
+    const member = await this.channelsService.findChannelMember(
+      kickMemberDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER", "ADMIN"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToKick = await this.channelsService.findChannelMember(
+      kickMemberDto.channelId,
+      kickMemberDto.memberId,
+    );
+
+    if (memberToKick.role == "OWNER") {
+      throw new ForbiddenException();
+    }
+
+    if (!memberToKick) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.updateMemberState(
+      kickMemberDto.channelId,
+      kickMemberDto.memberId,
+      "KICKED",
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/members/mute")
+  @MuteChannelMemberApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async muteMember(
+    @User() user: UserEntity,
+    @Body() muteMemberDto: MuteMemberDto,
+  ) {
+    if (user.id == muteMemberDto.memberId) {
+      throw new ForbiddenException();
+    }
+
+    const member = await this.channelsService.findChannelMember(
+      muteMemberDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER", "ADMIN"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToMute = await this.channelsService.findChannelMember(
+      muteMemberDto.channelId,
+      muteMemberDto.memberId,
+    );
+
+    if (memberToMute.role == "OWNER") {
+      throw new ForbiddenException();
+    }
+
+    if (!memberToMute) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.muteMember(
+      muteMemberDto.channelId,
+      muteMemberDto.memberId,
+      muteMemberDto.minutes,
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/members/role")
+  @ChangeChannelMemberRoleApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async changeMemberRole(
+    @User() user: UserEntity,
+    @Body() changeMemberRoleDto: ChangeMemberRoleDto,
+  ) {
+    if (user.id == changeMemberRoleDto.memberId) {
+      throw new ForbiddenException();
+    }
+
+    const member = await this.channelsService.findChannelMember(
+      changeMemberRoleDto.channelId,
+      user.id,
+    );
+
+    const roles = ["OWNER"];
+
+    if (!member || !roles.includes(member.role)) {
+      throw new ForbiddenException();
+    }
+
+    const memberToUpdate = await this.channelsService.findChannelMember(
+      changeMemberRoleDto.channelId,
+      changeMemberRoleDto.memberId,
+    );
+
+    if (!memberToUpdate) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.updateMemberRole(
+      changeMemberRoleDto.channelId,
+      changeMemberRoleDto.memberId,
+      changeMemberRoleDto.role,
+    );
+
+    return {
+      message: "success",
     };
   }
 }

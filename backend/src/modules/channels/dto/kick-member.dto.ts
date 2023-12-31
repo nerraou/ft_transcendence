@@ -1,0 +1,14 @@
+import { Type } from "class-transformer";
+import { IsInt, IsPositive } from "class-validator";
+
+export class KickMemberDto {
+  @IsInt()
+  @Type(() => Number)
+  @IsPositive()
+  channelId: number;
+
+  @IsInt()
+  @Type(() => Number)
+  @IsPositive()
+  memberId: number;
+}
