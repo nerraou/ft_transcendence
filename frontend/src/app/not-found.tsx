@@ -7,7 +7,7 @@ export default function NotFound() {
         <span className="text-xxl text-light-fg-primary dark:text-dark-bg-secondary animate-bounce">
           4
         </span>
-        <Link href="/profile">
+        <Link href="/feed">
           <svg width="164" height="191" viewBox="0 0 164 191" fill="none">
             <path
               d="M21.2621 130.4V130.365L21.2597 130.331L13.2672 14.9978C13.1547 13.3747 14.3565 11.9578 15.9763 11.8039L85.6137 5.18815L85.6273 5.18695L133.464 1.30415C135.056 1.17494 136.47 2.31551 136.681 3.89863L155.516 145.459C155.724 147.022 154.687 148.479 153.141 148.794L88.6201 161.94C88.423 161.98 88.2223 162 88.0212 162H24.2621C22.6053 162 21.2621 160.657 21.2621 159V130.4Z"
