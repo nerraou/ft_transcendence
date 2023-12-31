@@ -14,8 +14,6 @@ type Story = StoryObj<typeof ChatBox>;
 export const Default: Story = {
   args: {
     userImage: "/anime.jpg",
-    message: "Hello How are you?",
     friendImage: "/totoro.jpg",
-    response: "I am fine \n and you?",
   },
 };

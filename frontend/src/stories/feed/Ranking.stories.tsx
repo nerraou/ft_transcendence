@@ -21,19 +21,22 @@ export const Default: Story = (args: RankingProps) => (
 Default.args = {
   users: [
     {
-      fullName: "Larbi El Hilali",
-      username: "CE0",
-      image: "/default/user-circle.png",
-    },
-    {
-      fullName: "Mahmoud zridi",
+      id: 1,
+      firstName: "Mahmoud",
+      lastName: "zridi",
       username: "MrDrogon",
-      image: "/default/user-circle.png",
+      ranking: 1,
+      rating: 400,
+      avatarPath: "/default/user-circle.png",
     },
     {
-      fullName: "John Doe",
-      username: "johndoe",
-      image: "/default/user-circle.png",
+      id: 2,
+      firstName: "John",
+      lastName: "Doe",
+      username: "jdoe",
+      ranking: 2,
+      rating: 399,
+      avatarPath: "/default/user-circle.png",
     },
   ],
   onViewMore: () => action("onViewMore"),

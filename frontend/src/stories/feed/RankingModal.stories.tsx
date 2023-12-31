@@ -21,30 +21,4 @@ export const Default: Story = (args: RankingModalProps) => (
 Default.args = {
   isOpen: true,
   onClose: () => action("onClose"),
-  users: [
-    {
-      fullName: "Larbi El Hilali",
-      username: "CE0",
-      image: "/default/user-circle.png",
-      points: 100,
-      rank: 1,
-    },
-    {
-      fullName: "Mahmoud zridi",
-      username: "MrDrogon",
-      image: "/default/user-circle.png",
-      points: 99,
-      rank: 2,
-    },
-    {
-      fullName: "John Doe",
-      username: "johndoe",
-      image: "/default/user-circle.png",
-      points: 80,
-      rank: 3,
-    },
-  ],
-  page: 1,
-  onPageChange: () => action("onPageChange"),
-  total: 100,
 };
