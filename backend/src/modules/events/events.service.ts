@@ -53,12 +53,24 @@ export class EventsService {
 
     client.data.userId = payload.sub;
 
-    await this.redisService.set(`user-${payload.sub}`, client.id);
-    this.usersService.updateStatusById(payload.sub, "ONLINE").catch(() => {
-      console.log("couldn't update user status");
-    });
+    const redisKey = `user-${payload.sub}`;
 
-    const channels = await this.usersService.finsChannelsIds(payload.sub);
+    const socketsIdsString = await this.redisService.get(redisKey);
+    const userSocketsIds: string[] = socketsIdsString
+      ? JSON.parse(socketsIdsString)
+      : [];
+
+    userSocketsIds.push(client.id);
+
+    await this.redisService.set(redisKey, JSON.stringify(userSocketsIds));
+
+    if (userSocketsIds.length == 1) {
+      this.usersService.updateStatusById(payload.sub, "ONLINE").catch(() => {
+        console.log("couldn't update user status");
+      });
+    }
+
+    const channels = await this.usersService.findChannelsIds(payload.sub);
 
     channels.forEach((channel) => {
       const channeRoomName = `chat-channel-${channel.channelId}`;
@@ -110,15 +122,19 @@ export class EventsService {
       createMessageDto.text,
     );
 
-    const socketId = await this.redisService.get(`user-${receiver.id}`);
+    const socketxIdsString = await this.redisService.get(`user-${receiver.id}`);
 
-    if (socketId) {
-      client
-        .to(socketId)
-        .emit(
-          "message",
-          this.messagesService.composeMessageSocketPayload(message, user),
-        );
+    if (socketxIdsString) {
+      const socketIds: string[] = JSON.parse(socketxIdsString);
+
+      socketIds.forEach((socketId) => {
+        client
+          .to(socketId)
+          .emit(
+            "message",
+            this.messagesService.composeMessageSocketPayload(message, user),
+          );
+      });
     }
   }
 
@@ -246,9 +262,19 @@ export class EventsService {
         playerSocket.join(game.getSocketRoomName());
         opponentSocket.join(game.getSocketRoomName());
 
-        game.events.on("game-debug", (data) =>
-          serverSocket.to(game.getSocketRoomName()).emit("game-debug", data),
-        );
+        game.events.on("game-debug", (data) => {
+          this.usersService.updateStatusById(player.id, "IN_GAME").catch(() => {
+            // can't update status
+          });
+
+          this.usersService
+            .updateStatusById(opponent.id, "IN_GAME")
+            .catch(() => {
+              // can't update status
+            });
+
+          serverSocket.to(game.getSocketRoomName()).emit("game-debug", data);
+        });
 
         game.events.on("game-started", (data: any) => {
           serverSocket.to(game.getSocketRoomName()).emit("game-started", data);
@@ -264,6 +290,16 @@ export class EventsService {
 
         game.events.on("game-over", (data: any) => {
           const winner = data.winnerId == player.id ? "PLAYER" : "OPPONENT";
+
+          this.usersService.updateStatusById(player.id, "ONLINE").catch(() => {
+            // can't update status
+          });
+
+          this.usersService
+            .updateStatusById(opponent.id, "ONLINE")
+            .catch(() => {
+              // can't update status
+            });
 
           this.claimAchievements(game, winner, data.winnerId).catch(() => {
             console.error("can't claim achievements");
