@@ -150,7 +150,7 @@ export class UsersService {
 
   async getUserRanking(id: number) {
     const sqlQuery = Prisma.sql`SELECT ranking
-    FROM (SELECT RANK() OVER (ORDER BY rating DESC) as ranking, id FROM users) ranked_users
+    FROM (SELECT RANK() OVER (ORDER BY rating DESC, created_at DESC, id ASC) as ranking, id FROM users) ranked_users
     WHERE id = ${id}`;
 
     const data = await this.prisma.$queryRaw<{ ranking: number }[]>(sqlQuery);
@@ -177,7 +177,7 @@ export class UsersService {
   async getLeaderboard(page: number, limit: number) {
     const getUsersQuery = Prisma.sql`
     SELECT id, username, email, status, rating,
-      RANK() OVER (ORDER BY rating, created_at, id DESC) as ranking,
+      RANK() OVER (ORDER BY rating DESC, created_at DESC, id ASC) as ranking,
       first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
       created_at as "createdAt", updated_at as "updatedAt"
     FROM users
@@ -332,7 +332,7 @@ export class UsersService {
   async findLastRankedPlayer() {
     const getUsersQuery = Prisma.sql`
     SELECT id, username, email, status, rating,
-      RANK() OVER (ORDER BY rating, created_at, id DESC) as ranking,
+      RANK() OVER (ORDER BY rating DESC, created_at DESC, id ASC) as ranking,
       first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
       created_at as "createdAt", updated_at as "updatedAt"
     FROM users
