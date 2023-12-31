@@ -56,6 +56,7 @@ export class EventsService {
     const redisKey = `user-${payload.sub}`;
 
     const socketsIdsString = await this.redisService.get(redisKey);
+
     const userSocketsIds: string[] = socketsIdsString
       ? JSON.parse(socketsIdsString)
       : [];
