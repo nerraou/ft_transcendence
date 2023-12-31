@@ -89,16 +89,27 @@ export class ContactsService {
       return ids;
     }, []);
 
-    const getContactsUsersQuery = Prisma.sql`
-    SELECT id, username, email, status, rating,
-      RANK() OVER (ORDER BY rating DESC) as ranking,
-      first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
-      created_at as "createdAt", updated_at as "updatedAt"
-    FROM users
-    WHERE id IN (${Prisma.join(usersContactsIds)})
-    OFFSET ${(page - 1) * limit} 
-    LIMIT ${limit}
-    `;
+    let getContactsUsersQuery: Prisma.Sql;
+
+    if (limit) {
+      getContactsUsersQuery = Prisma.sql`
+      SELECT id, username, email, status, rating,
+        RANK() OVER (ORDER BY rating DESC) as ranking,
+        first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+        created_at as "createdAt", updated_at as "updatedAt"
+      FROM users
+      WHERE id IN (${Prisma.join(usersContactsIds)})
+      OFFSET ${(page - 1) * limit} 
+      LIMIT ${limit}`;
+    } else {
+      getContactsUsersQuery = Prisma.sql`
+      SELECT id, username, email, status, rating,
+        RANK() OVER (ORDER BY rating DESC) as ranking,
+        first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+        created_at as "createdAt", updated_at as "updatedAt"
+      FROM users
+      WHERE id IN (${Prisma.join(usersContactsIds)})`;
+    }
 
     const users = await this.prisma.$queryRaw<User[]>(getContactsUsersQuery);
 
