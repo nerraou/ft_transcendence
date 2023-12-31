@@ -97,7 +97,7 @@ export class UsersController {
     };
   }
 
-  @Get("/:username")
+  @Get("/profile/:username")
   @GetUserByUsernameDocumentation()
   @UseGuards(JwtAuthGuard)
   async getUserByUsername(
@@ -134,7 +134,7 @@ export class UsersController {
     };
   }
 
-  @Get("/leaderboard")
+  @Get("/games/leaderboard")
   @GetLeaderboardApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async getLeaderboard(@Query() getLeaderboardDto: GetLeaderboardDto) {

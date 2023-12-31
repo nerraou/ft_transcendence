@@ -163,7 +163,7 @@ export const useRankingQuery = (
   async function fetchRanking() {
     const url =
       process.env.NEXT_PUBLIC_API_BASE_URL +
-      "/users/leaderboard" +
+      "/users/games/leaderboard" +
       "?page=" +
       page +
       "&limit=" +
