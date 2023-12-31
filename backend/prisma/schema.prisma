@@ -129,6 +129,7 @@ model ChannelMember {
   channelId  Int                 @map("channel_id")
   role       ChannelMemberRole   @map("role")
   state      ChannelMemberState? @map("state")
+  isLeft     Boolean             @default(false) @map("is_left")
   mutedUntil DateTime?           @map("muted_until") @db.Timestamp()
   createdAt  DateTime            @default(now()) @map("created_at") @db.Timestamp()
   updatedAt  DateTime            @updatedAt @map("updated_at") @db.Timestamp()

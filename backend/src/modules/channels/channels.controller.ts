@@ -46,12 +46,14 @@ import {
   ChangeChannelMemberRoleApiDocumentation,
   GetChannelMembersApiDocumentation,
   GetPublicChannelsApiDocumentation,
+  LeaveChannelApiDocumentation,
 } from "./decorators/docs.decorator";
 import { BanMemberDto } from "./dto/ban-member.dto";
 import { KickMemberDto } from "./dto/kick-member.dto";
 import { MuteMemberDto } from "./dto/mute-member.dto";
 import { ChangeMemberRoleDto } from "./dto/change-member-role.dto";
 import { GetPublicChannelsDto } from "./dto/get-public-channels.dto";
+import { LeaveChannelDto } from "./dto/leave-channel.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -238,6 +240,28 @@ export class ChannelsController {
     }
 
     await this.channelsService.joinChannel(userId, channel.id);
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch("/leave")
+  @LeaveChannelApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async leaveChannel(
+    @User("id") userId: number,
+    @Body() leaveChannelDto: LeaveChannelDto,
+  ) {
+    const channel = await this.channelsService.findChannelById(
+      leaveChannelDto.channelId,
+    );
+
+    if (!channel) {
+      throw new ForbiddenException();
+    }
+
+    await this.channelsService.leaveChannel(userId, channel.id);
 
     return {
       message: "success",
