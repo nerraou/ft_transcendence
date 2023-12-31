@@ -143,7 +143,7 @@ function MessagesList(props: MessagesListProps) {
   );
 }
 
-function ChatBox(props: ChatBoxProps) {
+function ChatBoxDms(props: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
   const socket = useSocket();
@@ -237,4 +237,4 @@ function ChatBox(props: ChatBoxProps) {
   );
 }
 
-export default ChatBox;
+export default ChatBoxDms;

@@ -3,10 +3,10 @@
 import { useSession } from "next-auth/react";
 import { Popover, Transition } from "@headlessui/react";
 import { redirect } from "next/navigation";
-import { Fragment, Suspense } from "react";
+import { Fragment, Suspense, useState } from "react";
 
 import LoadingPage from "../../loading";
-import ChatBox from "@components/organisms/ChatBox";
+import ChatBoxDms from "@components/organisms/ChatBox";
 import SidePanel from "@components/organisms/SidePanel";
 import ChatHeader from "@molecules/chat/ChatHeader";
 import Layout from "@templates/Layout";
@@ -21,13 +21,15 @@ import { useFriendQuery } from "@services/useFriendQuery";
 interface SidePanelProps {
   image: string;
   token: string | unknown;
+  channelId: number;
+  onChannelClick: (channelId: number) => void;
 }
 
 interface ChatPageProps {
   params: { username: string };
 }
 
-interface ChatDmsProps {
+interface ChatProps {
   username: string;
   token: string | unknown;
 }
@@ -48,43 +50,68 @@ function SidePanelPopover(props: SidePanelProps) {
         leaveTo="opacity-0 translate-y-1"
       >
         <Popover.Panel className="absolute z-10">
-          <SidePanel image={props.image} token={props.token} />
+          <SidePanel
+            image={props.image}
+            token={props.token}
+            channelId={props.channelId}
+            onChannelClick={props.onChannelClick}
+          />
         </Popover.Panel>
       </Transition>
     </Popover>
   );
 }
 
-function ChatDms(props: ChatDmsProps) {
-  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+function Chat(props: ChatProps) {
+  const [isChannel, setIsChannel] = useState<boolean>(false);
+  const [channelId, setChannelId] = useState<number>(0);
 
   const { data: userData } = useUserProfileQuery(props.token);
   const { data: friendData } = useFriendQuery(props.token, props.username);
 
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+
   return (
     <Fragment>
       <div className="w-1/3 lg:hidden md:hidden sm:hidden">
-        <SidePanel image={imageUrl + userData.avatarPath} token={props.token} />
+        <SidePanel
+          image={imageUrl + userData.avatarPath}
+          token={props.token}
+          channelId={channelId}
+          onChannelClick={(id) => {
+            setChannelId(id);
+            setIsChannel(true);
+          }}
+        />
       </div>
       <div className="2xl:hidden xl:hidden lg:visible md:visible sm:visible">
         <SidePanelPopover
           image={imageUrl + userData.avatarPath}
           token={props.token}
+          channelId={channelId}
+          onChannelClick={(id) => {
+            setChannelId(id);
+            setIsChannel(true);
+          }}
         />
       </div>
-      <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
-        <ChatHeader
-          image={imageUrl + friendData.avatarPath}
-          status={friendData.status}
-          username={friendData.username}
-        />
-        <ChatBox
-          receiver={props.username}
-          userImage={imageUrl + userData.avatarPath}
-          friendImage={imageUrl + friendData.avatarPath}
-          token={props.token}
-        />
-      </div>
+      {isChannel && <p>IT is Channel bitch </p>}
+
+      {!isChannel && (
+        <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
+          <ChatHeader
+            image={imageUrl + friendData.avatarPath}
+            status={friendData.status}
+            username={friendData.username}
+          />
+          <ChatBoxDms
+            receiver={props.username}
+            userImage={imageUrl + userData.avatarPath}
+            friendImage={imageUrl + friendData.avatarPath}
+            token={props.token}
+          />
+        </div>
+      )}
     </Fragment>
   );
 }
@@ -130,7 +157,7 @@ function ChatPage({ params }: ChatPageProps) {
               )}
             >
               <Suspense fallback={<LoadingPage />}>
-                <ChatDms
+                <Chat
                   username={params.username}
                   token={session?.user.accessToken}
                 />
