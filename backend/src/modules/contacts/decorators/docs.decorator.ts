@@ -117,6 +117,11 @@ export function GetContactsApiDocumentation() {
       type: "number",
       required: false,
     }),
+    ApiQuery({
+      name: "search_query",
+      type: "string",
+      required: false,
+    }),
     ApiOkResponse({
       description: "contacts list",
       schema: {

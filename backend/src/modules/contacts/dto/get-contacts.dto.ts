@@ -1,5 +1,11 @@
-import { Type } from "class-transformer";
-import { IsInt, IsOptional, IsPositive } from "class-validator";
+import { Expose, Type } from "class-transformer";
+import {
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Length,
+} from "class-validator";
 
 export class GetContactsDto {
   @IsInt()
@@ -13,4 +19,10 @@ export class GetContactsDto {
   @IsPositive()
   @IsOptional()
   limit: number;
+
+  @Expose({ name: "search_query" })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  searchQuery?: string;
 }

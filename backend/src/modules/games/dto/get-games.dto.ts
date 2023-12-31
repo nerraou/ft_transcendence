@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  Length,
 } from "class-validator";
 
 export enum SortOrderEnum {
@@ -34,6 +35,7 @@ export class GetGamesdDto {
   @Expose({ name: "search_query" })
   @IsOptional()
   @IsString()
+  @Length(1, 255)
   searchQuery?: string;
 
   @Expose({ name: "start_date" })
