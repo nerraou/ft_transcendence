@@ -12,12 +12,13 @@ export interface ChannelProps {
 }
 
 interface ChannelAddUserProps {
-  id?: number;
+  id: number;
   name: string;
   imagePath: string;
   description?: string;
   membersCount?: number;
   type?: "PUBLIC";
+  onChannelClick: (channelId: number) => void;
 }
 
 interface ChannelsListProps {
@@ -29,11 +30,17 @@ interface ChannelsListProps {
 function ChannelAddUser(props: ChannelAddUserProps) {
   return (
     <div className="flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
-      <Channel
-        name={props.name}
-        imagePath={props.imagePath}
-        membersCount={props.membersCount}
-      />
+      <div
+        onClick={() => {
+          props.onChannelClick(props.id);
+        }}
+      >
+        <Channel
+          name={props.name}
+          imagePath={props.imagePath}
+          membersCount={props.membersCount}
+        />
+      </div>
       <UsersAdd
         color="stroke-light-fg-primary"
         onClick={() => {
@@ -60,16 +67,13 @@ function ChannelsList(props: ChannelsListProps) {
       <div className="space-y-4 px-3 scrollbar-thin h-56 overflow-auto scrollbar-thumb-light-fg-primary">
         {props.channels.map((channel) => {
           return (
-            <div
-              key={channel.id}
-              onClick={() => {
-                props.onChannelClick(channel.id);
-              }}
-            >
+            <div key={channel.id}>
               <ChannelAddUser
+                id={channel.id}
                 name={channel.name}
                 imagePath={imageUrl + channel.imagePath}
                 membersCount={channel.membersCount}
+                onChannelClick={props.onChannelClick}
               />
             </div>
           );

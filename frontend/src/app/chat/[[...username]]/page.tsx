@@ -17,12 +17,14 @@ import { ErrorBoundary } from "react-error-boundary";
 import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
 import { useFriendQuery } from "@services/useFriendQuery";
+import ChannelHeader from "@components/molecules/chat/ChannelHeader";
 
 interface SidePanelProps {
   image: string;
   token: string | unknown;
   channelId: number;
   onChannelClick: (channelId: number) => void;
+  onFriendClick: () => void;
 }
 
 interface ChatPageProps {
@@ -55,6 +57,7 @@ function SidePanelPopover(props: SidePanelProps) {
             token={props.token}
             channelId={props.channelId}
             onChannelClick={props.onChannelClick}
+            onFriendClick={props.onFriendClick}
           />
         </Popover.Panel>
       </Transition>
@@ -73,6 +76,7 @@ function Chat(props: ChatProps) {
   }
   const { data: friendData } = useFriendQuery(props.token, username);
 
+  console.log(isChannel);
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   return (
@@ -86,6 +90,9 @@ function Chat(props: ChatProps) {
             setChannelId(id);
             setIsChannel(true);
           }}
+          onFriendClick={() => {
+            setIsChannel(false);
+          }}
         />
       </div>
       <div className="2xl:hidden xl:hidden lg:visible md:visible sm:visible">
@@ -97,9 +104,18 @@ function Chat(props: ChatProps) {
             setChannelId(id);
             setIsChannel(true);
           }}
+          onFriendClick={() => {
+            setIsChannel(false);
+          }}
         />
       </div>
-      {isChannel && <p>IT is Channel bitch </p>}
+      {isChannel && (
+        <ChannelHeader
+          channelDescription="we are the best"
+          channelName="WINNERS"
+          image="/anime.jpg"
+        />
+      )}
 
       {!isChannel && (
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
