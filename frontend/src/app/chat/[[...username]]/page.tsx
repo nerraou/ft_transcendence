@@ -67,7 +67,11 @@ function Chat(props: ChatProps) {
   const [channelId, setChannelId] = useState<number>(0);
 
   const { data: userData } = useUserProfileQuery(props.token);
-  const { data: friendData } = useFriendQuery(props.token, props.username);
+  let username = props.username;
+  if (!props.username) {
+    username = userData.username;
+  }
+  const { data: friendData } = useFriendQuery(props.token, username);
 
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
@@ -105,7 +109,8 @@ function Chat(props: ChatProps) {
             username={friendData.username}
           />
           <ChatBoxDms
-            receiver={props.username}
+            username={userData.username}
+            receiver={username}
             userImage={imageUrl + userData.avatarPath}
             friendImage={imageUrl + friendData.avatarPath}
             token={props.token}

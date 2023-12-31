@@ -11,6 +11,7 @@ import Loading from "@components/atoms/icons/outline/Loading";
 
 interface ChatBoxProps {
   receiver: string;
+  username: string;
   userImage: string;
   friendImage: string;
   token: string | unknown;
@@ -42,6 +43,7 @@ interface Message {
 interface MessagesListProps {
   token: string | unknown;
   receiver: string;
+  username: string;
 }
 
 interface OldMessage {
@@ -118,7 +120,10 @@ function MessagesList(props: MessagesListProps) {
         return (
           <Fragment key={key}>
             {page.messages?.map((value) => {
-              if (value.sender.username == props.receiver) {
+              if (
+                value.sender.username == props.receiver &&
+                props.receiver != props.username
+              ) {
                 return (
                   <ChatBubbleResponse
                     key={value.id}
@@ -156,10 +161,19 @@ function ChatBoxDms(props: ChatBoxProps) {
 
     function onDirectMessage(message: Response) {
       if (message.sender.username == props.receiver) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: message.message.text, isReceived: true },
-        ]);
+        if (props.username == props.receiver) {
+          console.log("same same");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: message.message.text, isReceived: false },
+          ]);
+        } else {
+          console.log("nope");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: message.message.text, isReceived: true },
+          ]);
+        }
       }
     }
 
@@ -194,7 +208,11 @@ function ChatBoxDms(props: ChatBoxProps) {
   return (
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
       <div className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
-        <MessagesList receiver={props.receiver} token={props.token} />
+        <MessagesList
+          receiver={props.receiver}
+          username={props.username}
+          token={props.token}
+        />
         <section ref={ref}>
           {messages.map((message, index) => {
             if (message.isReceived) {
