@@ -587,3 +587,44 @@ export function GetChannelMembersApiDocumentation() {
     }),
   );
 }
+
+export function GetPublicChannelsApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiQuery({
+      name: "search_query",
+      required: false,
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          channels: [
+            {
+              id: 4,
+              name: "The Greating",
+              description: "greeting channel",
+              imagePath: "5df0bfee-8c73-4571-90cc-13bb9b68aa3d.png",
+              membersCount: 2,
+              type: "PUBLIC",
+              password: null,
+              creatorId: 1,
+              createdAt: "2023-12-25T19:44:25.565Z",
+              updatedAt: "2023-12-26T16:04:40.566Z",
+            },
+          ],
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}

@@ -45,11 +45,13 @@ import {
   MuteChannelMemberApiDocumentation,
   ChangeChannelMemberRoleApiDocumentation,
   GetChannelMembersApiDocumentation,
+  GetPublicChannelsApiDocumentation,
 } from "./decorators/docs.decorator";
 import { BanMemberDto } from "./dto/ban-member.dto";
 import { KickMemberDto } from "./dto/kick-member.dto";
 import { MuteMemberDto } from "./dto/mute-member.dto";
 import { ChangeMemberRoleDto } from "./dto/change-member-role.dto";
+import { GetPublicChannelsDto } from "./dto/get-public-channels.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -154,6 +156,19 @@ export class ChannelsController {
   @UseGuards(JwtAuthGuard)
   async getChannels(@User("id") userId: number) {
     const channels = await this.channelsService.findUserChannels(userId);
+
+    return {
+      channels,
+    };
+  }
+
+  @Get("/public")
+  @GetPublicChannelsApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async getPublicChannels(@Query() getPublicChannelsDto: GetPublicChannelsDto) {
+    const channels = await this.channelsService.findPublicChannels(
+      getPublicChannelsDto.searchQuery,
+    );
 
     return {
       channels,

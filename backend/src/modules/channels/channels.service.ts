@@ -155,6 +155,40 @@ export class ChannelsService {
     });
   }
 
+  findPublicChannels(searchQuery: string | undefined) {
+    return this.prisma.channel.findMany({
+      where: {
+        type: "PUBLIC",
+        OR: [
+          {
+            name: {
+              contains: searchQuery || "",
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: searchQuery || "",
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      take: 4,
+      orderBy: [
+        {
+          membersCount: "desc",
+        },
+        {
+          updatedAt: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
+  }
+
   findChannelMembers(channelId: number) {
     return this.prisma.channelMember.findMany({
       where: {
