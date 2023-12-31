@@ -20,9 +20,7 @@ function FriendsList(props: FriendsListProps) {
             <div
               key={friend.id}
               className="hover:bg-light-bg-tertiary cursor-pointer"
-              onClick={() => {
-                props.onFriendClick;
-              }}
+              onClick={props.onFriendClick}
             >
               <Link href={`/chat/${friend.username}`}>
                 <User

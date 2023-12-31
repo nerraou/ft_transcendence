@@ -1,3 +1,4 @@
+import { ChannelInformation } from "@app/chat/[[...username]]/page";
 import Channel from "@components/atoms/chat/Channel";
 import Add from "@components/atoms/icons/outline/Add";
 import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
@@ -6,8 +7,8 @@ export interface ChannelProps {
   id: number;
   name: string;
   imagePath: string;
-  description?: string;
-  membersCount?: number;
+  description: string;
+  membersCount: number;
   type?: "PUBLIC";
 }
 
@@ -15,16 +16,16 @@ interface ChannelAddUserProps {
   id: number;
   name: string;
   imagePath: string;
-  description?: string;
-  membersCount?: number;
+  description: string;
+  membersCount: number;
   type?: "PUBLIC";
-  onChannelClick: (channelId: number) => void;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
 interface ChannelsListProps {
   channels: ChannelProps[];
-  channelId: number | undefined;
-  onChannelClick: (channelId: number) => void;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
 function ChannelAddUser(props: ChannelAddUserProps) {
@@ -32,7 +33,12 @@ function ChannelAddUser(props: ChannelAddUserProps) {
     <div className="flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
       <div
         onClick={() => {
-          props.onChannelClick(props.id);
+          props.onChannelClick({
+            channelId: props.id,
+            description: props.description,
+            imagePath: props.imagePath,
+            name: props.name,
+          });
         }}
       >
         <Channel
@@ -73,6 +79,7 @@ function ChannelsList(props: ChannelsListProps) {
                 name={channel.name}
                 imagePath={imageUrl + channel.imagePath}
                 membersCount={channel.membersCount}
+                description={channel.description}
                 onChannelClick={props.onChannelClick}
               />
             </div>

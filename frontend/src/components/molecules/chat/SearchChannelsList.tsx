@@ -11,11 +11,12 @@ import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
 import { Suspense } from "react";
 import LoadingPage from "@app/loading";
+import { ChannelInformation } from "@app/chat/[[...username]]/page";
 
 interface SearchChannelsListProps {
   token: string | unknown;
-  channelId: number;
-  onChannelClick: (channelId: number) => void;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
 interface ChannelsListProps {
@@ -78,7 +79,7 @@ function SearchChannelsList(props: SearchChannelsListProps) {
           >
             <Suspense fallback={<LoadingPage />}>
               <ChannelsList
-                channelId={props.channelId}
+                channelInformation={props.channelInformation}
                 onChannelClick={props.onChannelClick}
                 channels={data.channels}
               />

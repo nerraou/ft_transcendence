@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { Fragment, Suspense, useState } from "react";
 
 import LoadingPage from "../../loading";
-import ChatBoxDms from "@components/organisms/ChatBox";
+import ChatBoxDms from "@components/organisms/ChatBoxDms";
 import SidePanel from "@components/organisms/SidePanel";
 import ChatHeader from "@molecules/chat/ChatHeader";
 import Layout from "@templates/Layout";
@@ -18,12 +18,13 @@ import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
 import { useFriendQuery } from "@services/useFriendQuery";
 import ChannelHeader from "@components/molecules/chat/ChannelHeader";
+import ChatBoxChannel from "@components/organisms/chatBoxChannel";
 
 interface SidePanelProps {
   image: string;
   token: string | unknown;
-  channelId: number;
-  onChannelClick: (channelId: number) => void;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
   onFriendClick: () => void;
 }
 
@@ -55,7 +56,7 @@ function SidePanelPopover(props: SidePanelProps) {
           <SidePanel
             image={props.image}
             token={props.token}
-            channelId={props.channelId}
+            channelInformation={props.channelInformation}
             onChannelClick={props.onChannelClick}
             onFriendClick={props.onFriendClick}
           />
@@ -65,18 +66,31 @@ function SidePanelPopover(props: SidePanelProps) {
   );
 }
 
+export interface ChannelInformation {
+  channelId: number;
+  name: string;
+  imagePath: string;
+  description: string;
+}
+
 function Chat(props: ChatProps) {
   const [isChannel, setIsChannel] = useState<boolean>(false);
-  const [channelId, setChannelId] = useState<number>(0);
+  const [channelInformation, setChannelInformation] =
+    useState<ChannelInformation>({
+      description: "",
+      channelId: 0,
+      imagePath: "",
+      name: "",
+    });
 
   const { data: userData } = useUserProfileQuery(props.token);
   let username = props.username;
   if (!props.username) {
     username = userData.username;
   }
+
   const { data: friendData } = useFriendQuery(props.token, username);
 
-  console.log(isChannel);
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   return (
@@ -85,10 +99,10 @@ function Chat(props: ChatProps) {
         <SidePanel
           image={imageUrl + userData.avatarPath}
           token={props.token}
-          channelId={channelId}
-          onChannelClick={(id) => {
-            setChannelId(id);
+          channelInformation={channelInformation}
+          onChannelClick={(information) => {
             setIsChannel(true);
+            setChannelInformation(information);
           }}
           onFriendClick={() => {
             setIsChannel(false);
@@ -99,10 +113,10 @@ function Chat(props: ChatProps) {
         <SidePanelPopover
           image={imageUrl + userData.avatarPath}
           token={props.token}
-          channelId={channelId}
-          onChannelClick={(id) => {
-            setChannelId(id);
+          channelInformation={channelInformation}
+          onChannelClick={(information) => {
             setIsChannel(true);
+            setChannelInformation(information);
           }}
           onFriendClick={() => {
             setIsChannel(false);
@@ -110,11 +124,19 @@ function Chat(props: ChatProps) {
         />
       </div>
       {isChannel && (
-        <ChannelHeader
-          channelDescription="we are the best"
-          channelName="WINNERS"
-          image="/anime.jpg"
-        />
+        <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
+          <ChannelHeader
+            channelDescription={channelInformation.description}
+            channelName={channelInformation.name}
+            image={channelInformation.imagePath}
+          />
+          <ChatBoxChannel
+            channelId={channelInformation.channelId}
+            token={props.token}
+            username={userData.username}
+            userImage={imageUrl + userData.avatarPath}
+          />
+        </div>
       )}
 
       {!isChannel && (
@@ -126,8 +148,8 @@ function Chat(props: ChatProps) {
           />
           <ChatBoxDms
             username={userData.username}
-            receiver={username}
             userImage={imageUrl + userData.avatarPath}
+            receiver={username}
             friendImage={imageUrl + friendData.avatarPath}
             token={props.token}
           />

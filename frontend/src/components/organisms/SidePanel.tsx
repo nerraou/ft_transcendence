@@ -1,3 +1,4 @@
+import { ChannelInformation } from "@app/chat/[[...username]]/page";
 import MenuDots from "@components/atoms/icons/outline/MenuDots";
 import SearchChannelsList from "@components/molecules/chat/SearchChannelsList";
 import SearchFriendsList from "@components/molecules/chat/SearchFriendsList";
@@ -6,8 +7,8 @@ import Image from "next/image";
 interface SidePanelProps {
   image: string;
   token: string | unknown;
-  channelId: number;
-  onChannelClick: (channelId: number) => void;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
   onFriendClick: () => void;
 }
 
@@ -42,7 +43,7 @@ function SidePanel(props: SidePanelProps) {
       />
       <SearchChannelsList
         onChannelClick={props.onChannelClick}
-        channelId={props.channelId}
+        channelInformation={props.channelInformation}
         token={props.token}
       />
     </section>

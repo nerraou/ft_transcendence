@@ -1,60 +1,66 @@
 import InputChat from "@components/atoms/InputChat";
+import ChatBubbleResponse from "@components/atoms/chat/ChatBubbleMessage";
 import ChatBubbleMessage from "@components/atoms/chat/ChatBubbleMessage";
-import ChatBubbleResponse from "@components/atoms/chat/ChatBubbleResponse";
+import Loading from "@components/atoms/icons/outline/Loading";
 import { useSocket } from "@contexts/socket";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import Loading from "@components/atoms/icons/outline/Loading";
-
-interface ChatBoxProps {
-  receiver: string;
+interface ChatBoxChannelProps {
+  token: string | unknown;
+  channelId: number;
   username: string;
   userImage: string;
-  friendImage: string;
-  token: string | unknown;
 }
 
-interface SocketMessage {
+interface user {
   id: number;
-  text: string;
-}
-
-interface Sender {
-  id: number;
-  avatarPath: string;
   username: string;
-  firstName: string;
-  lastName: string;
+  avatarPath: string;
 }
 
 interface Response {
-  message: SocketMessage;
-  sender: Sender;
+  channelId: number;
+  message: string;
+  user: user;
 }
 
 interface Message {
+  message: string;
+  user?: user;
   isReceived: boolean;
-  text: string;
 }
 
 interface MessagesListProps {
-  token: string | unknown;
-  receiver: string;
+  id: number;
   username: string;
+  token: string | unknown;
 }
 
+interface member {
+  id: number;
+  avatarPath: string;
+  username: string;
+  rating: number;
+}
+
+interface sender {
+  id: number;
+  state: "KICKED" | "BANNED " | "null";
+  mutedUntil: string;
+  createdAt: string;
+  member: member;
+}
 interface OldMessage {
   id: number;
+  messge: string;
   senderId: number;
-  receiverId: number;
-  isRead: boolean;
-  text: string;
+  channelId: number;
   createdAt: string;
   updatedAt: string;
-  sender: Sender;
+  sender: sender;
 }
 
 interface OldMessages {
@@ -63,15 +69,11 @@ interface OldMessages {
   nextPage: [];
 }
 
-async function getMessages(
-  page: number,
-  username: string,
-  token: string | unknown,
-) {
+async function getMessages(page: number, id: number, token: string | unknown) {
   const limit = 50;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
-    `/users/messages/${username}?limit=${limit}&page=${page}`;
+    `/channels/${id}/messages/?limit=${limit}&page=${page}`;
 
   const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -92,9 +94,9 @@ function MessagesList(props: MessagesListProps) {
 
   const { data, isFetchingPreviousPage, fetchPreviousPage } =
     useSuspenseInfiniteQuery<OldMessages>({
-      queryKey: ["messages", props.receiver],
+      queryKey: ["messages", props.id],
       queryFn: ({ pageParam }) => {
-        return getMessages(pageParam as number, props.receiver, props.token);
+        return getMessages(pageParam as number, props.id, props.token);
       },
       initialPageParam: 1,
       getPreviousPageParam: (_, pages) => {
@@ -120,23 +122,20 @@ function MessagesList(props: MessagesListProps) {
         return (
           <Fragment key={key}>
             {page.messages?.map((value) => {
-              if (
-                value.sender.username == props.receiver &&
-                props.receiver != props.username
-              ) {
+              if (value.sender.member.username != props.username) {
                 return (
                   <ChatBubbleResponse
                     key={value.id}
-                    image={imageUrl + value.sender.avatarPath}
-                    message={value.text}
+                    image={imageUrl + value.sender.member.avatarPath}
+                    message={value.messge}
                   />
                 );
               } else {
                 return (
                   <ChatBubbleMessage
                     key={value.id}
-                    image={imageUrl + value.sender.avatarPath}
-                    message={value.text}
+                    image={imageUrl + value.sender.member.avatarPath}
+                    message={value.messge}
                   />
                 );
               }
@@ -148,11 +147,11 @@ function MessagesList(props: MessagesListProps) {
   );
 }
 
-function ChatBoxDms(props: ChatBoxProps) {
+function ChatBoxChannel(props: ChatBoxChannelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
   const socket = useSocket();
-  const ref = useRef<HTMLElement>(null);
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   useEffect(() => {
     if (!socket) {
@@ -160,47 +159,36 @@ function ChatBoxDms(props: ChatBoxProps) {
     }
 
     function onDirectMessage(message: Response) {
-      if (message.sender.username == props.receiver) {
-        if (props.username == props.receiver) {
-          console.log("same same");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { text: message.message.text, isReceived: false },
-          ]);
-        } else {
-          console.log("nope");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { text: message.message.text, isReceived: true },
-          ]);
-        }
-      }
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { message: message.message, isReceived: true, user: message.user },
+      ]);
     }
 
     function onError(error: string) {
       console.log(error);
     }
 
-    socket.on("message", onDirectMessage);
+    socket.on("channel-chat-message", onDirectMessage);
     socket.on("error", onError);
 
     return () => {
-      socket.off("message", onDirectMessage);
+      socket.off("channel-chat-message", onDirectMessage);
       socket.off("error", onError);
     };
-  }, [socket, props.receiver, messages]);
+  }, [socket]);
 
   function sendMessage() {
     if (!socket) {
       return;
     }
-    socket.emit("direct-message", {
-      username: props.receiver,
-      text: messageText,
+    socket.emit("channel-chat-message", {
+      channelId: props.channelId,
+      message: messageText,
     });
     setMessages((prevMessages) => [
       ...prevMessages,
-      { text: messageText, isReceived: false },
+      { message: messageText, isReceived: false },
     ]);
     setMessageText("");
   }
@@ -209,18 +197,18 @@ function ChatBoxDms(props: ChatBoxProps) {
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
       <div className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
         <MessagesList
-          receiver={props.receiver}
+          id={props.channelId}
           username={props.username}
           token={props.token}
         />
-        <section ref={ref}>
+        <section>
           {messages.map((message, index) => {
             if (message.isReceived) {
               return (
                 <ChatBubbleResponse
                   key={index}
-                  image={props.friendImage}
-                  message={message.text}
+                  image={imageUrl + message.user?.avatarPath}
+                  message={message.message}
                 />
               );
             } else {
@@ -228,7 +216,7 @@ function ChatBoxDms(props: ChatBoxProps) {
                 <ChatBubbleMessage
                   key={index}
                   image={props.userImage}
-                  message={message.text}
+                  message={message.message}
                 />
               );
             }
@@ -244,15 +232,10 @@ function ChatBoxDms(props: ChatBoxProps) {
         onClick={(e) => {
           e.preventDefault();
           sendMessage();
-          if (ref.current) {
-            ref.current.scrollIntoView({
-              behavior: "instant",
-            });
-          }
         }}
       />
     </div>
   );
 }
 
-export default ChatBoxDms;
+export default ChatBoxChannel;
