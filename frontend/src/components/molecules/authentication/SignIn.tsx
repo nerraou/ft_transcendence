@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ErrorMessage } from "@hookform/error-message";
 import { SubmitHandler } from "react-hook-form";
@@ -13,6 +13,7 @@ import Bar from "@atoms/decoration/Bar";
 import Button from "@atoms/Button";
 import Modal from "@atoms/Modal";
 import { useBoolean } from "@hooks/useBoolean";
+import useOAuthFlow from "@hooks/useOAuthFlow";
 
 import ButtonOAuth from "./ButtonOAuth";
 import useSignInForm from "./useSignInForm";
@@ -53,6 +54,20 @@ function SignInForm() {
     setTrue: showErrorModal,
     setFalse: hideErrorModal,
   } = useBoolean();
+
+  const {
+    isPending: isOAuthPending,
+    isSuccess: isOAuthSuccess,
+    isError: isOAuthError,
+    startGoogleOAuthFlow,
+    start42OAuthFlow,
+  } = useOAuthFlow();
+
+  useEffect(() => {
+    if (isOAuthError) {
+      showErrorModal();
+    }
+  }, [isOAuthError, showErrorModal]);
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
     try {
@@ -117,7 +132,7 @@ function SignInForm() {
       />
 
       <Modal
-        isOpen={isSuccessModalVisible}
+        isOpen={isSuccessModalVisible || isOAuthSuccess}
         title="Welcom to BongBoy"
         description="Complete your acount from here"
         action={<Redirect path="/profile/settings" text="Settings" />}
@@ -186,7 +201,11 @@ function SignInForm() {
       </label>
       <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
         <Button text="Sign In" disabled={isLoading} loading={isLoading} />
-        <ButtonOAuth />
+        <ButtonOAuth
+          onGoogleAuthClick={startGoogleOAuthFlow}
+          on42AuthClick={start42OAuthFlow}
+          loading={isOAuthPending}
+        />
       </div>
     </form>
   );

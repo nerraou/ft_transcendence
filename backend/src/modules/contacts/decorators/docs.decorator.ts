@@ -110,10 +110,17 @@ export function GetContactsApiDocumentation() {
     ApiQuery({
       name: "page",
       type: "number",
+      required: false,
     }),
     ApiQuery({
       name: "limit",
       type: "number",
+      required: false,
+    }),
+    ApiQuery({
+      name: "search_query",
+      type: "string",
+      required: false,
     }),
     ApiOkResponse({
       description: "contacts list",

@@ -65,7 +65,12 @@ export class ContactsService {
     };
   }
 
-  async getUserContacts(userId: number, page: number, limit: number) {
+  async getUserContacts(
+    userId: number,
+    page: number,
+    limit: number,
+    searchQuery?: string,
+  ) {
     const getContactsQuery = Prisma.sql`
     SELECT id, status, follower_id as "followerId", following_id as "followingId",
           created_at as "createdAt", updated_at as "updatedAt"
@@ -89,19 +94,76 @@ export class ContactsService {
       return ids;
     }, []);
 
-    const getContactsUsersQuery = Prisma.sql`
-    SELECT id, username, email, status, rating,
-      RANK() OVER (ORDER BY rating DESC) as ranking,
-      first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
-      created_at as "createdAt", updated_at as "updatedAt"
-    FROM users
-    WHERE id IN (${Prisma.join(usersContactsIds)})
-    OFFSET ${(page - 1) * limit} 
-    LIMIT ${limit}
-    `;
+    const getContactsUsersQuery = this.generateGetUserContactsSQL(
+      page,
+      limit,
+      usersContactsIds,
+      searchQuery,
+    );
 
     const users = await this.prisma.$queryRaw<User[]>(getContactsUsersQuery);
 
     return users;
+  }
+
+  generateGetUserContactsSQL(
+    page: number,
+    limit: number,
+    usersContactsIds: number[],
+    searchQuery?: string,
+  ) {
+    let getContactsUsersQuery: Prisma.Sql;
+
+    if (limit) {
+      if (searchQuery) {
+        searchQuery = `%${searchQuery}%`;
+
+        getContactsUsersQuery = Prisma.sql`
+          SELECT id, username, email, status, rating,
+            RANK() OVER (ORDER BY rating DESC) as ranking,
+            first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+            created_at as "createdAt", updated_at as "updatedAt"
+          FROM users
+          WHERE id IN (${Prisma.join(
+            usersContactsIds,
+          )}) AND username LIKE ${searchQuery}
+          OFFSET ${(page - 1) * limit} 
+          LIMIT ${limit}`;
+      } else {
+        getContactsUsersQuery = Prisma.sql`
+        SELECT id, username, email, status, rating,
+          RANK() OVER (ORDER BY rating DESC) as ranking,
+          first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+          created_at as "createdAt", updated_at as "updatedAt"
+        FROM users
+        WHERE id IN (${Prisma.join(usersContactsIds)})
+        OFFSET ${(page - 1) * limit} 
+        LIMIT ${limit}`;
+      }
+    } else {
+      if (searchQuery) {
+        searchQuery = `%${searchQuery}%`;
+
+        getContactsUsersQuery = Prisma.sql`
+          SELECT id, username, email, status, rating,
+          RANK() OVER (ORDER BY rating DESC) as ranking,
+          first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+          created_at as "createdAt", updated_at as "updatedAt"
+          FROM users
+          WHERE id IN (${Prisma.join(
+            usersContactsIds,
+          )}) AND username LIKE ${searchQuery}`;
+      } else {
+        getContactsUsersQuery = Prisma.sql`
+        SELECT id, username, email, status, rating,
+        RANK() OVER (ORDER BY rating DESC) as ranking,
+        first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
+        created_at as "createdAt", updated_at as "updatedAt"
+        FROM users
+        WHERE id IN (${Prisma.join(usersContactsIds)})`;
+      }
+    }
+
+    return getContactsUsersQuery;
   }
 }

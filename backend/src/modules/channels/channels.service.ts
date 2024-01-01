@@ -70,13 +70,51 @@ export class ChannelsService {
   }
 
   joinChannel(userId: number, channelId: number) {
-    return this.prisma.channelMember.create({
-      data: {
-        channelId: channelId,
-        memberId: userId,
-        role: "MEMBER",
-      },
-    });
+    return this.prisma.$transaction([
+      this.prisma.channelMember.create({
+        data: {
+          channelId: channelId,
+          memberId: userId,
+          role: "MEMBER",
+        },
+      }),
+      this.prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          membersCount: {
+            increment: 1,
+          },
+        },
+      }),
+    ]);
+  }
+
+  leaveChannel(memberId: number, channelId: number) {
+    return this.prisma.$transaction([
+      this.prisma.channelMember.update({
+        data: {
+          isLeft: true,
+        },
+        where: {
+          channelId_memberId: {
+            channelId,
+            memberId,
+          },
+        },
+      }),
+      this.prisma.channel.update({
+        data: {
+          membersCount: {
+            decrement: 1,
+          },
+        },
+        where: {
+          id: channelId,
+        },
+      }),
+    ]);
   }
 
   createChannelMessage(
@@ -97,6 +135,7 @@ export class ChannelsService {
       where: {
         channelId: channelId,
         memberId: userId,
+        isLeft: false,
       },
     });
 
@@ -155,11 +194,46 @@ export class ChannelsService {
     });
   }
 
+  findPublicChannels(searchQuery: string | undefined) {
+    return this.prisma.channel.findMany({
+      where: {
+        type: "PUBLIC",
+        OR: [
+          {
+            name: {
+              contains: searchQuery || "",
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: searchQuery || "",
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      take: 4,
+      orderBy: [
+        {
+          membersCount: "desc",
+        },
+        {
+          updatedAt: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
+  }
+
   findChannelMembers(channelId: number) {
     return this.prisma.channelMember.findMany({
       where: {
         channelId,
         state: null,
+        isLeft: false,
       },
       include: {
         member: {
@@ -193,6 +267,7 @@ export class ChannelsService {
         members: {
           where: {
             role: "OWNER",
+            isLeft: false,
           },
         },
       },
@@ -205,6 +280,7 @@ export class ChannelsService {
         members: {
           some: {
             memberId: userId,
+            isLeft: false,
           },
         },
       },
@@ -219,13 +295,14 @@ export class ChannelsService {
     });
   }
 
-  findChannelMember(channelId: number, userId: number) {
+  findChannelMember(channelId: number, userId: number, isLeft = false) {
     return this.prisma.channelMember.findUnique({
       where: {
         channelId_memberId: {
           channelId,
           memberId: userId,
         },
+        isLeft,
       },
     });
   }

@@ -170,7 +170,7 @@ export class EventsService {
     }
 
     await this.channelsService.createChannelMessage(
-      user.id,
+      channelMember.id,
       createChannelMessageDto,
     );
 

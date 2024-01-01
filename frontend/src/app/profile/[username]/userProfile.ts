@@ -61,7 +61,7 @@ export const useProfile = (token: string | unknown, username: string) => {
   const fetchProfile = async () => {
     const url =
       process.env.NEXT_PUBLIC_API_BASE_URL +
-      `/users/${username}?include_stats=true`;
+      `/users/profile/${username}?include_stats=true`;
 
     const res = await baseQuery(url, {
       headers: {

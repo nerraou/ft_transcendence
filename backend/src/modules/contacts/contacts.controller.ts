@@ -131,6 +131,7 @@ export class ContactsController {
       userId,
       query.page,
       query.limit,
+      query.searchQuery,
     );
 
     return {

@@ -1,3 +1,6 @@
+"use client";
+
+import useTheme from "@hooks/useTheme";
 import clsx from "clsx";
 import { ReactNode } from "react";
 
@@ -6,6 +9,8 @@ interface LayoutAuthProps {
 }
 
 function LayoutAuth(props: LayoutAuthProps) {
+  useTheme();
+
   return (
     <main className="relative flex min-h-screen p-4 bg-light-bg-tertiary dark:bg-dark-bg-primary">
       <section

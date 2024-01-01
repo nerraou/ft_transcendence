@@ -587,3 +587,97 @@ export function GetChannelMembersApiDocumentation() {
     }),
   );
 }
+
+export function GetPublicChannelsApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiQuery({
+      name: "search_query",
+      required: false,
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          channels: [
+            {
+              id: 4,
+              name: "The Greating",
+              description: "greeting channel",
+              imagePath: "5df0bfee-8c73-4571-90cc-13bb9b68aa3d.png",
+              membersCount: 2,
+              type: "PUBLIC",
+              password: null,
+              creatorId: 1,
+              createdAt: "2023-12-25T19:44:25.565Z",
+              updatedAt: "2023-12-26T16:04:40.566Z",
+            },
+          ],
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function LeaveChannelApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          channelId: {
+            type: "number",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: [""],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}

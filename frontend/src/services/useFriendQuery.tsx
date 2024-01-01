@@ -2,7 +2,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
 
 async function getUserHeader(token: string | unknown, username: string) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/users/${username}`;
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE_URL + `/users/profile/${username}`;
 
   const res = await baseQuery(url, {
     headers: {
@@ -26,7 +27,7 @@ export interface UserHeaderProps {
 
 export function useFriendQuery(token: string | unknown, username: string) {
   return useSuspenseQuery<UserHeaderProps>({
-    queryKey: ["friend"],
+    queryKey: ["friend", username],
     queryFn: () => {
       return getUserHeader(token, username);
     },
