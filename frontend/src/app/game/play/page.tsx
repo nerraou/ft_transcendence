@@ -16,6 +16,7 @@ import useWindowEvent from "@hooks/useWindowEvent";
 import { GameConfig } from "./hooks/useGame";
 import ErrorModal from "./components/ErrorModal";
 import GameOverModal, { GameOverStatus } from "./components/GameOverModal";
+import PendingModal from "./components/PendingModal";
 
 const Game = dynamic(() => import("./Game"), {
   ssr: false,
@@ -199,7 +200,7 @@ export default function Page() {
     return (
       <Layout>
         <ErrorModal
-          isOpen={true}
+          isOpen
           message="Failed to start game"
           onClose={() => null}
           onRetry={() => router.push("/game/make")}
@@ -209,7 +210,17 @@ export default function Page() {
   }
 
   if (gameStatus == "pending") {
-    return <h1>Pending...</h1>;
+    return (
+      <Layout>
+        <PendingModal
+          isOpen
+          message="Waiting for opponent"
+          onCancel={() => {
+            //cancel game
+          }}
+        />
+      </Layout>
+    );
   }
 
   if (gameStatus == "idle") {
@@ -217,7 +228,16 @@ export default function Page() {
   }
 
   if (!gameConfig || !makeGameOptions) {
-    return <p>Something went wrong</p>;
+    return (
+      <Layout>
+        <ErrorModal
+          isOpen
+          message="Failed to start game"
+          onClose={() => null}
+          onRetry={() => router.push("/game/make")}
+        />
+      </Layout>
+    );
   }
 
   const gameOverStatus = getGameOverStatus();

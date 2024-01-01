@@ -8,15 +8,16 @@ import { redirect, useRouter } from "next/navigation";
 import Layout from "@components/templates/Layout";
 import useWindowEvent from "@hooks/useWindowEvent";
 import Bar from "@components/atoms/decoration/Bar";
+import Loading from "@app/loading";
 
 import ActionsSection from "./components/ActionsSection";
 import { CustomizeGameSection } from "./components/CustomizeGameSection";
 
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
+
 const GameBoard = dynamic(() => import("./components/GameBoard"), {
   ssr: false,
 });
-
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
 
 export default function MakeGame() {
   const { status: sessionStatus } = useSession();
@@ -39,7 +40,7 @@ export default function MakeGame() {
   }
 
   if (sessionStatus === "loading") {
-    return <h1>Loading</h1>;
+    return <Loading />;
   }
 
   function resetHandler() {
