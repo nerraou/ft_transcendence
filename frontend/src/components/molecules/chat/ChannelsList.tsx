@@ -1,19 +1,52 @@
-import Channel, { ChannelProps } from "@components/atoms/chat/Channel";
+import { ChannelInformation } from "@app/chat/[[...username]]/page";
+import Channel from "@components/atoms/chat/Channel";
 import Add from "@components/atoms/icons/outline/Add";
 import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
 
-interface ChannelsListProps {
-  channels: ChannelProps[];
+export interface ChannelProps {
+  id: number;
+  name: string;
+  imagePath: string;
+  description: string;
+  membersCount: number;
+  type?: "PUBLIC";
 }
 
-function ChannelAddUser(props: ChannelProps) {
+interface ChannelAddUserProps {
+  id: number;
+  name: string;
+  imagePath: string;
+  description: string;
+  membersCount: number;
+  type?: "PUBLIC";
+  onChannelClick: (channelInformation: ChannelInformation) => void;
+}
+
+interface ChannelsListProps {
+  channels: ChannelProps[];
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
+}
+
+function ChannelAddUser(props: ChannelAddUserProps) {
   return (
     <div className="flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
-      <Channel
-        name={props.name}
-        imagePath={props.imagePath}
-        membersCount={props.membersCount}
-      />
+      <div
+        onClick={() => {
+          props.onChannelClick({
+            channelId: props.id,
+            description: props.description,
+            imagePath: props.imagePath,
+            name: props.name,
+          });
+        }}
+      >
+        <Channel
+          name={props.name}
+          imagePath={props.imagePath}
+          membersCount={props.membersCount}
+        />
+      </div>
       <UsersAdd
         color="stroke-light-fg-primary"
         onClick={() => {
@@ -40,12 +73,16 @@ function ChannelsList(props: ChannelsListProps) {
       <div className="space-y-4 px-3 scrollbar-thin h-56 overflow-auto scrollbar-thumb-light-fg-primary">
         {props.channels.map((channel) => {
           return (
-            <ChannelAddUser
-              key={channel.id}
-              name={channel.name}
-              imagePath={imageUrl + channel.imagePath}
-              membersCount={channel.membersCount}
-            />
+            <div key={channel.id}>
+              <ChannelAddUser
+                id={channel.id}
+                name={channel.name}
+                imagePath={imageUrl + channel.imagePath}
+                membersCount={channel.membersCount}
+                description={channel.description}
+                onChannelClick={props.onChannelClick}
+              />
+            </div>
           );
         })}
       </div>

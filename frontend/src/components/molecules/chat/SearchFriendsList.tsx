@@ -14,6 +14,7 @@ import LoadingPage from "@app/loading";
 
 interface FriendsListProps {
   token: string | unknown;
+  onFriendClick: () => void;
 }
 
 interface UsersProps {
@@ -79,7 +80,10 @@ function SearchFriendsList(props: FriendsListProps) {
             )}
           >
             <Suspense fallback={<LoadingPage />}>
-              <FriendsList friends={data.contacts} />
+              <FriendsList
+                onFriendClick={props.onFriendClick}
+                friends={data.contacts}
+              />
             </Suspense>
           </ErrorBoundary>
         )}

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 interface FriendsListProps {
   friends: UserProps[];
+  onFriendClick: () => void;
 }
 
 function FriendsList(props: FriendsListProps) {
@@ -19,6 +20,7 @@ function FriendsList(props: FriendsListProps) {
             <div
               key={friend.id}
               className="hover:bg-light-bg-tertiary cursor-pointer"
+              onClick={props.onFriendClick}
             >
               <Link href={`/chat/${friend.username}`}>
                 <User

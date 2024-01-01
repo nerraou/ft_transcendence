@@ -8,7 +8,6 @@ async function getUserHeader(token: string | unknown, username: string) {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    cache: "no-cache",
   });
   const response = res.json();
   return response;

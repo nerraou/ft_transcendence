@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import Image from "next/image";
-
-export interface ChannelProps {
+interface ChannelProps {
   id?: number;
   name: string;
   imagePath: string;

@@ -1,6 +1,6 @@
-import InputSearch from "@components/atoms/InputSearch";
+import InputSearch from "@atoms/InputSearch";
 import ChannelsList from "./ChannelsList";
-import { ChannelProps } from "@components/atoms/chat/Channel";
+import { ChannelProps } from "@molecules/chat/ChannelsList";
 import baseQuery from "@utils/baseQuery";
 import {
   QueryErrorResetBoundary,
@@ -11,9 +11,12 @@ import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
 import { Suspense } from "react";
 import LoadingPage from "@app/loading";
+import { ChannelInformation } from "@app/chat/[[...username]]/page";
 
 interface SearchChannelsListProps {
   token: string | unknown;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
 interface ChannelsListProps {
@@ -75,7 +78,11 @@ function SearchChannelsList(props: SearchChannelsListProps) {
             )}
           >
             <Suspense fallback={<LoadingPage />}>
-              <ChannelsList channels={data.channels} />
+              <ChannelsList
+                channelInformation={props.channelInformation}
+                onChannelClick={props.onChannelClick}
+                channels={data.channels}
+              />
             </Suspense>
           </ErrorBoundary>
         )}

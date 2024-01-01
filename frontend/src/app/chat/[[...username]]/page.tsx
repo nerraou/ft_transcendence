@@ -3,10 +3,10 @@
 import { useSession } from "next-auth/react";
 import { Popover, Transition } from "@headlessui/react";
 import { redirect } from "next/navigation";
-import { Fragment, Suspense } from "react";
+import { Fragment, Suspense, useState } from "react";
 
 import LoadingPage from "../../loading";
-import ChatBox from "@components/organisms/ChatBox";
+import ChatBoxDms from "@components/organisms/ChatBoxDms";
 import SidePanel from "@components/organisms/SidePanel";
 import ChatHeader from "@molecules/chat/ChatHeader";
 import Layout from "@templates/Layout";
@@ -17,17 +17,22 @@ import { ErrorBoundary } from "react-error-boundary";
 import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
 import { useFriendQuery } from "@services/useFriendQuery";
+import ChannelHeader from "@components/molecules/chat/ChannelHeader";
+import ChatBoxChannel from "@components/organisms/ChatBoxChannel";
 
 interface SidePanelProps {
   image: string;
   token: string | unknown;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
+  onFriendClick: () => void;
 }
 
 interface ChatPageProps {
   params: { username: string };
 }
 
-interface ChatDmsProps {
+interface ChatProps {
   username: string;
   token: string | unknown;
 }
@@ -48,43 +53,108 @@ function SidePanelPopover(props: SidePanelProps) {
         leaveTo="opacity-0 translate-y-1"
       >
         <Popover.Panel className="absolute z-10">
-          <SidePanel image={props.image} token={props.token} />
+          <SidePanel
+            image={props.image}
+            token={props.token}
+            channelInformation={props.channelInformation}
+            onChannelClick={props.onChannelClick}
+            onFriendClick={props.onFriendClick}
+          />
         </Popover.Panel>
       </Transition>
     </Popover>
   );
 }
 
-function ChatDms(props: ChatDmsProps) {
-  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+export interface ChannelInformation {
+  channelId: number;
+  name: string;
+  imagePath: string;
+  description: string;
+}
+
+function Chat(props: ChatProps) {
+  const [isChannel, setIsChannel] = useState<boolean>(false);
+  const [channelInformation, setChannelInformation] =
+    useState<ChannelInformation>({
+      description: "",
+      channelId: 0,
+      imagePath: "",
+      name: "",
+    });
 
   const { data: userData } = useUserProfileQuery(props.token);
-  const { data: friendData } = useFriendQuery(props.token, props.username);
+  let username = props.username;
+  if (!props.username) {
+    username = userData.username;
+  }
+
+  const { data: friendData } = useFriendQuery(props.token, username);
+
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   return (
     <Fragment>
       <div className="w-1/3 lg:hidden md:hidden sm:hidden">
-        <SidePanel image={imageUrl + userData.avatarPath} token={props.token} />
+        <SidePanel
+          image={imageUrl + userData.avatarPath}
+          token={props.token}
+          channelInformation={channelInformation}
+          onChannelClick={(information) => {
+            setIsChannel(true);
+            setChannelInformation(information);
+          }}
+          onFriendClick={() => {
+            setIsChannel(false);
+          }}
+        />
       </div>
       <div className="2xl:hidden xl:hidden lg:visible md:visible sm:visible">
         <SidePanelPopover
           image={imageUrl + userData.avatarPath}
           token={props.token}
+          channelInformation={channelInformation}
+          onChannelClick={(information) => {
+            setIsChannel(true);
+            setChannelInformation(information);
+          }}
+          onFriendClick={() => {
+            setIsChannel(false);
+          }}
         />
       </div>
-      <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
-        <ChatHeader
-          image={imageUrl + friendData.avatarPath}
-          status={friendData.status}
-          username={friendData.username}
-        />
-        <ChatBox
-          receiver={props.username}
-          userImage={imageUrl + userData.avatarPath}
-          friendImage={imageUrl + friendData.avatarPath}
-          token={props.token}
-        />
-      </div>
+      {isChannel && (
+        <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
+          <ChannelHeader
+            channelDescription={channelInformation.description}
+            channelName={channelInformation.name}
+            image={channelInformation.imagePath}
+          />
+          <ChatBoxChannel
+            channelId={channelInformation.channelId}
+            token={props.token}
+            username={userData.username}
+            userImage={imageUrl + userData.avatarPath}
+          />
+        </div>
+      )}
+
+      {!isChannel && (
+        <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
+          <ChatHeader
+            image={imageUrl + friendData.avatarPath}
+            status={friendData.status}
+            username={friendData.username}
+          />
+          <ChatBoxDms
+            username={userData.username}
+            userImage={imageUrl + userData.avatarPath}
+            receiver={username}
+            friendImage={imageUrl + friendData.avatarPath}
+            token={props.token}
+          />
+        </div>
+      )}
     </Fragment>
   );
 }
@@ -130,7 +200,7 @@ function ChatPage({ params }: ChatPageProps) {
               )}
             >
               <Suspense fallback={<LoadingPage />}>
-                <ChatDms
+                <Chat
                   username={params.username}
                   token={session?.user.accessToken}
                 />

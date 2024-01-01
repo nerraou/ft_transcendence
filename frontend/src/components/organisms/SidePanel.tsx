@@ -1,3 +1,4 @@
+import { ChannelInformation } from "@app/chat/[[...username]]/page";
 import MenuDots from "@components/atoms/icons/outline/MenuDots";
 import SearchChannelsList from "@components/molecules/chat/SearchChannelsList";
 import SearchFriendsList from "@components/molecules/chat/SearchFriendsList";
@@ -6,6 +7,9 @@ import Image from "next/image";
 interface SidePanelProps {
   image: string;
   token: string | unknown;
+  channelInformation: ChannelInformation;
+  onChannelClick: (channelInformation: ChannelInformation) => void;
+  onFriendClick: () => void;
 }
 
 interface UserHeaderProps {
@@ -33,8 +37,15 @@ function SidePanel(props: SidePanelProps) {
   return (
     <section className="scrollbar-thin scrollbar-track-light-fg-tertiary scrollbar-thumb-light-fg-primary space-y-10 h-full sm:h-[80vh] overflow-auto sm:w-5/6 w-full flex flex-col px-5 pt-3 pb-14 bg-light-bg-primary border-4 border-light-bg-tertiary rounded-bl-2xl rounded-tl-xl">
       <UserHeader image={props.image} />
-      <SearchFriendsList token={props.token} />
-      <SearchChannelsList token={props.token} />
+      <SearchFriendsList
+        onFriendClick={props.onFriendClick}
+        token={props.token}
+      />
+      <SearchChannelsList
+        onChannelClick={props.onChannelClick}
+        channelInformation={props.channelInformation}
+        token={props.token}
+      />
     </section>
   );
 }
