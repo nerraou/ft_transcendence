@@ -9,7 +9,7 @@ import {
 import { ErrorBoundary } from "react-error-boundary";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
-import { Suspense } from "react";
+import { ChangeEvent, Suspense, useState } from "react";
 import LoadingPage from "@app/loading";
 import { ChannelInformation } from "@app/chat/[[...username]]/page";
 
@@ -35,6 +35,8 @@ async function getChannels(token: string | unknown) {
 }
 
 function SearchChannelsList(props: SearchChannelsListProps) {
+  const [searchChannel, setSearchChannel] = useState("");
+
   const { data } = useSuspenseQuery<ChannelsListProps>({
     queryKey: ["channels"],
     queryFn: () => {
@@ -42,19 +44,32 @@ function SearchChannelsList(props: SearchChannelsListProps) {
     },
   });
 
+  const [filtredChannels, setFiltredChannels] = useState<ChannelProps[]>(
+    data.channels,
+  );
+
+  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+    const searchTerm = e.target.value;
+    setSearchChannel(searchTerm);
+
+    const filtredItems = data.channels.filter((channel) => {
+      return channel.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+    });
+    setFiltredChannels(filtredItems);
+  }
+
   return (
     <section className="flex flex-col space-y-4">
       <InputSearch
-        value=""
+        value={searchChannel}
         bgColor="bg-light-fg-tertiary"
         textColor="text-light-fg-primary"
         placeholder="Search"
         width="w-full"
-        onChange={() => {
-          return;
-        }}
+        onChange={handleInputChange}
         onClear={() => {
-          return;
+          setSearchChannel("");
+          setFiltredChannels(data.channels);
         }}
       />
       <QueryErrorResetBoundary>
@@ -81,7 +96,7 @@ function SearchChannelsList(props: SearchChannelsListProps) {
               <ChannelsList
                 channelInformation={props.channelInformation}
                 onChannelClick={props.onChannelClick}
-                channels={data.channels}
+                channels={filtredChannels}
               />
             </Suspense>
           </ErrorBoundary>
