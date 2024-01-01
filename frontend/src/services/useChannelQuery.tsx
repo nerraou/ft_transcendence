@@ -31,7 +31,7 @@ export interface MembersData {
 
 export function useChannelQuery(token: string | unknown, id: number) {
   return useSuspenseQuery<{ members: MembersData[] }>({
-    queryKey: ["members"],
+    queryKey: ["members", id],
     queryFn: () => {
       return getChannel(token, id);
     },

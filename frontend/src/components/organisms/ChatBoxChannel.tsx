@@ -16,7 +16,7 @@ interface ChatBoxChannelProps {
   userImage: string;
 }
 
-interface user {
+interface User {
   id: number;
   username: string;
   avatarPath: string;
@@ -25,13 +25,13 @@ interface user {
 interface Response {
   channelId: number;
   message: string;
-  user: user;
+  user: User;
 }
 
 interface Message {
   message: string;
   isReceived: boolean;
-  user?: user;
+  user?: User;
 }
 
 interface MessagesListProps {
@@ -41,19 +41,19 @@ interface MessagesListProps {
   members: MembersData[];
 }
 
-interface member {
+interface Member {
   id: number;
   avatarPath: string;
   username: string;
   rating: number;
 }
 
-interface sender {
+interface Sender {
   id: number;
-  state: "KICKED" | "BANNED " | "null";
+  state: "KICKED" | "BANNED " | null;
   mutedUntil: string;
   createdAt: string;
-  member: member;
+  member: Member;
 }
 interface OldMessage {
   id: number;
@@ -62,7 +62,7 @@ interface OldMessage {
   channelId: number;
   createdAt: string;
   updatedAt: string;
-  sender: sender;
+  sender: Sender;
 }
 
 interface OldMessages {
@@ -86,7 +86,6 @@ async function getMessages(page: number, id: number, token: string | unknown) {
   if (response.count == 0) {
     nextPage = null;
   }
-  console.log(response);
   return { ...response, nextPage: nextPage };
 }
 
