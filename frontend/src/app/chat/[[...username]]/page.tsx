@@ -18,7 +18,7 @@ import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
 import { useFriendQuery } from "@services/useFriendQuery";
 import ChannelHeader from "@components/molecules/chat/ChannelHeader";
-import ChatBoxChannel from "@components/organisms/chatBoxChannel";
+import ChatBoxChannel from "@components/organisms/ChatBoxChannel";
 
 interface SidePanelProps {
   image: string;
