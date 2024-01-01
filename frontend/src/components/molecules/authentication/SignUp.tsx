@@ -17,6 +17,7 @@ import useSignUpMutation from "./useSignUpMutation";
 import Modal from "@components/atoms/Modal";
 import Link from "next/link";
 import { useBoolean } from "@hooks/useBoolean";
+import useOAuthFlow from "@hooks/useOAuthFlow";
 
 export interface FormInput {
   email: string;
@@ -35,6 +36,18 @@ function SingInRedirect() {
   );
 }
 
+function SettingsRedirect() {
+  const router = useRouter();
+  return (
+    <Button
+      text="Settings"
+      onClick={() => {
+        router.push("/profile/settings");
+      }}
+    />
+  );
+}
+
 function SignUpForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
   const { register, handleSubmit, formState, getFieldState } = useSignUpForm();
@@ -45,14 +58,22 @@ function SignUpForm() {
     setFalse: hideErrorModal,
   } = useBoolean();
 
+  const {
+    isPending: isOAuthPending,
+    isSuccess: isOAuthSuccess,
+    isError: isOAuthError,
+    startGoogleOAuthFlow,
+    start42OAuthFlow,
+  } = useOAuthFlow();
+
   const { mutate, isPending, isError, isSuccess, error } = useSignUpMutation();
   const onSubmit: SubmitHandler<FormInput> = (data) => mutate(data);
 
   useEffect(() => {
-    if (isError) {
+    if (isError || isOAuthError) {
       showErrorModal();
     }
-  }, [isError, showErrorModal]);
+  }, [isError, isOAuthError, showErrorModal]);
 
   function changePasswordVisibility() {
     if (isPasswordVisible == false) {
@@ -94,6 +115,13 @@ function SignUpForm() {
         title="Success"
         description="Sign up completed successfully!"
         action={<SingInRedirect />}
+      />
+
+      <Modal
+        isOpen={isOAuthSuccess}
+        title="Success"
+        description="Sign up completed successfully!"
+        action={<SettingsRedirect />}
       />
 
       <div className="space-y-4">
@@ -157,8 +185,16 @@ function SignUpForm() {
         </Link>
       </label>
       <div className="flex m-6 w-full h-36 justify-evenly items-center sm:flex-col">
-        <Button text="Sign Up" disabled={isPending} loading={isPending} />
-        <ButtonOAuth />
+        <Button
+          text="Sign Up"
+          disabled={isPending || isOAuthPending}
+          loading={isPending}
+        />
+        <ButtonOAuth
+          onGoogleAuthClick={startGoogleOAuthFlow}
+          on42AuthClick={start42OAuthFlow}
+          loading={isPending || isOAuthPending}
+        />
       </div>
     </form>
   );
