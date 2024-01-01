@@ -5,6 +5,7 @@ import {
   ApiConsumes,
   ApiForbiddenResponse,
   ApiOkResponse,
+  ApiParam,
   ApiPayloadTooLargeResponse,
   ApiQuery,
   ApiTags,
@@ -676,6 +677,51 @@ export function LeaveChannelApiDocumentation() {
           message: [""],
           error: "Unprocessable Entity",
           statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function GetChannelApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiParam({
+      name: "id",
+      type: "number",
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          id: 4,
+          name: "The Greating",
+          description: "greeting channel",
+          imagePath: "5df0bfee-8c73-4571-90cc-13bb9b68aa3d.png",
+          membersCount: 6,
+          type: "PUBLIC",
+          creatorId: 1,
+          createdAt: "2023-12-25T19:44:25.565Z",
+          updatedAt: "2023-12-31T17:54:21.947Z",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
         },
       },
     }),
