@@ -92,7 +92,7 @@ function MessagesList(props: MessagesListProps) {
 
   const { data, isFetchingPreviousPage, fetchPreviousPage } =
     useSuspenseInfiniteQuery<OldMessages>({
-      queryKey: ["messages", props.receiver],
+      queryKey: ["dms", props.receiver],
       queryFn: ({ pageParam }) => {
         return getMessages(pageParam as number, props.receiver, props.token);
       },

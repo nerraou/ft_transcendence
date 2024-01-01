@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
 
 async function getChannel(token: string | unknown, id: number) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/channel/${id}`;
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/channels/${id}/members`;
 
   const res = await baseQuery(url, {
     headers: {
@@ -13,20 +13,25 @@ async function getChannel(token: string | unknown, id: number) {
   return response;
 }
 
-export interface UserHeaderProps {
+interface Member {
   id: number;
   username: string;
-  email: string;
   firstName: string;
   lastName: string;
   avatarPath: string;
-  status: "ONLINE" | "OFFLINE" | "IN_GAME";
-  createdAt: string;
+  rating: number;
 }
 
-export function useFriendQuery(token: string | unknown, id: number) {
-  return useSuspenseQuery<UserHeaderProps>({
-    queryKey: ["friend"],
+export interface MembersData {
+  id: number;
+  memberId: number;
+  channelId: number;
+  member: Member;
+}
+
+export function useChannelQuery(token: string | unknown, id: number) {
+  return useSuspenseQuery<{ members: MembersData[] }>({
+    queryKey: ["members"],
     queryFn: () => {
       return getChannel(token, id);
     },
