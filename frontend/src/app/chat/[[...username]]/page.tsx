@@ -84,9 +84,10 @@ function Chat(props: ChatProps) {
     });
 
   const { data: userData } = useUserProfileQuery(props.token);
-  let username = props.username;
-  if (!props.username) {
-    username = userData.username;
+
+  let username = userData.username;
+  if (props.username) {
+    username = props.username[0];
   }
 
   const { data: friendData } = useFriendQuery(props.token, username);
