@@ -14,7 +14,7 @@ type Story = StoryObj<typeof User>;
 export const Default: Story = {
   args: {
     username: "noface",
-    image: "/anime.jpg",
+    avatarPath: "/anime.jpg",
     status: "OFFLINE",
   },
 };

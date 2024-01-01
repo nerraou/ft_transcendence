@@ -155,6 +155,27 @@ export class ChannelsService {
     });
   }
 
+  findChannelMembers(channelId: number) {
+    return this.prisma.channelMember.findMany({
+      where: {
+        channelId,
+        state: null,
+      },
+      include: {
+        member: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            avatarPath: true,
+            rating: true,
+          },
+        },
+      },
+    });
+  }
+
   findChannelById(channelId: number) {
     return this.prisma.channel.findUnique({
       where: {

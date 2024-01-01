@@ -68,15 +68,6 @@ export function CreateChannelApiDocumentation() {
         },
       },
     }),
-    ApiForbiddenResponse({
-      description: "Forbidden",
-      schema: {
-        example: {
-          message: "Forbidden",
-          statusCode: 403,
-        },
-      },
-    }),
     ApiUnprocessableEntityResponse({
       description: "Unprocessable Entity",
       schema: {
@@ -501,6 +492,68 @@ export function ChangeChannelMemberRoleApiDocumentation() {
       schema: {
         example: {
           message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["channelId must be a number"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function GetChannelMembersApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          members: [
+            {
+              id: 12,
+              memberId: 3,
+              channelId: 4,
+              role: "MEMBER",
+              state: null,
+              mutedUntil: null,
+              createdAt: "2023-12-26T22:03:41.251Z",
+              updatedAt: "2023-12-26T22:03:41.251Z",
+              member: {
+                id: 5,
+                username: "user3",
+                firstName: null,
+                lastName: null,
+                avatarPath: "88ea7025-39bd-41bc-b838-793d2933145b.png",
+                rating: 400,
+              },
+            },
+          ],
         },
       },
     }),
