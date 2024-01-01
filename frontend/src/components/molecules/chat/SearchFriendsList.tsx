@@ -50,7 +50,7 @@ function SearchFriendsList(props: FriendsListProps) {
     data.contacts,
   );
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const searchTerm = e.target.value;
     setSearchFriend(searchTerm);
 
@@ -60,7 +60,7 @@ function SearchFriendsList(props: FriendsListProps) {
         .startsWith(searchTerm.toLowerCase());
     });
     setFiltredFriends(filtredItems);
-  };
+  }
 
   return (
     <section className="flex flex-col space-y-4">
