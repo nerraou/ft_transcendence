@@ -9,7 +9,7 @@ import { UserProps } from "@components/atoms/chat/User";
 import { ErrorBoundary } from "react-error-boundary";
 import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
-import { Suspense } from "react";
+import { ChangeEvent, Suspense, useState } from "react";
 import LoadingPage from "@app/loading";
 
 interface FriendsListProps {
@@ -37,6 +37,8 @@ async function getFriends(token: string | unknown) {
 }
 
 function SearchFriendsList(props: FriendsListProps) {
+  const [searchFriend, setSearchFriend] = useState("");
+
   const { data } = useSuspenseQuery<UsersProps>({
     queryKey: ["friends"],
     queryFn: () => {
@@ -44,19 +46,34 @@ function SearchFriendsList(props: FriendsListProps) {
     },
   });
 
+  const [filtredFriends, setFiltredFriends] = useState<UserProps[]>(
+    data.contacts,
+  );
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    setSearchFriend(searchTerm);
+
+    const filtredItems = data.contacts.filter((contact) => {
+      return contact.username
+        .toLowerCase()
+        .startsWith(searchTerm.toLowerCase());
+    });
+    setFiltredFriends(filtredItems);
+  };
+
   return (
     <section className="flex flex-col space-y-4">
       <InputSearch
-        value=""
+        value={searchFriend}
         bgColor="bg-light-fg-tertiary"
         textColor="text-light-fg-primary"
         placeholder="Search"
         width="w-full"
-        onChange={() => {
-          return;
-        }}
+        onChange={handleInputChange}
         onClear={() => {
-          return;
+          setSearchFriend("");
+          setFiltredFriends(data.contacts);
         }}
       />
       <QueryErrorResetBoundary>
@@ -82,7 +99,7 @@ function SearchFriendsList(props: FriendsListProps) {
             <Suspense fallback={<LoadingPage />}>
               <FriendsList
                 onFriendClick={props.onFriendClick}
-                friends={data.contacts}
+                friends={filtredFriends}
               />
             </Suspense>
           </ErrorBoundary>
