@@ -1,7 +1,10 @@
 import { ChannelInformation } from "@app/chat/[[...username]]/page";
+import InputSearch from "@components/atoms/InputSearch";
+import Modal from "@components/atoms/Modal";
 import Channel from "@components/atoms/chat/Channel";
 import Add from "@components/atoms/icons/outline/Add";
 import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
+import { useState } from "react";
 
 export interface ChannelProps {
   id: number;
@@ -28,7 +31,32 @@ interface ChannelsListProps {
   onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
+function AddUser() {
+  return (
+    <div className="bg-light-bg-tertiary">
+      <InputSearch
+        value=""
+        bgColor="bg-light-fg-tertiary"
+        textColor="text-light-fg-primary"
+        placeholder="Search"
+        width="w-full"
+        onChange={() => {
+          return;
+        }}
+        onClear={() => {
+          return;
+        }}
+      />
+    </div>
+  );
+}
+
 function ChannelAddUser(props: ChannelAddUserProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  function onClose() {
+    return setIsOpen(false);
+  }
   return (
     <div className="flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
       <div
@@ -49,9 +77,14 @@ function ChannelAddUser(props: ChannelAddUserProps) {
       </div>
       <UsersAdd
         color="stroke-light-fg-primary"
-        onClick={() => {
-          return;
-        }}
+        onClick={() => setIsOpen(true)}
+      />
+      <Modal
+        title="New users"
+        onClose={onClose}
+        isOpen={isOpen}
+        description="Add Users To this channel"
+        action={<AddUser />}
       />
     </div>
   );
