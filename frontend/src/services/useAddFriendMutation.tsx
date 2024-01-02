@@ -7,7 +7,7 @@ interface AddFriend {
   token: string | unknown;
 }
 
-async function AddFriend(userId: number, token: string | unknown) {
+async function addFriend(userId: number, token: string | unknown) {
   const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/contacts";
 
   return await baseQuery(api, {
@@ -23,7 +23,7 @@ async function AddFriend(userId: number, token: string | unknown) {
 function useAddFriendMutation(token: string | unknown, userId: number) {
   return useMutation<Response, RequestError, AddFriend>({
     mutationFn: () => {
-      return AddFriend(userId, token);
+      return addFriend(userId, token);
     },
   });
 }

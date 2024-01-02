@@ -7,7 +7,7 @@ interface RemoveFriend {
   token: string | unknown;
 }
 
-async function RemoveFriend(userId: number, token: string | unknown) {
+async function removeFriend(userId: number, token: string | unknown) {
   const api =
     process.env.NEXT_PUBLIC_API_BASE_URL + `/users/${userId}/unfriend`;
 
@@ -23,7 +23,7 @@ async function RemoveFriend(userId: number, token: string | unknown) {
 function useRemoveFriendMutation(token: string | unknown, userId: number) {
   return useMutation<Response, RequestError, RemoveFriend>({
     mutationFn: () => {
-      return RemoveFriend(userId, token);
+      return removeFriend(userId, token);
     },
   });
 }

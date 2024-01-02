@@ -143,9 +143,14 @@ function Chat(props: ChatProps) {
       {!isChannel && (
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
           <ChatHeader
+            id={friendData.id}
+            isProfileOwner={friendData.isProfileOwner}
             image={imageUrl + friendData.avatarPath}
             status={friendData.status}
             username={friendData.username}
+            isBlocked={friendData.isBlocked}
+            isFriend={friendData.isFriend}
+            token={props.token}
           />
           <ChatBoxDms
             username={userData.username}
