@@ -41,6 +41,7 @@ import {
   BlockUserApiDocumentation,
   UnblockUserApiDocumentation,
   UnfriendUserApiDocumentation,
+  SearchUsersDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -49,6 +50,7 @@ import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
 import { GetUserDto } from "./dto/get-user.dto";
+import { SearchUsersDto } from "./dto/search-users.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -150,6 +152,20 @@ export class UsersController {
       isBlocked,
       gamesStats: stats,
     };
+  }
+
+  @Get("/search")
+  @SearchUsersDocumentation()
+  @UseGuards(JwtAuthGuard)
+  searchUsers(
+    @Query() searchUsersDto: SearchUsersDto,
+    @User("id") connectedUserId: number,
+  ) {
+    return this.usersService.searchUsers(
+      searchUsersDto.searchQuery,
+      searchUsersDto.channelId,
+      connectedUserId,
+    );
   }
 
   @Delete("/:id/unfriend")

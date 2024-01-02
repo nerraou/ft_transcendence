@@ -403,4 +403,62 @@ export class UsersService {
 
     return count == 1;
   }
+
+  async searchUsers(
+    searchQuery: string,
+    channelId: number,
+    connectedUserId: number,
+  ) {
+    const blockedUsers = await this.prisma.block.findMany({
+      where: {
+        OR: [
+          {
+            blocked: connectedUserId,
+          },
+          {
+            blockedBy: connectedUserId,
+          },
+        ],
+      },
+      select: {
+        blocked: true,
+        blockedBy: true,
+      },
+    });
+
+    const channelMemebersIds = await this.prisma.channelMember.findMany({
+      where: {
+        channelId,
+      },
+    });
+
+    const excludeIds: number[] = [];
+
+    blockedUsers.forEach((block) => {
+      excludeIds.push(block.blocked);
+      excludeIds.push(block.blockedBy);
+    });
+
+    channelMemebersIds.forEach((member) => {
+      excludeIds.push(member.memberId);
+    });
+
+    return this.prisma.user.findMany({
+      where: {
+        username: {
+          startsWith: searchQuery,
+          mode: "insensitive",
+        },
+        id: {
+          notIn: excludeIds,
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarPath: true,
+      },
+      take: 10,
+    });
+  }
 }
