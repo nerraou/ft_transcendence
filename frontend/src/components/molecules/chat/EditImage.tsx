@@ -48,7 +48,11 @@ function EditImage(props: EditImageProps) {
           </p>
         )}
       </div>
-      <Pencil color="stroke-light-fg-primary" onClick={handleClick} />
+      {/* onhover: cursor-pointer */}
+      <Pencil
+        color="stroke-light-fg-primary cursor-pointer"
+        onClick={handleClick}
+      />
       <input
         ref={inputRef}
         className="hidden"

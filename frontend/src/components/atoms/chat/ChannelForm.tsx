@@ -68,11 +68,13 @@ function ChannelForm({
                 setImage={(image) => {
                   setChannel("image", image);
                 }}
-                image={channel?.image}
+                image={channel?.image || undefined}
                 originalImage={
                   channel?.imagePath ? imageUrl + channel.imagePath : ""
                 }
                 labelValue="Channel Image"
+                name="image"
+                errors={formState.errors}
               />
 
               <LabelInputText
@@ -81,7 +83,6 @@ function ChannelForm({
                 placeholder="Name"
                 borderColor="border-light-fg-primary"
                 errors={formState.errors}
-                // {...register("name")}
                 onChange={(e) => {
                   setChannel("name", e.target.value);
                 }}
@@ -90,7 +91,6 @@ function ChannelForm({
 
               <LabelSelectButtonGroup
                 labelValue="Channel Type"
-                // {...register("type")}
                 onChange={(newValue) => {
                   setChannel("type", newValue);
                 }}
@@ -106,7 +106,6 @@ function ChannelForm({
                 isDisabled={channel.type != ChannelType.PROTECTED}
                 onPasswordVisibilityChange={changePasswordVisibility}
                 isPasswordVisible={isPasswordVisible}
-                // {...register("password")}
                 onChange={(e) => {
                   setChannel("password", e.target.value);
                 }}
@@ -119,7 +118,6 @@ function ChannelForm({
                 labelValue="Channel Description"
                 placeholder="Description"
                 borderColor="border-light-fg-primary"
-                // {...register("description")}
                 value={channel?.description}
                 onChange={(e) => {
                   setChannel("description", e.target.value);

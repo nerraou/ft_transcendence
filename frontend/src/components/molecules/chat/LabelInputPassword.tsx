@@ -1,4 +1,5 @@
 import InputPassword from "@atoms/InputPassword";
+import { ErrorMessage } from "@hookform/error-message";
 // import { ErrorMessage } from "@hookform/error-message";
 import { ChangeEvent, forwardRef } from "react";
 import { FieldErrors } from "react-hook-form";
@@ -31,6 +32,7 @@ const LabelInputPassword = forwardRef<
       <div className="border-solid border-light-fg-tertiary">
         <InputPassword
           ref={ref}
+          value={props.value}
           name={props.name}
           iconColor="stroke-light-fg-primary dark:stroke-dark-fg-primary"
           borderColor={props.borderColor}
@@ -41,13 +43,13 @@ const LabelInputPassword = forwardRef<
           width="w-96 sm:w-full md:w-full"
           isDisabled={props.isDisabled}
         />
-        {/* <ErrorMessage
+        <ErrorMessage
           errors={props.errors}
           name={props.name as any}
           render={({ message }) => (
             <p className="text-light-fg-secondary">{message}</p>
           )}
-        /> */}
+        />
       </div>
     </div>
   );

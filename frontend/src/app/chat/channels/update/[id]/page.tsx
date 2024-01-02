@@ -55,18 +55,24 @@ function Page({ params }: updateChannelProps) {
       <QueryErrorResetBoundary>
         {({ reset }) => (
           <ErrorBoundary
-            fallbackRender={({ resetErrorBoundary }) => (
+            fallbackRender={({ resetErrorBoundary, error }) => (
               <Modal
                 isOpen
                 title="Error"
-                description="Something went wrong"
+                description={
+                  error.response?.status === 403
+                    ? `This channel does not exist`
+                    : "Something went wrong"
+                }
                 action={
-                  <Button
-                    text="Retry"
-                    onClick={() => {
-                      resetErrorBoundary();
-                    }}
-                  />
+                  error.response?.status !== 403 ? (
+                    <Button
+                      text="Retry"
+                      onClick={() => {
+                        resetErrorBoundary();
+                      }}
+                    />
+                  ) : null
                 }
               />
             )}
