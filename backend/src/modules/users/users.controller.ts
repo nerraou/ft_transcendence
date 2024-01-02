@@ -113,6 +113,20 @@ export class UsersController {
 
     const ranking = await this.usersService.getUserRanking(user.id);
 
+    const isFriend = await this.usersService.isUsersFriend(
+      connectedUserId,
+      user.id,
+    );
+
+    let isBlocked = false;
+
+    if (!isFriend) {
+      isBlocked = await this.usersService.isUsersBlocked(
+        connectedUserId,
+        user.id,
+      );
+    }
+
     let stats: any = {};
     if (getUserDto.includeStats) {
       stats = await this.usersService.getUserGamesStats(user.id);
@@ -130,6 +144,8 @@ export class UsersController {
       rating: user.rating,
       ranking,
       isProfileOwner: connectedUserId == user.id,
+      isFriend,
+      isBlocked,
       gamesStats: stats,
     };
   }

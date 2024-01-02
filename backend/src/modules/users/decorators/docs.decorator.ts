@@ -305,6 +305,8 @@ export function GetUserByUsernameDocumentation() {
           createdAt: 1692017290161,
           ranking: 2,
           isProfileOwner: true,
+          isBlocked: false,
+          isFriend: true,
           gamesStats: {
             wins: 1,
             losses: 5,

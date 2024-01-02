@@ -348,4 +348,42 @@ export class UsersService {
 
     return null;
   }
+
+  async isUsersFriend(connectedUserId: number, userId: number) {
+    const count = await this.prisma.contact.count({
+      where: {
+        OR: [
+          {
+            followerId: connectedUserId,
+            followingId: userId,
+          },
+          {
+            followerId: userId,
+            followingId: connectedUserId,
+          },
+        ],
+      },
+    });
+
+    return count == 1;
+  }
+
+  async isUsersBlocked(connectedUserId: number, userId: number) {
+    const count = await this.prisma.block.count({
+      where: {
+        OR: [
+          {
+            blocked: connectedUserId,
+            blockedBy: userId,
+          },
+          {
+            blocked: userId,
+            blockedBy: connectedUserId,
+          },
+        ],
+      },
+    });
+
+    return count == 1;
+  }
 }
