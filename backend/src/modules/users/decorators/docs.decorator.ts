@@ -11,6 +11,7 @@ import {
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
   ApiUnsupportedMediaTypeResponse,
 } from "@nestjs/swagger";
 
@@ -305,6 +306,8 @@ export function GetUserByUsernameDocumentation() {
           createdAt: 1692017290161,
           ranking: 2,
           isProfileOwner: true,
+          isBlocked: false,
+          isFriend: true,
           gamesStats: {
             wins: 1,
             losses: 5,
@@ -386,6 +389,94 @@ export function UnblockUserApiDocumentation() {
         example: {
           message: "Unauthorized",
           statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function UnfriendUserApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+  );
+}
+
+export function SearchUsersDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiQuery({
+      name: "search_query",
+      type: "string",
+      required: true,
+    }),
+    ApiQuery({
+      name: "channel_id",
+      type: "number",
+      required: true,
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: [
+          {
+            id: 4,
+            username: "user2",
+            avatarPath: "08b99582-f79a-46d8-b2c0-bde722413a7d.png",
+          },
+          {
+            id: 5,
+            username: "user3",
+            avatarPath: "88ea7025-39bd-41bc-b838-793d2933145b.png",
+          },
+        ],
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: [
+            "searchQuery must be shorter than or equal to 255 characters",
+          ],
+          error: "Unprocessable Entity",
+          statusCode: 422,
         },
       },
     }),
