@@ -1,9 +1,10 @@
-import EditImage from "../Settings/EditImage";
+import EditImage from "./EditImage";
 
 interface LableImageProps {
   labelValue: string;
-  jwt: string | unknown;
-  image: string;
+  originalImage: string;
+  image?: File;
+  setImage: (image: File) => void;
 }
 
 function LabelImage(props: LableImageProps) {
@@ -14,7 +15,11 @@ function LabelImage(props: LableImageProps) {
           {props.labelValue}
         </label>
       </div>
-      <EditImage image={props.image} jwt={props.jwt} />
+      <EditImage
+        image={props.image}
+        originalImage={props.originalImage}
+        setImage={props.setImage}
+      />
     </div>
   );
 }

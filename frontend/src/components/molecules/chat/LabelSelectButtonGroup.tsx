@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { RadioGroup } from "@headlessui/react";
-
+import { ChannelType } from "@components/atoms/chat/ChannelForm";
+import { ErrorMessage } from "@hookform/error-message";
+import { FieldErrors } from "react-hook-form";
 interface SelectButtonProps {
   text: string;
   selected: boolean;
@@ -25,23 +27,36 @@ interface SelectButtonGroupProps {
   values: string[];
   margin?: string;
   onChange: (value: string) => void;
+  name?: string;
+  errors?: FieldErrors<any>;
 }
 
 function SelectButtonGroup(props: SelectButtonGroupProps) {
   return (
-    <RadioGroup
-      className={clsx("flex flex-wrap gap-5", props.margin)}
-      value={props.value}
-      onChange={props.onChange}
-    >
-      {props.values.map((value) => {
-        return (
-          <RadioGroup.Option key={value} value={value}>
-            {({ checked }) => <SelectButton selected={checked} text={value} />}
-          </RadioGroup.Option>
-        );
-      })}
-    </RadioGroup>
+    <>
+      <RadioGroup
+        className={clsx("flex flex-wrap gap-5", props.margin)}
+        value={props.value}
+        onChange={props.onChange}
+      >
+        {props.values.map((value) => {
+          return (
+            <RadioGroup.Option key={value} value={value}>
+              {({ checked }) => (
+                <SelectButton selected={checked} text={value} />
+              )}
+            </RadioGroup.Option>
+          );
+        })}
+      </RadioGroup>
+      <ErrorMessage
+        errors={props.errors}
+        name={props.name as any}
+        render={({ message }) => (
+          <p className="text-light-fg-secondary">{message}</p>
+        )}
+      />
+    </>
   );
 }
 
@@ -49,6 +64,8 @@ interface LabelSelectButtonGroupProps {
   labelValue: string;
   value: string;
   onChange: (value: string) => void;
+  name?: string;
+  errors?: FieldErrors<any>;
 }
 
 function LabelSelectButtonGroup(props: LabelSelectButtonGroupProps) {
@@ -62,8 +79,10 @@ function LabelSelectButtonGroup(props: LabelSelectButtonGroupProps) {
 
       <SelectButtonGroup
         value={props.value}
-        values={["public", "private", "protected"]}
+        values={Object.values(ChannelType)}
         onChange={props.onChange}
+        name={props.name}
+        errors={props.errors}
       />
     </div>
   );
