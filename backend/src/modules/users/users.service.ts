@@ -256,6 +256,23 @@ export class UsersService {
     });
   }
 
+  unfriendUser(userId: number, userToUnfriend: number) {
+    return this.prisma.contact.deleteMany({
+      where: {
+        OR: [
+          {
+            followerId: userId,
+            followingId: userToUnfriend,
+          },
+          {
+            followerId: userToUnfriend,
+            followingId: userId,
+          },
+        ],
+      },
+    });
+  }
+
   async getUserGamesStats(id: number) {
     const gamesCount = await this.prisma.game.aggregate({
       _count: true,

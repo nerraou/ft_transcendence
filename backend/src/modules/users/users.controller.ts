@@ -2,6 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -39,6 +40,7 @@ import {
   GetUserByUsernameDocumentation,
   BlockUserApiDocumentation,
   UnblockUserApiDocumentation,
+  UnfriendUserApiDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -147,6 +149,24 @@ export class UsersController {
       isFriend,
       isBlocked,
       gamesStats: stats,
+    };
+  }
+
+  @Delete("/:id/unfriend")
+  @UnfriendUserApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async unfriendUser(
+    @Param("id", ParseIntPipe) userToUnfriend: number,
+    @User("id") connectedUserId: number,
+  ) {
+    if (connectedUserId == userToUnfriend) {
+      throw new ForbiddenException();
+    }
+
+    await this.usersService.unfriendUser(connectedUserId, userToUnfriend);
+
+    return {
+      message: "success",
     };
   }
 
