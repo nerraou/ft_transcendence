@@ -2,6 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -39,6 +40,8 @@ import {
   GetUserByUsernameDocumentation,
   BlockUserApiDocumentation,
   UnblockUserApiDocumentation,
+  UnfriendUserApiDocumentation,
+  SearchUsersDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -47,6 +50,7 @@ import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
 import { GetUserDto } from "./dto/get-user.dto";
+import { SearchUsersDto } from "./dto/search-users.dto";
 
 const ImageValidatorPipe = new ParseFilePipeBuilder()
   .addMaxSizeValidator({
@@ -113,6 +117,20 @@ export class UsersController {
 
     const ranking = await this.usersService.getUserRanking(user.id);
 
+    const isFriend = await this.usersService.isUsersFriend(
+      connectedUserId,
+      user.id,
+    );
+
+    let isBlocked = false;
+
+    if (!isFriend) {
+      isBlocked = await this.usersService.isUsersBlocked(
+        connectedUserId,
+        user.id,
+      );
+    }
+
     let stats: any = {};
     if (getUserDto.includeStats) {
       stats = await this.usersService.getUserGamesStats(user.id);
@@ -130,7 +148,41 @@ export class UsersController {
       rating: user.rating,
       ranking,
       isProfileOwner: connectedUserId == user.id,
+      isFriend,
+      isBlocked,
       gamesStats: stats,
+    };
+  }
+
+  @Get("/search")
+  @SearchUsersDocumentation()
+  @UseGuards(JwtAuthGuard)
+  searchUsers(
+    @Query() searchUsersDto: SearchUsersDto,
+    @User("id") connectedUserId: number,
+  ) {
+    return this.usersService.searchUsers(
+      searchUsersDto.searchQuery,
+      searchUsersDto.channelId,
+      connectedUserId,
+    );
+  }
+
+  @Delete("/:id/unfriend")
+  @UnfriendUserApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async unfriendUser(
+    @Param("id", ParseIntPipe) userToUnfriend: number,
+    @User("id") connectedUserId: number,
+  ) {
+    if (connectedUserId == userToUnfriend) {
+      throw new ForbiddenException();
+    }
+
+    await this.usersService.unfriendUser(connectedUserId, userToUnfriend);
+
+    return {
+      message: "success",
     };
   }
 

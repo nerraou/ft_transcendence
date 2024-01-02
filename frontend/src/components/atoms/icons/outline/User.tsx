@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { MouseEvent } from "react";
-0;
 
 interface UserProps {
   color: string;
