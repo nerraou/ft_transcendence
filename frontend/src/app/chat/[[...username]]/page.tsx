@@ -127,6 +127,9 @@ function Chat(props: ChatProps) {
       {isChannel && (
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
           <ChannelHeader
+            role="ADMIN"
+            token={props.token}
+            channelId={channelInformation.channelId}
             channelDescription={channelInformation.description}
             channelName={channelInformation.name}
             image={channelInformation.imagePath}
