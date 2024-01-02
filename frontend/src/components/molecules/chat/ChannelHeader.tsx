@@ -34,17 +34,17 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
         leaveTo="opacity-0 translate-y-1"
       >
         <Popover.Panel className="absolute">
-          <div className="flex flex-col border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-md bg-light-fg-tertiary p-base">
+          <div className="flex flex-col items-start border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-md bg-light-fg-tertiary p-base">
+            <button className="text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary ">
+              <p>Members</p>
+            </button>
             {isOwner && (
               <Link href="chat/channels/update">
-                <label className="text-base text-light-fg-primary hover:bg-light-bg-tertiary">
+                <label className="text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary">
                   Update
                 </label>
               </Link>
             )}
-            <label className="text-base text-light-fg-primary hover:bg-light-bg-tertiary">
-              Members
-            </label>
           </div>
         </Popover.Panel>
       </Transition>
