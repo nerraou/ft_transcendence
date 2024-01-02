@@ -71,12 +71,13 @@ export function useChannel(id: string, token: string | unknown) {
 }
 
 async function patchChannel(channel: Channel, token: string | unknown) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/channels/${channel.id}`;
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/channels`;
 
   const data = new FormData();
   data.append("name", channel.name);
   data.append("description", channel.description);
   data.append("type", channel.type);
+  data.append("channelId", channel?.id?.toString() || "");
   if (channel.type === ChannelType.PROTECTED) {
     data.append("password", channel.password || "");
   }
@@ -117,10 +118,7 @@ export function useChannelForm(
       await createChannelMutation.mutateAsync({ channel });
     } else {
       await editChannelMutation.mutateAsync({
-        channel: {
-          ...channel,
-          id: defaultValues.id,
-        },
+        channel,
       });
     }
   }
