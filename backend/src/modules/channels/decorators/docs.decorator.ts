@@ -195,6 +195,7 @@ export function GetChannelsApiDocumentation() {
               imagePath: "80188ab1-b599-4c9b-b452-aeafda41b995.png",
               type: "PUBLIC",
               membersCount: 1,
+              connectedMemberRole: "ADMIN",
             },
           ],
         },
