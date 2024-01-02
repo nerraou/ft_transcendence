@@ -8,25 +8,30 @@ import { useBlockUser } from "@app/profile/[username]/userProfile";
 import UserPlus from "@components/atoms/icons/outline/UserPlus";
 import UserMinus from "@components/atoms/icons/outline/UserMinus";
 import UserBlock from "@components/atoms/icons/outline/UserBlock";
+import useAddFriendMutation from "@services/useAddFriendMutation";
+import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
 interface ChatHeaderProps {
+  id: number;
   status: "ONLINE" | "OFFLINE" | "IN_GAME";
   username: string;
   image: string;
+  isFriend: boolean;
+  isBlocked: boolean;
+  isProfileOwner: boolean;
+  token: string | unknown;
 }
 
 interface MenuDotsPopoverProps {
-  isFriend: boolean;
   id: number;
+  isBlocked: boolean;
+  isFriend: boolean;
   token: string | unknown;
 }
 
 function MenuDotsPopover(props: MenuDotsPopoverProps) {
-  const blockUser = useBlockUser(props.token, props.id);
-  let action = "Add";
-
-  if (props.isFriend) {
-    action = "Remove";
-  }
+  const blockUserMutation = useBlockUser(props.token, props.id);
+  const addUserMutation = useAddFriendMutation(props.token, props.id);
+  const removeUserMutation = useRemoveFriendMutation(props.token, props.id);
 
   return (
     <Popover className="relative">
@@ -47,22 +52,47 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
       >
         <Popover.Panel className="absolute">
           <div className="flex flex-col border-2 border-light-fg-primary dark:border-dark-fg-primary  rounded-md bg-light-fg-tertiary p-sm">
-            <button className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm">
-              {!props.isFriend && (
+            {!props.isFriend && (
+              <button
+                disabled={addUserMutation.isPending}
+                onClick={() =>
+                  addUserMutation.mutate({
+                    token: props.token,
+                    userId: props.id,
+                  })
+                }
+                className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm"
+              >
                 <UserPlus color="stroke-light-fg-primary dark:stroke-dark-fg-primary" />
-              )}
-              {props.isFriend && (
+                <label className="text-base text-light-fg-primary dark:text-dark-fg-primary ml-sm">
+                  Add
+                </label>
+              </button>
+            )}
+
+            {props.isFriend && (
+              <button
+                disabled={removeUserMutation.isPending}
+                onClick={() =>
+                  removeUserMutation.mutate({
+                    token: props.token,
+                    userId: props.id,
+                  })
+                }
+                className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm"
+              >
                 <UserMinus color="stroke-light-fg-primary dark:stroke-dark-fg-primary" />
-              )}
-              <label className="text-base text-light-fg-primary dark:text-dark-fg-primary ml-sm">
-                {action}
-              </label>
-            </button>
+                <label className="text-base text-light-fg-primary dark:text-dark-fg-primary ml-sm">
+                  Remove
+                </label>
+              </button>
+            )}
+
             <button
-              disabled={blockUser.status === "pending"}
+              disabled={blockUserMutation.isPending}
               className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
               onClick={() =>
-                blockUser.mutate({ token: props.token, id: props.id })
+                blockUserMutation.mutate({ token: props.token, id: props.id })
               }
             >
               <UserBlock color="stroke-light-fg-primary dark:stroke-dark-fg-primary" />
@@ -85,10 +115,17 @@ function ChatHeader(props: ChatHeaderProps) {
         avatarPath={props.image}
         status={props.status}
       />
-      <div className="flex items-center space-x-5">
-        <DeviceGamePad color="stroke-dark-fg-primary" />
-        <MenuDotsPopover isFriend id={1} token="" />
-      </div>
+      {!props.isProfileOwner && (
+        <div className="flex items-center space-x-5">
+          <DeviceGamePad color="stroke-dark-fg-primary" />
+          <MenuDotsPopover
+            isFriend={props.isFriend}
+            isBlocked={props.isBlocked}
+            id={props.id}
+            token={props.token}
+          />
+        </div>
+      )}
     </div>
   );
 }
