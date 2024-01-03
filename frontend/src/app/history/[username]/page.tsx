@@ -4,7 +4,7 @@ import Modal from "@components/atoms/Modal";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { redirect, useRouter } from "next/navigation";
-import React, { Suspense, useCallback } from "react";
+import React, { Suspense, useCallback, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import LoadingPage from "../../loading";
 import Layout from "@components/templates/Layout";
@@ -14,7 +14,9 @@ import useGameHistory, {
 } from "@components/molecules/history/useGameHistory";
 import { getColumns } from "@components/molecules/history/HistoryTableColumns";
 import Pagination from "@components/atoms/Pagination";
-import DatePickerInterval from "@components/atoms/DatePickerInterval";
+import DatePickerInterval, {
+  DateInterval,
+} from "@components/atoms/DatePickerInterval";
 import InputSearch from "@components/atoms/InputSearch";
 import { useMediaQuery } from "@hooks/useMediaQuery";
 import debounce from "lodash/debounce";
@@ -36,6 +38,7 @@ const History = ({ token, username }: HistoryProps) => {
   const xxs = useMediaQuery("(max-width: 450px)");
   const columns = getColumns(filters, setFilters, xs, xxs);
   const [query, setQuery] = React.useState<string>("");
+  const [intervale, setIntervale] = useState<DateInterval | null>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetQuery = useCallback(
@@ -51,10 +54,13 @@ const History = ({ token, username }: HistoryProps) => {
       <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-start">
         <div className="flex flex-row gap-6 w-full items-start justify-start sm:flex-col sm:items-center sm:justify-center">
           <DatePickerInterval
-            value={filters.dateInterval}
-            onChange={(dateInterval) =>
-              setFilters({ ...filters, dateInterval })
-            }
+            value={intervale}
+            onChange={(dateInterval) => {
+              setIntervale(dateInterval);
+              if (dateInterval?.[0] && dateInterval?.[1]) {
+                setFilters({ ...filters, dateInterval });
+              }
+            }}
           />
           <InputSearch
             bgColor="bg-light-fg-tertiary"
