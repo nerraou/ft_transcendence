@@ -101,6 +101,9 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
                 </label>
               </Link>
             )}
+            <label className="text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary">
+              Leave
+            </label>
           </div>
         </Popover.Panel>
       </Transition>

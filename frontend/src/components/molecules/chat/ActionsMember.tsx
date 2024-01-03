@@ -1,4 +1,4 @@
-import DeviceGamePad from "@components/atoms/icons/outline/DeviceGamePad";
+import ActionChallengeMember from "@components/atoms/chat/ActionChallengeMember";
 import { MembersData } from "@services/useChannelQuery";
 import Image from "next/image";
 
@@ -31,7 +31,7 @@ function Member(props: MemberProps) {
 
         <p className="text-light-fg-link text-lg">{props.username}</p>
       </div>
-      <DeviceGamePad color="stroke-light-fg-primary" />
+      <ActionChallengeMember username={props.username} />
     </div>
   );
 }

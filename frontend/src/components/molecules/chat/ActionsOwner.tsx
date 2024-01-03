@@ -1,8 +1,8 @@
-import Admin from "@components/atoms/icons/outline/Admin";
-import Ban from "@components/atoms/icons/outline/Ban";
-import DeviceGamePad from "@components/atoms/icons/outline/DeviceGamePad";
-import Kick from "@components/atoms/icons/outline/Kick";
-import Mute from "@components/atoms/icons/outline/Mute";
+import ActionAddAdmin from "@components/atoms/chat/ActionAddAdmin";
+import ActionBanMember from "@components/atoms/chat/ActionBanMember";
+import ActionChallengeMember from "@components/atoms/chat/ActionChallengeMember";
+import ActionKickMember from "@components/atoms/chat/ActionKickMember";
+import ActionMuteMember from "@components/atoms/chat/ActionMuteMember";
 import { MembersData } from "@services/useChannelQuery";
 import Image from "next/image";
 interface ActionsOwnerProps {
@@ -11,6 +11,8 @@ interface ActionsOwnerProps {
 }
 
 interface OwnerProps {
+  channelId: number;
+  memberId: number;
   imagePath: string;
   username: string;
   token: string | unknown;
@@ -35,25 +37,26 @@ function Owner(props: OwnerProps) {
         <p className="text-dark-fg-primary text-lg">{props.username}</p>
       </div>
       <div className="flex space-x-5">
-        <DeviceGamePad
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionMuteMember
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
-        <Ban
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionChallengeMember username={props.username} />
+        <ActionBanMember
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
-        <Kick
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionKickMember
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
-        <Mute
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
-        />
-        <Admin
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionAddAdmin
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
       </div>
     </div>
@@ -67,6 +70,8 @@ function ActionsOwner(props: ActionsOwnerProps) {
         return (
           <Owner
             key={member.memberId}
+            channelId={member.channelId}
+            memberId={member.memberId}
             imagePath={member.member.avatarPath}
             username={member.member.username}
             token={props.token}
