@@ -2,6 +2,7 @@ import { ChangeEvent, forwardRef } from "react";
 // import { ErrorMessage } from "@hookform/error-message";
 import { FieldErrors } from "react-hook-form";
 import clsx from "clsx";
+import { ErrorMessage } from "@hookform/error-message";
 
 interface LabelInputTextAreaProps {
   labelValue: string;
@@ -37,13 +38,13 @@ const LabelInputTextArea = forwardRef<
             "w-96 md:w-full sm:w-full text-light-fg-primary max-h-32 min-h-[80px] bg-light-bg-tertiary focus-within:border-dark-useless rounded-lg outline-none p-4 overflow-hidden border-2 border-light-fg-primary",
           )}
         />
-        {/* <ErrorMessage
+        <ErrorMessage
           errors={props.errors}
           name={props.name as any}
           render={({ message }) => (
             <p className="text-light-fg-secondary">{message}</p>
           )}
-        /> */}
+        />
       </div>
     </div>
   );

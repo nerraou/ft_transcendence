@@ -12,6 +12,7 @@ interface ImageCroperProps {
   isPending: boolean;
   isSuccess: boolean;
   onClose: () => void;
+  isChannelModal?: boolean;
 }
 
 function readFile(file: File): Promise<string> {
@@ -62,6 +63,9 @@ export default function ImageCroper(props: ImageCroperProps) {
       props.onCropComplete(croppendImage);
     } catch (e) {
       //   console.error(e);
+    }
+    if (props.isChannelModal) {
+      props.onClose();
     }
   }
 
