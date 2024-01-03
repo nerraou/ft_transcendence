@@ -14,31 +14,25 @@ interface KickMember {
   token: string | unknown;
 }
 
-async function kickMember(
-  channelId: number,
-  memberId: number,
-  token: string | unknown,
-) {
+async function kickMember(member: KickMember) {
   const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/members/Kick";
 
   return await baseQuery(api, {
     method: "PATCH",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${member.token}`,
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      channelId: channelId,
-      memberId: memberId,
+      channelId: member.channelId,
+      memberId: member.memberId,
     }),
   });
 }
 
 function ActionKickMember(props: ActionKickMemberProps) {
   const mutation = useMutation<Response, RequestError, KickMember>({
-    mutationFn: () => {
-      return kickMember(props.channelId, props.memberId, props.token);
-    },
+    mutationFn: kickMember,
   });
 
   return (

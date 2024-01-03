@@ -14,22 +14,18 @@ interface AddAdmin {
   token: string | unknown;
 }
 
-async function addAdmin(
-  channelId: number,
-  memberId: number,
-  token: string | unknown,
-) {
+async function addAdmin(member: AddAdmin) {
   const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/members/role";
 
   return await baseQuery(api, {
     method: "PATCH",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${member.token}`,
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      channelId: channelId,
-      memberId: memberId,
+      channelId: member.channelId,
+      memberId: member.memberId,
       role: "ADMIN",
     }),
   });
@@ -37,9 +33,7 @@ async function addAdmin(
 
 function ActionAddAdmin(props: ActionAddAdminProps) {
   const mutation = useMutation<Response, RequestError, AddAdmin>({
-    mutationFn: () => {
-      return addAdmin(props.channelId, props.memberId, props.token);
-    },
+    mutationFn: addAdmin,
   });
 
   return (

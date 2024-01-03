@@ -1,8 +1,8 @@
 import ActionAddAdmin from "@components/atoms/chat/ActionAddAdmin";
 import ActionBanMember from "@components/atoms/chat/ActionBanMember";
+import ActionChallengeMember from "@components/atoms/chat/ActionChallengeMember";
 import ActionKickMember from "@components/atoms/chat/ActionKickMember";
 import ActionMuteMember from "@components/atoms/chat/ActionMuteMember";
-import DeviceGamePad from "@components/atoms/icons/outline/DeviceGamePad";
 import { MembersData } from "@services/useChannelQuery";
 import Image from "next/image";
 interface ActionsOwnerProps {
@@ -42,10 +42,7 @@ function Owner(props: OwnerProps) {
           memberId={props.memberId}
           token={props.token}
         />
-        <DeviceGamePad
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
-        />
+        <ActionChallengeMember username={props.username} />
         <ActionBanMember
           channelId={props.channelId}
           memberId={props.memberId}

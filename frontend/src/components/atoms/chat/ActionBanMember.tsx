@@ -14,31 +14,25 @@ interface BanMember {
   token: string | unknown;
 }
 
-async function banMember(
-  channelId: number,
-  memberId: number,
-  token: string | unknown,
-) {
+async function banMember(member: BanMember) {
   const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/members/ban";
 
   return await baseQuery(api, {
     method: "PATCH",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${member.token}`,
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      channelId: channelId,
-      memberId: memberId,
+      channelId: member.channelId,
+      memberId: member.memberId,
     }),
   });
 }
 
 function ActionBanMember(props: ActionBanMemberProps) {
   const mutation = useMutation<Response, RequestError, BanMember>({
-    mutationFn: () => {
-      return banMember(props.channelId, props.memberId, props.token);
-    },
+    mutationFn: banMember,
   });
 
   return (
