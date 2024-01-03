@@ -1,4 +1,4 @@
-import Admin from "@components/atoms/icons/outline/Admin";
+import ActionAddAdmin from "@components/atoms/chat/ActionAddAdmin";
 import Ban from "@components/atoms/icons/outline/Ban";
 import DeviceGamePad from "@components/atoms/icons/outline/DeviceGamePad";
 import Kick from "@components/atoms/icons/outline/Kick";
@@ -11,6 +11,8 @@ interface ActionsOwnerProps {
 }
 
 interface OwnerProps {
+  channelId: number;
+  memberId: number;
   imagePath: string;
   username: string;
   token: string | unknown;
@@ -51,9 +53,10 @@ function Owner(props: OwnerProps) {
           color="stroke-light-fg-primary"
           hover="hover:bg-light-bg-tertiary"
         />
-        <Admin
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionAddAdmin
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
       </div>
     </div>
@@ -67,6 +70,8 @@ function ActionsOwner(props: ActionsOwnerProps) {
         return (
           <Owner
             key={member.memberId}
+            channelId={member.channelId}
+            memberId={member.memberId}
             imagePath={member.member.avatarPath}
             username={member.member.username}
             token={props.token}
