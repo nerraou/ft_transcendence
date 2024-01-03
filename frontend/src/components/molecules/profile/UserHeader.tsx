@@ -16,9 +16,9 @@ import { Fragment } from "react";
 import { UserStatus } from "../FriendCard";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useBlockUser } from "@app/profile/[username]/userProfile";
 import useAddFriendMutation from "@services/useAddFriendMutation";
 import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
+import { useBlockUserMutation } from "@services/useBlockUserMutation";
 
 interface UserHeaderProps {
   fullname: string;
@@ -49,8 +49,7 @@ function UserPopover(props: UserPopoverProps) {
   const { data: session } = useSession();
   const token = session?.user.accessToken;
 
-  console.log(props.isFriend);
-  const blockUser = useBlockUser(token, props.id);
+  const blockUserMutation = useBlockUserMutation();
   const addUserMutation = useAddFriendMutation();
   const removeUserMutation = useRemoveFriendMutation();
 
@@ -111,9 +110,11 @@ function UserPopover(props: UserPopoverProps) {
             )}
 
             <button
-              disabled={blockUser.status === "pending"}
+              disabled={blockUserMutation.isPending}
               className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
-              onClick={() => blockUser.mutate({ token: token, id: props.id })}
+              onClick={() =>
+                blockUserMutation.mutate({ token: token, id: props.id })
+              }
             >
               <UserBlock color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">

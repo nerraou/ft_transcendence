@@ -105,7 +105,7 @@ function Profile({ token, username }: ProfileProps) {
               }}
             />
             <ButtonHistory
-              backgroundColor=" bg-light-bg-secondary"
+              backgroundColor="bg-light-bg-secondary"
               onClick={() => router.push(`/history/${user.username}`)}
             />
           </div>
