@@ -1,13 +1,119 @@
 "use client";
 
 import clsx from "clsx";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { Toaster } from "react-hot-toast";
 
 import Headphones from "@atoms/decoration/Headphones";
 import ThemeSwitch from "@components/atoms/ThemeSwitch";
 import useTheme, { Theme } from "@hooks/useTheme";
 import useOnChallengeRecieved from "@hooks/useOnChallengeRecieved";
+import { useUserProfileQuery } from "@services/useUserProfileQuery";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Logo from "@components/atoms/icons/Logo";
+import { Popover, Transition } from "@headlessui/react";
+import BurgerMenu from "@components/atoms/icons/outline/BurgerMenu";
+
+interface NavbarLink {
+  title: string;
+  link: string;
+}
+function getRoutes(username: string | null | undefined): NavbarLink[] {
+  return [
+    {
+      title: "Profile",
+      link: `/profile/${username}`,
+    },
+    {
+      title: "Friends",
+      link: `/friends`,
+    },
+    {
+      title: "History",
+      link: `/history/${username}`,
+    },
+    {
+      title: "Chat",
+      link: `/chat`,
+    },
+    {
+      title: "Feed",
+      link: `/feed`,
+    },
+    {
+      title: "Settings",
+      link: `/profile/settings`,
+    },
+    {
+      title: "Game",
+      link: `/game/make`,
+    },
+  ];
+}
+
+interface NavbarLinkActionProps {
+  action: NavbarLink;
+  router: any;
+  menu?: boolean;
+}
+
+function NavbarLinkAction({ action, router, menu }: NavbarLinkActionProps) {
+  return (
+    <button
+      className={clsx(
+        "flex items-center px-4 py-2 rounded-sm gap-2 text-base font-medium text-light-fg-link dark:text-light-bg-tertiary hover:bg-light-fg-tertiary dark:hover:bg-dark-fg-primary",
+        { "w-full": menu },
+      )}
+      onClick={() => router.push(action.link)}
+    >
+      {action.title}
+    </button>
+  );
+}
+
+interface ActionsMenuProps {
+  actions: NavbarLink[];
+  router: any;
+}
+
+function ActionsMenu({ actions, router }: ActionsMenuProps) {
+  return (
+    <Popover className="relative">
+      {({ open }) => (
+        <>
+          <Popover.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-light-fg-tertiary border border-light-fg-link dark:border-dark-fg-primary">
+            <BurgerMenu />
+          </Popover.Button>
+          <Transition
+            show={open}
+            as={Popover.Panel}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="transition ease-out duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+            className="absolute z-10 w-56 max-w-sm px-4 mt-3 transform -translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl"
+          >
+            <Popover.Panel className="absolute z-10 right-4">
+              <div className="w-72 w-max-full overflow-hidden rounded-sm relative flex flex-col items-start justify-start px-5 py-6 bg-light-bg-tertiary dark:bg-dark-bg-primary sm:p-8 border border-light-fg-link dark:border-dark-fg-primary">
+                {actions.map((action) => (
+                  <NavbarLinkAction
+                    key={action.link}
+                    action={action}
+                    router={router}
+                    menu={true}
+                  />
+                ))}
+              </div>
+            </Popover.Panel>
+          </Transition>
+        </>
+      )}
+    </Popover>
+  );
+}
 
 interface LayoutProps {
   children: ReactNode | ReactNode[];
@@ -15,6 +121,15 @@ interface LayoutProps {
 
 function DummyNavBar() {
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { data: currentUser, isSuccess } = useUserProfileQuery(
+    session?.user?.accessToken,
+  );
+  const routes = useMemo(
+    () => getRoutes(currentUser?.username),
+    [currentUser?.username],
+  );
 
   return (
     <header className="relative h-20 border-b-4 border-b-light-fg-primary dark:border-b-dark-fg-primary">
@@ -26,6 +141,25 @@ function DummyNavBar() {
           checked={theme?.value == Theme.DARK}
           onChange={toggleTheme}
         />
+        <div className="flex-grow" />
+        {isSuccess && (
+          <div className="flex flex-grow items-center justify-end px-8 lg:hidden md:hidden sm:hidden">
+            {routes.map((route: NavbarLink) => (
+              <NavbarLinkAction
+                key={route.link}
+                action={route}
+                router={router}
+              />
+            ))}
+          </div>
+        )}
+        <div className="px-4 hidden lg:flex md:flex sm:flex">
+          <ActionsMenu actions={routes} router={router} />
+        </div>
+        <div className="w-1 h-full bg-light-fg-tertiary" />
+        <div className="flex items-center justify-center w-14 h-full border-l-4 p-1 border-light-fg-primary dark:border-dark-fg-primary">
+          <Logo />
+        </div>
       </nav>
     </header>
   );
