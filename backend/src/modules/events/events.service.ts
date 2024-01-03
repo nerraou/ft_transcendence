@@ -25,12 +25,16 @@ import {
 } from "@modules/achievements/achievements.service";
 import { GamesService } from "@modules/games/games.service";
 import { JoinQueueDto } from "@modules/game-loop/dto/join-queue.dto";
+import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto";
+
 import claimAchievements from "./utils/claimAchievements";
 
 @Injectable()
 export class EventsService {
   private playersQueue: Map<number, PlayerEntity[]> = new Map();
   private playersQueueMutex = new Mutex();
+  private challengesSet: Set<string> = new Set();
+  private challengesSetMutex = new Mutex();
 
   constructor(
     private readonly redisService: RedisService,
@@ -82,6 +86,10 @@ export class EventsService {
   async userDisonnected(client: Socket) {
     const payload = this.verifyJwt(client.request);
 
+    if ("challengeToken" in client.data) {
+      this.cancelChallenge(client.data.challengeToken);
+    }
+
     if (!payload) {
       throw new WsException("Unauthorized");
     }
@@ -123,10 +131,10 @@ export class EventsService {
       createMessageDto.text,
     );
 
-    const socketxIdsString = await this.redisService.get(`user-${receiver.id}`);
+    const socketsIdsString = await this.redisService.get(`user-${receiver.id}`);
 
-    if (socketxIdsString) {
-      const socketIds: string[] = JSON.parse(socketxIdsString);
+    if (socketsIdsString) {
+      const socketIds: string[] = JSON.parse(socketsIdsString);
 
       socketIds.forEach((socketId) => {
         client
@@ -263,52 +271,7 @@ export class EventsService {
         playerSocket.join(game.getSocketRoomName());
         opponentSocket.join(game.getSocketRoomName());
 
-        game.events.on("game-debug", (data) => {
-          this.usersService.updateStatusById(player.id, "IN_GAME").catch(() => {
-            // can't update status
-          });
-
-          this.usersService
-            .updateStatusById(opponent.id, "IN_GAME")
-            .catch(() => {
-              // can't update status
-            });
-
-          serverSocket.to(game.getSocketRoomName()).emit("game-debug", data);
-        });
-
-        game.events.on("game-started", (data: any) => {
-          serverSocket.to(game.getSocketRoomName()).emit("game-started", data);
-        });
-
-        game.events.on("ball-moved", (data: any) => {
-          serverSocket.to(game.getSocketRoomName()).emit("ball-moved", data);
-        });
-
-        game.events.on("ball-out", (data: any) => {
-          serverSocket.to(game.getSocketRoomName()).emit("ball-out", data);
-        });
-
-        game.events.on("game-over", (data: any) => {
-          const winner = data.winnerId == player.id ? "PLAYER" : "OPPONENT";
-
-          this.usersService.updateStatusById(player.id, "ONLINE").catch(() => {
-            // can't update status
-          });
-
-          this.usersService
-            .updateStatusById(opponent.id, "ONLINE")
-            .catch(() => {
-              // can't update status
-            });
-
-          this.claimAchievements(game, winner, data.winnerId).catch(() => {
-            console.error("can't claim achievements");
-          });
-
-          this.gameLoopService.removeGame(game.getId());
-          serverSocket.to(game.getSocketRoomName()).emit("game-over", data);
-        });
+        this.registerGameEvents(game, player, opponent, serverSocket);
       }
     } catch (error) {
       console.error(error);
@@ -339,6 +302,183 @@ export class EventsService {
         .to(game.player.socketId)
         .emit("opponent-moved", { y: game.opponent.paddle.position.y });
     }
+  }
+
+  async handleChallengePlayer(
+    client: Socket,
+    user: UserEntity,
+    challengePlayerDto: ChallengePlayerDto,
+  ) {
+    const player = await this.usersService.findOneByUsername(
+      challengePlayerDto.username,
+    );
+
+    if (!user) {
+      throw new WsException("username not found");
+    }
+
+    if (player.status != "ONLINE") {
+      throw new WsException("player is not online or in game");
+    }
+
+    const socketsIdsString = await this.redisService.get(`user-${player.id}`);
+
+    if (!socketsIdsString) {
+      throw new WsException("player is not online");
+    }
+
+    const socketsIds: string[] = JSON.parse(socketsIdsString);
+
+    const token = this.jwtService.sign(
+      {
+        socketId: client.id,
+        scoreToWin: challengePlayerDto.scoreToWin,
+        username: user.username,
+      },
+      {
+        secret: "some-random-string",
+      },
+    );
+
+    try {
+      await this.challengesSetMutex.waitForUnlock();
+      await this.challengesSetMutex.acquire();
+
+      this.challengesSet.add(token);
+
+      socketsIds.forEach((socketId) => {
+        client.to(socketId).emit("game-challenge", {
+          token,
+        });
+      });
+    } finally {
+      this.challengesSetMutex.release();
+    }
+
+    client.data.challengeToken = token;
+
+    return { token };
+  }
+
+  async acceptChallenge(
+    client: Socket,
+    user: UserEntity,
+    socketId: string,
+    username: string,
+    scoreToWin: number,
+    serverSocket: Server,
+    token: string,
+  ) {
+    try {
+      await this.challengesSetMutex.waitForUnlock();
+      await this.challengesSetMutex.acquire();
+
+      if (!this.challengesSet.has(token)) {
+        this.challengesSetMutex.release();
+        return;
+      }
+
+      this.challengesSet.delete(token);
+    } finally {
+      this.challengesSetMutex.release();
+    }
+
+    const opponentUser = await this.usersService.findOneByUsername(username);
+
+    if (!opponentUser) {
+      throw new WsException("username not found");
+    }
+
+    if (opponentUser.status != "ONLINE") {
+      throw new WsException("player is not online or in game");
+    }
+
+    const opponentSocketClient = serverSocket.sockets.sockets.get(socketId);
+
+    if (!opponentSocketClient) {
+      throw new WsException("player is not online");
+    }
+
+    const player: PlayerEntity = {
+      id: user.id,
+      rating: user.rating,
+      avatar: user.avatarPath,
+      username: user.username,
+      ranking: await this.usersService.getUserRanking(user.id),
+      socketId: client.id,
+    };
+
+    const opponent: PlayerEntity = {
+      id: opponentUser.id,
+      rating: opponentUser.rating,
+      avatar: opponentUser.avatarPath,
+      username: opponentUser.username,
+      ranking: await this.usersService.getUserRanking(opponentUser.id),
+      socketId: opponentSocketClient.id,
+    };
+
+    const game = this.gameLoopService.createGame(player, opponent, scoreToWin);
+
+    client.data.gameId = game.getSocketRoomName();
+    opponentSocketClient.data.gameId = game.getSocketRoomName();
+
+    client.join(game.getSocketRoomName());
+    opponentSocketClient.join(game.getSocketRoomName());
+
+    this.registerGameEvents(game, player, opponent, serverSocket);
+  }
+
+  async cancelChallenge(token: string) {
+    try {
+      await this.challengesSetMutex.waitForUnlock();
+      await this.challengesSetMutex.acquire();
+
+      this.challengesSet.delete(token);
+    } finally {
+      this.challengesSetMutex.release();
+    }
+  }
+
+  registerGameEvents(
+    game: Game,
+    player: PlayerEntity,
+    opponent: PlayerEntity,
+    serverSocket: Server,
+  ) {
+    game.events.on("game-started", (data: any) => {
+      this.usersService.updateStatusById(player.id, "IN_GAME").catch(() => {
+        // can't update status
+      });
+
+      serverSocket.to(game.getSocketRoomName()).emit("game-started", data);
+    });
+
+    game.events.on("ball-moved", (data: any) => {
+      serverSocket.to(game.getSocketRoomName()).emit("ball-moved", data);
+    });
+
+    game.events.on("ball-out", (data: any) => {
+      serverSocket.to(game.getSocketRoomName()).emit("ball-out", data);
+    });
+
+    game.events.on("game-over", (data: any) => {
+      const winner = data.winnerId == player.id ? "PLAYER" : "OPPONENT";
+
+      this.usersService.updateStatusById(player.id, "ONLINE").catch(() => {
+        // can't update status
+      });
+
+      this.usersService.updateStatusById(opponent.id, "ONLINE").catch(() => {
+        // can't update status
+      });
+
+      this.claimAchievements(game, winner, data.winnerId).catch(() => {
+        console.error("can't claim achievements");
+      });
+
+      this.gameLoopService.removeGame(game.getId());
+      serverSocket.to(game.getSocketRoomName()).emit("game-over", data);
+    });
   }
 
   removeFromGameLoop(client: Socket, game: Game) {
@@ -419,6 +559,25 @@ export class EventsService {
       ...playerAchievements,
       ...opponentAchievements,
     ]);
+  }
+
+  async leaveQueue(client: Socket) {
+    try {
+      await this.playersQueueMutex.waitForUnlock();
+      await this.playersQueueMutex.acquire();
+
+      const queue = this.playersQueue.get(client.data.scoreToWin);
+
+      if (queue) {
+        const index = queue.findIndex((player) => player.socketId == client.id);
+
+        if (index != -1) {
+          queue.splice(index, 1);
+        }
+      }
+    } finally {
+      this.playersQueueMutex.release();
+    }
   }
 
   private verifyJwt(request: any): JwtPayload | undefined {

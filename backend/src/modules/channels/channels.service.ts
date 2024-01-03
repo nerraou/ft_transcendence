@@ -274,8 +274,8 @@ export class ChannelsService {
     });
   }
 
-  findUserChannels(userId: number) {
-    return this.prisma.channel.findMany({
+  async findUserChannels(userId: number) {
+    const channels = await this.prisma.channel.findMany({
       where: {
         members: {
           some: {
@@ -291,7 +291,27 @@ export class ChannelsService {
         imagePath: true,
         type: true,
         membersCount: true,
+
+        members: {
+          where: {
+            memberId: userId,
+          },
+        },
       },
+    });
+
+    return channels.map((channel) => {
+      const role = channel.members.at(0).role;
+
+      return {
+        id: channel.id,
+        name: channel.name,
+        description: channel.description,
+        imagePath: channel.imagePath,
+        type: channel.type,
+        membersCount: channel.membersCount,
+        connectedMemberRole: role,
+      };
     });
   }
 

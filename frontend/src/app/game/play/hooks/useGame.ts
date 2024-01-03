@@ -16,6 +16,7 @@ export interface PlayerEntity {
 
 export interface GameConfig {
   gameId: string;
+  scoreToWin: number;
   ballSpeed: number;
   paddleSpeed: number;
   ballDirection: number;

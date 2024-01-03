@@ -3,24 +3,26 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 
 import Layout from "@components/templates/Layout";
 import useWindowEvent from "@hooks/useWindowEvent";
 import Bar from "@components/atoms/decoration/Bar";
+import Loading from "@app/loading";
 
 import ActionsSection from "./components/ActionsSection";
 import { CustomizeGameSection } from "./components/CustomizeGameSection";
+
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
 
 const GameBoard = dynamic(() => import("./components/GameBoard"), {
   ssr: false,
 });
 
-import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
-
 export default function MakeGame() {
   const { status: sessionStatus } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [scoreToWin, setScoreToWin] = useState("10");
   const [paddleColor, setPaddleColor] = useState("#7E2625");
@@ -39,7 +41,7 @@ export default function MakeGame() {
   }
 
   if (sessionStatus === "loading") {
-    return <h1>Loading</h1>;
+    return <Loading />;
   }
 
   function resetHandler() {
@@ -49,12 +51,20 @@ export default function MakeGame() {
   }
 
   function playHandler() {
-    const searchParams = new URLSearchParams();
-    searchParams.set("paddle_color", paddleColor);
-    searchParams.set("board_color", boardColor);
-    searchParams.set("score_to_win", scoreToWin);
+    const gameParams = new URLSearchParams();
 
-    router.push(`/game/play?${searchParams.toString()}`);
+    gameParams.set("paddle_color", paddleColor);
+    gameParams.set("board_color", boardColor);
+    gameParams.set("score_to_win", scoreToWin);
+
+    const username = searchParams.get("username");
+
+    if (username) {
+      gameParams.append("username", username);
+      gameParams.append("mode", "challenge");
+    }
+
+    router.push(`/game/play?${gameParams.toString()}`);
   }
 
   return (

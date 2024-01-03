@@ -102,51 +102,6 @@ export default function Game(props: GameProps) {
     },
   });
 
-  // const { elementRef: debugElementRef, p5 } = useP5<HTMLDivElement>({
-  //   setup() {
-  //     //
-  //   },
-  //   draw() {
-  //     //
-  //   },
-  // });
-
-  // useEffect(() => {
-  //   if (!socketClient || !p5) {
-  //     return;
-  //   }
-
-  //   function onGameDebug(data: any) {
-  //     const {
-  //       paddleWidth,
-  //       paddleHeight,
-  //       leftPaddle,
-  //       rightPaddle,
-  //       boardWidth,
-  //       boardHeight,
-  //       ballX,
-  //       ballY,
-  //       ballRadius,
-  //     } = data;
-
-  //     p5.createCanvas(boardWidth, boardHeight);
-  //     p5.background(preferences.boardColor);
-
-  //     p5.noStroke();
-  //     p5.fill("white");
-  //     p5.rect(leftPaddle.x, leftPaddle.y, paddleWidth, paddleHeight);
-  //     p5.rect(rightPaddle.x, rightPaddle.y, paddleWidth, paddleHeight);
-
-  //     p5.circle(ballX, ballY, ballRadius);
-  //   }
-
-  //   socketClient.on("game-debug", onGameDebug);
-
-  //   return () => {
-  //     socketClient.removeListener("game-debug", onGameDebug);
-  //   };
-  // }, [p5, socketClient, preferences]);
-
   return (
     <Layout>
       <section className="px-16 sm:px-4">
@@ -155,14 +110,14 @@ export default function Game(props: GameProps) {
         <section className="flex justify-between">
           <PlayerScore
             score={player.score}
-            scoreToWin={preferences.scoreToWin}
+            scoreToWin={gameConfig.scoreToWin}
             username={gameConfig.player.username || "(no name)"}
             image={gameConfig.player.avatar}
           />
 
           <PlayerScore
             score={opponent.score}
-            scoreToWin={preferences.scoreToWin}
+            scoreToWin={gameConfig.scoreToWin}
             username={gameConfig.opponent.username || "(no name)"}
             image={gameConfig.opponent.avatar}
             reverse

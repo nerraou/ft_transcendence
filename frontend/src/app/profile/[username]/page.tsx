@@ -94,7 +94,16 @@ function Profile({ token, username }: ProfileProps) {
             />
           </div>
           <div className="flex justify-around my-10">
-            <ButtonPlay backgroundColor="bg-light-bg-secondary" />
+            <ButtonPlay
+              backgroundColor="bg-light-bg-secondary"
+              onClick={() => {
+                if (user.isProfileOwner) {
+                  router.push("/game/make");
+                } else {
+                  router.push(`/game/make?username=${username}`);
+                }
+              }}
+            />
             <ButtonHistory
               backgroundColor=" bg-light-bg-secondary"
               onClick={() => router.push(`/history/${user.username}`)}

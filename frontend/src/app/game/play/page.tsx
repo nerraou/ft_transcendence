@@ -16,6 +16,7 @@ import useWindowEvent from "@hooks/useWindowEvent";
 import { GameConfig } from "./hooks/useGame";
 import ErrorModal from "./components/ErrorModal";
 import GameOverModal, { GameOverStatus } from "./components/GameOverModal";
+import PendingModal from "./components/PendingModal";
 
 const Game = dynamic(() => import("./Game"), {
   ssr: false,
@@ -36,13 +37,43 @@ const makeGameSchema = yup.object({
       message: "invalid color",
     })
     .required(),
-  scoreToWin: yup.number().required().oneOf([3, 5, 10, 15, 20]),
+  mode: yup.string().oneOf(["challenge", "accepted"]).nullable(),
+  scoreToWin: yup
+    .number()
+    .nullable()
+    .when("mode", {
+      is: "challenge",
+      then(schema) {
+        return schema.required().oneOf([3, 5, 10, 15, 20]);
+      },
+    }),
+  username: yup
+    .string()
+    .nullable()
+    .when("mode", {
+      is: "challenge",
+      then(schema) {
+        return schema.required();
+      },
+    }),
+  token: yup
+    .string()
+    .nullable()
+    .when("mode", {
+      is: "accepted",
+      then(schema) {
+        return schema.required("token is required");
+      },
+    }),
 });
 
 export interface MakeGameOptions {
   paddleColor: string;
   boardColor: string;
-  scoreToWin: number;
+  scoreToWin?: number | null;
+  mode?: string | null;
+  username?: string | null;
+  token?: string | null;
 }
 
 interface GameOverState {
@@ -69,6 +100,8 @@ export default function Page() {
   const { data: session, status: sessionStatus } = useSession();
   const socketClient = useSocket();
 
+  const [challengeToken, setChallengeToken] = useState<string>();
+
   useWindowEvent("keydown", (e) => {
     const cancelKeys = ["ArrowDown", "ArrowUp"];
 
@@ -90,7 +123,6 @@ export default function Page() {
   const [gameOverState, setGameOverState] = useState<
     GameOverState | undefined
   >();
-  // const { value: isGameAborted, setTrue } = useBoolean();
 
   const payload = useDecodeAccessToken({
     accessToken: session?.user.accessToken,
@@ -102,23 +134,47 @@ export default function Page() {
     }
 
     try {
-      const paddleColor = searchParams.get("paddle_color");
-      const boardColor = searchParams.get("board_color");
+      const paddleColor = searchParams.get("paddle_color") ?? "#7E2625";
+      const boardColor = searchParams.get("board_color") ?? "#EF9935";
       const scoreToWin = searchParams.get("score_to_win");
+      const mode = searchParams.get("mode");
+      const username = searchParams.get("username");
+      const token = searchParams.get("token");
 
       const options = makeGameSchema.validateSync({
         paddleColor,
         boardColor,
         scoreToWin,
+        mode,
+        username,
+        token,
       });
 
       setMakeGameOptions(options);
 
       setGameStatus("pending");
 
-      socketClient?.emit("player-join-queue", {
-        scoreToWin: options.scoreToWin,
-      });
+      if (options.mode == "challenge") {
+        socketClient.emit(
+          "challenge-player",
+          {
+            username,
+            scoreToWin: options.scoreToWin,
+          },
+          (data: any) => {
+            setChallengeToken(data.token);
+          },
+        );
+      } else if (options.mode == "accepted") {
+        socketClient.emit("challenge-player-response", {
+          token,
+          action: "accept",
+        });
+      } else {
+        socketClient.emit("player-join-queue", {
+          scoreToWin: options.scoreToWin,
+        });
+      }
     } catch {
       raiseBadOptionsError();
     }
@@ -199,7 +255,7 @@ export default function Page() {
     return (
       <Layout>
         <ErrorModal
-          isOpen={true}
+          isOpen
           message="Failed to start game"
           onClose={() => null}
           onRetry={() => router.push("/game/make")}
@@ -209,7 +265,24 @@ export default function Page() {
   }
 
   if (gameStatus == "pending") {
-    return <h1>Pending...</h1>;
+    return (
+      <Layout>
+        <PendingModal
+          isOpen
+          message="Waiting for opponent"
+          onCancel={() => {
+            if (challengeToken) {
+              socketClient?.emit("challenge-player-cancel", {
+                token: challengeToken,
+              });
+            } else {
+              socketClient?.emit("leave-queue");
+            }
+            router.back();
+          }}
+        />
+      </Layout>
+    );
   }
 
   if (gameStatus == "idle") {
@@ -217,7 +290,16 @@ export default function Page() {
   }
 
   if (!gameConfig || !makeGameOptions) {
-    return <p>Something went wrong</p>;
+    return (
+      <Layout>
+        <ErrorModal
+          isOpen
+          message="Failed to start game"
+          onClose={() => null}
+          onRetry={() => router.push("/game/make")}
+        />
+      </Layout>
+    );
   }
 
   const gameOverStatus = getGameOverStatus();
