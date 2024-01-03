@@ -1,8 +1,8 @@
 import ActionAddAdmin from "@components/atoms/chat/ActionAddAdmin";
-import Ban from "@components/atoms/icons/outline/Ban";
+import ActionBanMember from "@components/atoms/chat/ActionBanMember";
+import ActionKickMember from "@components/atoms/chat/ActionKickMember";
+import ActionMuteMember from "@components/atoms/chat/ActionMuteMember";
 import DeviceGamePad from "@components/atoms/icons/outline/DeviceGamePad";
-import Kick from "@components/atoms/icons/outline/Kick";
-import Mute from "@components/atoms/icons/outline/Mute";
 import { MembersData } from "@services/useChannelQuery";
 import Image from "next/image";
 interface ActionsOwnerProps {
@@ -37,21 +37,24 @@ function Owner(props: OwnerProps) {
         <p className="text-dark-fg-primary text-lg">{props.username}</p>
       </div>
       <div className="flex space-x-5">
+        <ActionMuteMember
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
+        />
         <DeviceGamePad
           color="stroke-light-fg-primary"
           hover="hover:bg-light-bg-tertiary"
         />
-        <Ban
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionBanMember
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
-        <Kick
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
-        />
-        <Mute
-          color="stroke-light-fg-primary"
-          hover="hover:bg-light-bg-tertiary"
+        <ActionKickMember
+          channelId={props.channelId}
+          memberId={props.memberId}
+          token={props.token}
         />
         <ActionAddAdmin
           channelId={props.channelId}
