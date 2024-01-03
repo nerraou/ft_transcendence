@@ -11,21 +11,26 @@ import {
 import { UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { User as UserEntity } from "@prisma/client";
+import { JwtService } from "@nestjs/jwt";
 
 import { User } from "@modules/users/decorators/user.decorators";
 import { CreateMessageDto } from "@modules/messages/dto/create-message.dto";
 import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-message.dto";
 import { MovePlayerDto } from "@modules/game-loop/dto/move-player.dto";
 import { JoinQueueDto } from "@modules/game-loop/dto/join-queue.dto";
+import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
+import { ChallengePlayerResponseDto } from "@modules/game-loop/dto/challenge-player-response.dto";
 
 type EventName =
   | "direct-message"
   | "player-join-queue"
   | "player-moved"
-  | "channel-chat-message";
+  | "channel-chat-message"
+  | "challenge-player"
+  | "challenge-player-response";
 
 @WebSocketGateway({ cors: true })
 @UsePipes(
@@ -38,7 +43,10 @@ type EventName =
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(
+    private readonly eventsService: EventsService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   handleConnection(@ConnectedSocket() client: Socket) {
     return this.eventsService.userConnected(client);
@@ -111,5 +119,54 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @User() user: UserEntity,
   ) {
     return this.eventsService.handlePlayerMovement(client, user, data);
+  }
+
+  @SubscribeMessage<EventName>("challenge-player")
+  @UseGuards(WSJwtAuthGuard)
+  challengePlayer(
+    @MessageBody() challengePlayerDto: ChallengePlayerDto,
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+  ) {
+    return this.eventsService.handleChallengePlayer(
+      client,
+      user,
+      challengePlayerDto,
+    );
+  }
+
+  @SubscribeMessage<EventName>("challenge-player-response")
+  @UseGuards(WSJwtAuthGuard)
+  acceptChallenge(
+    @MessageBody() challengePlayerResponseDto: ChallengePlayerResponseDto,
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+  ) {
+    try {
+      if (challengePlayerResponseDto.action == "accept") {
+        const { socketId, username, scoreToWin } = this.jwtService.verify(
+          challengePlayerResponseDto.token,
+          {
+            secret: "some-random-string",
+          },
+        );
+
+        return this.eventsService.acceptChallenge(
+          client,
+          user,
+          socketId,
+          username,
+          scoreToWin,
+          this.server,
+          challengePlayerResponseDto.token,
+        );
+      } else {
+        // return this.eventsService.declineChallenge(
+        //   challengePlayerResponseDto.token,
+        // );
+      }
+    } catch (e) {
+      console.log("catch", e);
+    }
   }
 }

@@ -2,6 +2,7 @@ import ButtonContainer from "./ButtonContainer";
 
 interface ButtonPlayProps {
   backgroundColor: string;
+  onClick?: () => void;
 }
 
 function Play() {
@@ -27,7 +28,10 @@ function Play() {
 
 function ButtonPlay(props: ButtonPlayProps) {
   return (
-    <ButtonContainer backgroundColor={props.backgroundColor}>
+    <ButtonContainer
+      backgroundColor={props.backgroundColor}
+      onClick={props.onClick}
+    >
       <Play />
     </ButtonContainer>
   );

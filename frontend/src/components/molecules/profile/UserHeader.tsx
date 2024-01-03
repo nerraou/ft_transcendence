@@ -116,6 +116,13 @@ function UserHeaderActions(props: UserHeaderActionsProps) {
           hover="hover:bg-light-fg-tertiary"
           round="rounded-sm"
           animated={props.status == "ONLINE"}
+          onClick={() => {
+            if (props.isProfileOwner) {
+              router.push("/game/make");
+            } else {
+              router.push(`/game/make?username=${props.username}`);
+            }
+          }}
         />
         <button
           className="flex"

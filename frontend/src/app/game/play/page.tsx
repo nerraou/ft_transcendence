@@ -37,13 +37,43 @@ const makeGameSchema = yup.object({
       message: "invalid color",
     })
     .required(),
-  scoreToWin: yup.number().required().oneOf([3, 5, 10, 15, 20]),
+  mode: yup.string().oneOf(["challenge", "accepted"]).nullable(),
+  scoreToWin: yup
+    .number()
+    .nullable()
+    .when("mode", {
+      is: "challenge",
+      then(schema) {
+        return schema.required().oneOf([3, 5, 10, 15, 20]);
+      },
+    }),
+  username: yup
+    .string()
+    .nullable()
+    .when("mode", {
+      is: "challenge",
+      then(schema) {
+        return schema.required();
+      },
+    }),
+  token: yup
+    .string()
+    .nullable()
+    .when("mode", {
+      is: "accepted",
+      then(schema) {
+        return schema.required("token is required");
+      },
+    }),
 });
 
 export interface MakeGameOptions {
   paddleColor: string;
   boardColor: string;
-  scoreToWin: number;
+  scoreToWin?: number | null;
+  mode?: string | null;
+  username?: string | null;
+  token?: string | null;
 }
 
 interface GameOverState {
@@ -91,7 +121,6 @@ export default function Page() {
   const [gameOverState, setGameOverState] = useState<
     GameOverState | undefined
   >();
-  // const { value: isGameAborted, setTrue } = useBoolean();
 
   const payload = useDecodeAccessToken({
     accessToken: session?.user.accessToken,
@@ -103,23 +132,41 @@ export default function Page() {
     }
 
     try {
-      const paddleColor = searchParams.get("paddle_color");
-      const boardColor = searchParams.get("board_color");
+      const paddleColor = searchParams.get("paddle_color") ?? "#7E2625";
+      const boardColor = searchParams.get("board_color") ?? "#EF9935";
       const scoreToWin = searchParams.get("score_to_win");
+      const mode = searchParams.get("mode");
+      const username = searchParams.get("username");
+      const token = searchParams.get("token");
 
       const options = makeGameSchema.validateSync({
         paddleColor,
         boardColor,
         scoreToWin,
+        mode,
+        username,
+        token,
       });
 
       setMakeGameOptions(options);
 
       setGameStatus("pending");
 
-      socketClient?.emit("player-join-queue", {
-        scoreToWin: options.scoreToWin,
-      });
+      if (options.mode == "challenge") {
+        socketClient.emit("challenge-player", {
+          username,
+          scoreToWin: options.scoreToWin,
+        });
+      } else if (options.mode == "accepted") {
+        socketClient.emit("challenge-player-response", {
+          token,
+          action: "accept",
+        });
+      } else {
+        socketClient.emit("player-join-queue", {
+          scoreToWin: options.scoreToWin,
+        });
+      }
     } catch {
       raiseBadOptionsError();
     }
