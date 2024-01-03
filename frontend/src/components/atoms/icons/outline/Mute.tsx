@@ -1,17 +1,19 @@
+import clsx from "clsx";
 import { MouseEvent } from "react";
 
 interface MuteProps {
   color: string;
+  hover?: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Mute(props: MuteProps) {
   return (
     <svg
-      width="20"
-      height="21"
+      width="31"
+      height="32"
       viewBox="0 0 20 21"
-      className={props.color}
+      className={clsx(props.color, props.hover)}
       onClick={props.onClick}
       fill="none"
     >

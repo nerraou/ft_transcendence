@@ -1,17 +1,19 @@
+import clsx from "clsx";
 import { MouseEvent } from "react";
 
 interface AdminProps {
   color: string;
+  hover?: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Admin(props: AdminProps) {
   return (
     <svg
-      width="21"
-      height="21"
+      width="32"
+      height="32"
       viewBox="0 0 21 21"
-      className={props.color}
+      className={clsx(props.color, props.hover)}
       onClick={props.onClick}
       fill="none"
     >

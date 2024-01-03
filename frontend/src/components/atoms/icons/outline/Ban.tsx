@@ -1,17 +1,19 @@
+import clsx from "clsx";
 import { MouseEvent } from "react";
 
 interface BanProps {
   color: string;
+  hover?: string;
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 
 function Ban(props: BanProps) {
   return (
     <svg
-      width="20"
-      height="20"
+      width="32"
+      height="32"
       viewBox="0 0 20 20"
-      className={props.color}
+      className={clsx(props.color, props.hover)}
       onClick={props.onClick}
       fill="none"
     >

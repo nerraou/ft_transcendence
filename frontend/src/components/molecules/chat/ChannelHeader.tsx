@@ -54,15 +54,17 @@ function ManageMemebers(props: ManageMemebersProps) {
           return;
         }}
       />
-      {props.isMember && (
-        <ActionsMember members={data.members} token={props.token} />
-      )}
-      {props.isOwner && (
-        <ActionsOwner members={data.members} token={props.token} />
-      )}
-      {props.isAdmin && (
-        <ActionsAdmin members={data.members} token={props.token} />
-      )}
+      <div className="px-2 overflow-scroll h-96 scrollbar-thin scrollbar-thumb-dark-bg-primary">
+        {props.isMember && (
+          <ActionsMember members={data.members} token={props.token} />
+        )}
+        {props.isOwner && (
+          <ActionsOwner members={data.members} token={props.token} />
+        )}
+        {props.isAdmin && (
+          <ActionsAdmin members={data.members} token={props.token} />
+        )}
+      </div>
     </div>
   );
 }
