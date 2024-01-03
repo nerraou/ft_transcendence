@@ -39,7 +39,10 @@ const History = ({ token, username }: HistoryProps) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetQuery = useCallback(
-    debounce((q) => setFilters({ ...filters, query: q }), 1000),
+    debounce(
+      (q) => setFilters((oldFilters) => ({ ...oldFilters, query: q })),
+      1000,
+    ),
     [filters.query],
   );
 
