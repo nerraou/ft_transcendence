@@ -30,7 +30,7 @@ function Slider(props: SLiderProps) {
           borderColor: "#7E2625",
           height: 20,
           width: 20,
-          marginLeft: -10,
+          marginLeft: -1,
           marginTop: -5,
           backgroundColor: "#7E2625",
         },
