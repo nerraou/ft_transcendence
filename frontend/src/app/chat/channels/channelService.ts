@@ -1,4 +1,4 @@
-import { ChannelType } from "@components/atoms/chat/ChannelForm";
+import { Channel, ChannelType } from "@components/atoms/chat/ChannelForm";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import baseQuery, { RequestError } from "@utils/baseQuery";
 import { useForm } from "react-hook-form";
@@ -6,15 +6,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect } from "react";
 
-type Channel = {
-  image?: yup.Maybe<File | undefined>;
-  id?: number | undefined;
-  password?: string | undefined;
-  type: NonNullable<ChannelType | undefined>;
-  name: string;
-  description: string;
-  imagePath?: string;
-};
+// type Channel = {
+//   image?: File | undefined;
+//   id?: number | undefined;
+//   password?: string | undefined;
+//   type: NonNullable<ChannelType | undefined>;
+//   name: string;
+//   description: string;
+//   imagePath?: string;
+// };
 
 async function createChannel(channel: Channel, token: string | unknown) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels";
@@ -48,7 +48,12 @@ export const channelSchema = yup.object().shape({
   id: yup.number(),
   image: yup
     .mixed<File>()
-    .notRequired()
+    .when("id", ([id], schema) => {
+      if (id) {
+        return schema.notRequired();
+      }
+      return schema.required("Image is required");
+    })
     .test("fileSize", "The file is too large", (value) => {
       if (!value) {
         return true;
@@ -145,6 +150,11 @@ export function useChannelForm(
   });
 
   const channelType = watch("type");
+  const image = watch("image");
+
+  useEffect(() => {
+    trigger("image");
+  }, [image, trigger]);
 
   useEffect(() => {
     trigger("password");

@@ -25,7 +25,7 @@ function LabelImage(props: LableImageProps) {
           originalImage={props.originalImage}
           setImage={props.setImage}
         />
-        {props.errors && props.image ? (
+        {props.errors ? (
           <ErrorMessage
             errors={props.errors}
             name={props.name as any}
