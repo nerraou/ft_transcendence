@@ -56,7 +56,7 @@ function Profile({ token, username }: ProfileProps) {
               image={imageUrl + user.avatarPath}
               id={user.id}
               isProfileOwner={user.isProfileOwner}
-              isFriend
+              isFriend={user.isFriend}
               level={user.ranking}
               userStatus={user.status}
             />
@@ -105,7 +105,7 @@ function Profile({ token, username }: ProfileProps) {
               }}
             />
             <ButtonHistory
-              backgroundColor=" bg-light-bg-secondary"
+              backgroundColor="bg-light-bg-secondary"
               onClick={() => router.push(`/history/${user.username}`)}
             />
           </div>

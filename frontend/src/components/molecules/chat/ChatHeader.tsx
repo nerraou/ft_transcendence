@@ -4,12 +4,12 @@ import MenuDots from "@components/atoms/icons/outline/MenuDots";
 
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { useBlockUser } from "@app/profile/[username]/userProfile";
 import UserPlus from "@components/atoms/icons/outline/UserPlus";
 import UserMinus from "@components/atoms/icons/outline/UserMinus";
 import UserBlock from "@components/atoms/icons/outline/UserBlock";
 import useAddFriendMutation from "@services/useAddFriendMutation";
 import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
+import { useBlockUserMutation } from "@services/useBlockUserMutation";
 interface ChatHeaderProps {
   id: number;
   status: "ONLINE" | "OFFLINE" | "IN_GAME";
@@ -29,9 +29,9 @@ interface MenuDotsPopoverProps {
 }
 
 function MenuDotsPopover(props: MenuDotsPopoverProps) {
-  const blockUserMutation = useBlockUser(props.token, props.id);
-  const addUserMutation = useAddFriendMutation(props.token, props.id);
-  const removeUserMutation = useRemoveFriendMutation(props.token, props.id);
+  const blockUserMutation = useBlockUserMutation();
+  const addUserMutation = useAddFriendMutation();
+  const removeUserMutation = useRemoveFriendMutation();
 
   return (
     <Popover className="relative">
