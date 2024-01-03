@@ -42,10 +42,8 @@ const useGameHistory = (token: string | unknown, username: string) => {
       params.append("sort_field", "duration");
       params.append("sort_order", filters.timeSort);
     }
-    if (filters.dateInterval?.[0]) {
+    if (filters.dateInterval?.[0] && filters.dateInterval?.[1]) {
       params.append("start_date", filters.dateInterval[0].toString());
-    }
-    if (filters.dateInterval?.[1]) {
       params.append("end_date", filters.dateInterval[1].toString());
     }
     params.append("page", filters.page.toString());
