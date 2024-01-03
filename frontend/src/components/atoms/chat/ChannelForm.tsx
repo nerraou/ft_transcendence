@@ -9,6 +9,7 @@ import LabelSelectButtonGroup from "@components/molecules/chat/LabelSelectButton
 import LabelInputTextArea from "@components/molecules/chat/LabelInputTextArea";
 import Button from "@components/atoms/Button";
 import { useChannelForm } from "@app/chat/channels/channelService";
+import Modal from "../Modal";
 
 export enum ChannelType {
   PUBLIC = "PUBLIC",
@@ -49,14 +50,37 @@ function ChannelForm({
     }
   }
 
-  const { channel, setChannel, formState, handleSubmit } = useChannelForm(
-    defaultChannel,
-    formType,
-    token,
-  );
+  const {
+    channel,
+    setChannel,
+    formState,
+    handleSubmit,
+    isLoading,
+    isModalOpen,
+    setIsModalOpen,
+  } = useChannelForm(defaultChannel, formType, token);
 
   return (
     <div className="flex flex-col justify-center py-16  px-8 sm:px-2 ">
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          title="Success"
+          description={
+            formType == "create"
+              ? "Channel Created Successfully"
+              : "Channel Updated Successfully"
+          }
+          action={
+            <Button
+              text="Ok"
+              onClick={() => {
+                setIsModalOpen(false);
+              }}
+            />
+          }
+        />
+      )}
       <div className="bg-light-bg-secondary border-4 rounded-xl p-12 sm:p-2">
         <div className="bg-light-bg-primary dark:bg-light-bg-tertiary border-4 rounded-xl p-10 xl:px-5 lg:px-5 sm:px-2">
           <h1 className="text-light-fg-primary text-xxl  sm:text-xl md:text-xl">
@@ -126,7 +150,7 @@ function ChannelForm({
                 name="description"
               />
               <div className="flex justify-end">
-                <Button text="Save" onClick={() => handleSubmit()} />
+                <Button text="Save" loading={isLoading} />
               </div>
             </div>
           </form>
