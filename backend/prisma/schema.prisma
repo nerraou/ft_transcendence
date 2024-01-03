@@ -41,6 +41,7 @@ model User {
   blocking         Block[]         @relation("blocking")
   blocked          Block[]         @relation("blocked")
   achievements     Achievement[]
+  notifications    Notification[]
 
   @@map("users")
 }
@@ -205,6 +206,19 @@ model Achievement {
 
   @@unique([userId, name])
   @@map("achievements")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement()) @map("id")
+  userId    Int      @map("user_id")
+  metadata  Json?    @map("metadata") @db.JsonB
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
 }
 
 enum ContactStatus {

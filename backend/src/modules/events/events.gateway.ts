@@ -63,7 +63,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     this.eventsService.userDisonnected(client).catch((e) => {
-      console.error("userDisonnected: failed to update disconnect data", e);
+      console.error("userDisonnected:", e);
     });
 
     // TODO: broadcast online status using client.broadcast.emit()
