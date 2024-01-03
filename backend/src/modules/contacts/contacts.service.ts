@@ -1,18 +1,36 @@
 import { Injectable } from "@nestjs/common";
+import { Contact, Prisma, User, User as UserEntity } from "@prisma/client";
 
 import { PrismaService } from "@common/modules/prisma/prisma.service";
-import { Contact, Prisma, User, User as UserEntity } from "@prisma/client";
+import { NotificationsService } from "@modules/notifications/notifications.service";
 
 @Injectable()
 export class ContactsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   createContact(connectedUserId: number, followingId: number) {
-    return this.prisma.contact.create({
-      data: {
-        followerId: connectedUserId,
+    return this.prisma.$transaction(async (tx) => {
+      const contact = await tx.contact.create({
+        data: {
+          followerId: connectedUserId,
+          followingId,
+        },
+      });
+
+      await this.notificationsService.createContactNotification(
         followingId,
-      },
+        tx,
+        {
+          type: "contact",
+          id: contact.id,
+          status: "PENDING",
+        },
+      );
+
+      return contact;
     });
   }
 
@@ -36,13 +54,23 @@ export class ContactsService {
   }
 
   acceptContactRequest(id: number) {
-    return this.prisma.contact.update({
-      where: {
-        id,
-      },
-      data: {
+    return this.prisma.$transaction(async (tx) => {
+      const contact = await this.prisma.contact.update({
+        where: {
+          id,
+        },
+        data: {
+          status: "ACCEPTED",
+        },
+      });
+
+      await this.notificationsService.createContactNotification(id, tx, {
+        type: "contact",
+        id: contact.id,
         status: "ACCEPTED",
-      },
+      });
+
+      return contact;
     });
   }
 

@@ -26,6 +26,7 @@ import {
 import { GamesService } from "@modules/games/games.service";
 import { JoinQueueDto } from "@modules/game-loop/dto/join-queue.dto";
 import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto";
+import { NotificationsService } from "@modules/notifications/notifications.service";
 
 import claimAchievements from "./utils/claimAchievements";
 
@@ -46,6 +47,7 @@ export class EventsService {
     private readonly channelsService: ChannelsService,
     private readonly gamesService: GamesService,
     private readonly achievementsService: AchievementsService,
+    private readonly notificationsSerivces: NotificationsService,
   ) {}
 
   async userConnected(client: Socket) {
@@ -94,8 +96,23 @@ export class EventsService {
       throw new WsException("Unauthorized");
     }
 
-    await this.redisService.del(`user-${payload.sub}`);
-    await this.usersService.updateStatusById(payload.sub, "OFFLINE");
+    const redisKey = `user-${payload.sub}`;
+
+    const socketsIdsString = await this.redisService.get(redisKey);
+
+    const userSocketsIds: string[] = socketsIdsString
+      ? JSON.parse(socketsIdsString)
+      : [];
+
+    if (userSocketsIds.length == 0) {
+      this.redisService.del(redisKey).catch((e) => {
+        console.error("can't remove key from redis", e);
+      });
+
+      this.usersService.updateStatusById(payload.sub, "OFFLINE").catch((e) => {
+        console.error("can't update user status", e);
+      });
+    }
   }
 
   async handleGameAbandoned(client: Socket) {
@@ -132,6 +149,13 @@ export class EventsService {
     );
 
     const socketsIdsString = await this.redisService.get(`user-${receiver.id}`);
+
+    if (!socketsIdsString) {
+      await this.notificationsSerivces.createMessageNotification(receiver.id, {
+        type: "message",
+        sender: user.username,
+      });
+    }
 
     if (socketsIdsString) {
       const socketIds: string[] = JSON.parse(socketsIdsString);
