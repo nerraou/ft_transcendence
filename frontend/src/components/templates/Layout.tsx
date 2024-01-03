@@ -2,10 +2,12 @@
 
 import clsx from "clsx";
 import { ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
 
 import Headphones from "@atoms/decoration/Headphones";
 import ThemeSwitch from "@components/atoms/ThemeSwitch";
 import useTheme, { Theme } from "@hooks/useTheme";
+import useOnChallengeRecieved from "@hooks/useOnChallengeRecieved";
 
 interface LayoutProps {
   children: ReactNode | ReactNode[];
@@ -30,6 +32,8 @@ function DummyNavBar() {
 }
 
 export default function Layout(props: LayoutProps) {
+  useOnChallengeRecieved();
+
   return (
     <main className="relative flex min-h-screen p-4 bg-light-bg-primary dark:bg-dark-bg-primary">
       <section
@@ -50,6 +54,7 @@ export default function Layout(props: LayoutProps) {
           {props.children}
         </section>
       </section>
+      <Toaster position="top-right" />
     </main>
   );
 }
