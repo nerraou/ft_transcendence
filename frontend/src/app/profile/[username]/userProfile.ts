@@ -13,6 +13,7 @@ interface User {
   createdAt: number;
   ranking: number;
   isProfileOwner: boolean;
+  isFriend: boolean;
   rating: number;
   gamesStats: {
     wins: number;

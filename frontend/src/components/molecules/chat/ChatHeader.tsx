@@ -30,8 +30,8 @@ interface MenuDotsPopoverProps {
 
 function MenuDotsPopover(props: MenuDotsPopoverProps) {
   const blockUserMutation = useBlockUser(props.token, props.id);
-  const addUserMutation = useAddFriendMutation(props.token, props.id);
-  const removeUserMutation = useRemoveFriendMutation(props.token, props.id);
+  const addUserMutation = useAddFriendMutation();
+  const removeUserMutation = useRemoveFriendMutation();
 
   return (
     <Popover className="relative">

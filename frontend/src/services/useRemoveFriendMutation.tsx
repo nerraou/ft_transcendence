@@ -7,24 +7,22 @@ interface RemoveFriend {
   token: string | unknown;
 }
 
-async function removeFriend(userId: number, token: string | unknown) {
+async function removeFriend(user: RemoveFriend) {
   const api =
-    process.env.NEXT_PUBLIC_API_BASE_URL + `/users/${userId}/unfriend`;
+    process.env.NEXT_PUBLIC_API_BASE_URL + `/users/${user.userId}/unfriend`;
 
   return await baseQuery(api, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${user.token}`,
       "content-type": "application/json",
     },
   });
 }
 
-function useRemoveFriendMutation(token: string | unknown, userId: number) {
+function useRemoveFriendMutation() {
   return useMutation<Response, RequestError, RemoveFriend>({
-    mutationFn: () => {
-      return removeFriend(userId, token);
-    },
+    mutationFn: removeFriend,
   });
 }
 

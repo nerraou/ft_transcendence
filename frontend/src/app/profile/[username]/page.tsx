@@ -56,7 +56,7 @@ function Profile({ token, username }: ProfileProps) {
               image={imageUrl + user.avatarPath}
               id={user.id}
               isProfileOwner={user.isProfileOwner}
-              isFriend
+              isFriend={user.isFriend}
               level={user.ranking}
               userStatus={user.status}
             />
