@@ -4,15 +4,11 @@ import {
   ForbiddenException,
   Get,
   Param,
-  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
-  PayloadTooLargeException,
   Post,
   Query,
   UnauthorizedException,
-  UnprocessableEntityException,
-  UnsupportedMediaTypeException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -27,8 +23,7 @@ import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User } from "@modules/users/decorators/user.decorators";
 import { HashService } from "@common/services/hash.service";
 import { AppEnv } from "@config/env-configuration";
-import { ONE_MEGA } from "@common/constants";
-import { ImageValidator } from "@common/ImageValidator";
+import { buildParseFilePipe } from "@common/ImageValidator";
 
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { JoinChannelDto } from "./dto/join-channel.dto";
@@ -55,25 +50,6 @@ import { ChangeMemberRoleDto } from "./dto/change-member-role.dto";
 import { GetPublicChannelsDto } from "./dto/get-public-channels.dto";
 import { LeaveChannelDto } from "./dto/leave-channel.dto";
 
-const ImageValidatorPipe = new ParseFilePipeBuilder()
-  .addMaxSizeValidator({
-    maxSize: ONE_MEGA,
-    message: "size",
-  })
-  .addValidator(new ImageValidator())
-  .build({
-    fileIsRequired: true,
-    exceptionFactory(error) {
-      if (error == "size") {
-        return new PayloadTooLargeException();
-      } else if (error == "type") {
-        return new UnsupportedMediaTypeException();
-      } else if (error == "File is required") {
-        return new UnprocessableEntityException();
-      }
-    },
-  });
-
 @Controller("channels")
 export class ChannelsController {
   constructor(
@@ -89,7 +65,8 @@ export class ChannelsController {
   async createChannel(
     @User() user: UserEntity,
     @Body() createChannelDto: CreateChannelDto,
-    @UploadedFile(ImageValidatorPipe) file: Express.Multer.File,
+    @UploadedFile(buildParseFilePipe({ required: true }))
+    file: Express.Multer.File,
   ) {
     const filename = uuid4() + ".png";
     const imagePath = `${this.configService.get("imagesPath")}/${filename}`;
@@ -114,7 +91,7 @@ export class ChannelsController {
   async updateChannel(
     @User() user: UserEntity,
     @Body() updateChannelDto: UpdateChannelDto,
-    @UploadedFile(ImageValidatorPipe)
+    @UploadedFile(buildParseFilePipe({ required: false }))
     file: Express.Multer.File,
   ) {
     let filename: string | undefined;

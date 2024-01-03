@@ -1,6 +1,13 @@
-import { FileValidator } from "@nestjs/common";
+import {
+  FileValidator,
+  ParseFilePipeBuilder,
+  PayloadTooLargeException,
+  UnprocessableEntityException,
+  UnsupportedMediaTypeException,
+} from "@nestjs/common";
+import { ONE_MEGA } from "./constants";
 
-function isPng(buffer) {
+function isPng(buffer: Buffer) {
   if (!buffer || buffer.length < 8) {
     return false;
   }
@@ -17,7 +24,7 @@ function isPng(buffer) {
   );
 }
 
-function isJpg(buffer) {
+function isJpg(buffer: Buffer) {
   if (!buffer || buffer.length < 3) {
     return false;
   }
@@ -41,4 +48,33 @@ export class ImageValidator extends FileValidator {
   buildErrorMessage(): string {
     return "type";
   }
+}
+
+interface BuildParseFilePipeOptions {
+  required: boolean;
+}
+
+export function buildParseFilePipe(options: BuildParseFilePipeOptions) {
+  return new ParseFilePipeBuilder()
+    .addMaxSizeValidator({
+      maxSize: ONE_MEGA,
+      message: "size",
+    })
+    .addValidator(new ImageValidator())
+    .build({
+      fileIsRequired: options.required,
+      exceptionFactory(error) {
+        if (error == "size") {
+          return new PayloadTooLargeException();
+        } else if (error == "type") {
+          return new UnsupportedMediaTypeException();
+        } else if (error == "File is required") {
+          return new UnprocessableEntityException({
+            error: "Unprocessable Entity",
+            message: ["file is required"],
+            statusCode: 422,
+          });
+        }
+      },
+    });
 }
