@@ -23,6 +23,7 @@ import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto"
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
 import { ChallengePlayerResponseDto } from "@modules/game-loop/dto/challenge-player-response.dto";
+import { CancelChallengePlayerDto } from "@modules/game-loop/dto/cancel-challenge-player.dto";
 
 type EventName =
   | "direct-message"
@@ -30,7 +31,9 @@ type EventName =
   | "player-moved"
   | "channel-chat-message"
   | "challenge-player"
-  | "challenge-player-response";
+  | "challenge-player-response"
+  | "challenge-player-cancel"
+  | "leave-queue";
 
 @WebSocketGateway({ cors: true })
 @UsePipes(
@@ -161,12 +164,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           challengePlayerResponseDto.token,
         );
       } else {
-        // return this.eventsService.declineChallenge(
-        //   challengePlayerResponseDto.token,
-        // );
+        return this.eventsService.cancelChallenge(
+          challengePlayerResponseDto.token,
+        );
       }
-    } catch (e) {
-      console.log("catch", e);
-    }
+    } catch {}
+  }
+
+  @SubscribeMessage<EventName>("challenge-player-cancel")
+  @UseGuards(WSJwtAuthGuard)
+  cancelChallenge(
+    @MessageBody() cancelChallengePlayerDto: CancelChallengePlayerDto,
+  ) {
+    try {
+      this.jwtService.verify(cancelChallengePlayerDto.token, {
+        secret: "some-random-string",
+      });
+
+      this.eventsService.cancelChallenge(cancelChallengePlayerDto.token);
+    } catch {}
+  }
+
+  @SubscribeMessage<EventName>("leave-queue")
+  @UseGuards(WSJwtAuthGuard)
+  leaveQueue(@ConnectedSocket() client: Socket) {
+    return this.eventsService.leaveQueue(client);
   }
 }

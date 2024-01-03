@@ -86,6 +86,10 @@ export class EventsService {
   async userDisonnected(client: Socket) {
     const payload = this.verifyJwt(client.request);
 
+    if ("challengeToken" in client.data) {
+      this.cancelChallenge(client.data.challengeToken);
+    }
+
     if (!payload) {
       throw new WsException("Unauthorized");
     }
@@ -350,6 +354,10 @@ export class EventsService {
     } finally {
       this.challengesSetMutex.release();
     }
+
+    client.data.challengeToken = token;
+
+    return { token };
   }
 
   async acceptChallenge(
@@ -418,6 +426,17 @@ export class EventsService {
     opponentSocketClient.join(game.getSocketRoomName());
 
     this.registerGameEvents(game, player, opponent, serverSocket);
+  }
+
+  async cancelChallenge(token: string) {
+    try {
+      await this.challengesSetMutex.waitForUnlock();
+      await this.challengesSetMutex.acquire();
+
+      this.challengesSet.delete(token);
+    } finally {
+      this.challengesSetMutex.release();
+    }
   }
 
   registerGameEvents(
@@ -540,6 +559,25 @@ export class EventsService {
       ...playerAchievements,
       ...opponentAchievements,
     ]);
+  }
+
+  async leaveQueue(client: Socket) {
+    try {
+      await this.playersQueueMutex.waitForUnlock();
+      await this.playersQueueMutex.acquire();
+
+      const queue = this.playersQueue.get(client.data.scoreToWin);
+
+      if (queue) {
+        const index = queue.findIndex((player) => player.socketId == client.id);
+
+        if (index != -1) {
+          queue.splice(index, 1);
+        }
+      }
+    } finally {
+      this.playersQueueMutex.release();
+    }
   }
 
   private verifyJwt(request: any): JwtPayload | undefined {

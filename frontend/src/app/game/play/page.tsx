@@ -100,6 +100,8 @@ export default function Page() {
   const { data: session, status: sessionStatus } = useSession();
   const socketClient = useSocket();
 
+  const [challengeToken, setChallengeToken] = useState<string>();
+
   useWindowEvent("keydown", (e) => {
     const cancelKeys = ["ArrowDown", "ArrowUp"];
 
@@ -153,10 +155,16 @@ export default function Page() {
       setGameStatus("pending");
 
       if (options.mode == "challenge") {
-        socketClient.emit("challenge-player", {
-          username,
-          scoreToWin: options.scoreToWin,
-        });
+        socketClient.emit(
+          "challenge-player",
+          {
+            username,
+            scoreToWin: options.scoreToWin,
+          },
+          (data: any) => {
+            setChallengeToken(data.token);
+          },
+        );
       } else if (options.mode == "accepted") {
         socketClient.emit("challenge-player-response", {
           token,
@@ -263,7 +271,14 @@ export default function Page() {
           isOpen
           message="Waiting for opponent"
           onCancel={() => {
-            //cancel game
+            if (challengeToken) {
+              socketClient?.emit("challenge-player-cancel", {
+                token: challengeToken,
+              });
+            } else {
+              socketClient?.emit("leave-queue");
+            }
+            router.back();
           }}
         />
       </Layout>

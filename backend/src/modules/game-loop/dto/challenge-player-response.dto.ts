@@ -1,7 +1,6 @@
-import { IsEnum, IsJWT, IsString } from "class-validator";
+import { IsEnum, IsJWT } from "class-validator";
 
 export class ChallengePlayerResponseDto {
-  @IsString()
   @IsJWT()
   token: string;
 

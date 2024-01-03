@@ -77,18 +77,20 @@ export class AuthController {
   @Get("/google/authorize")
   @UseGuards(GoogleAuthGuard)
   googleAuthorize(@GoogleAuthResponse() response: GoogleAuthResponseType) {
-    this.mailService
-      .sendMail({
-        to: response.user.email,
-        subject: "Welcome to PongBoy",
-        template: "oauth-welcome",
-        context: {
-          firstName: response.user.firstName,
-          lastName: response.user.lastName,
-          provider: "Google",
-        },
-      })
-      .catch((e) => console.error("sendMail error:", e));
+    if (response.isNew) {
+      this.mailService
+        .sendMail({
+          to: response.user.email,
+          subject: "Welcome to PongBoy",
+          template: "oauth-welcome",
+          context: {
+            firstName: response.user.firstName,
+            lastName: response.user.lastName,
+            provider: "Google",
+          },
+        })
+        .catch((e) => console.error("sendMail error:", e));
+    }
 
     return {
       accessToken: response.accessToken,
@@ -98,18 +100,20 @@ export class AuthController {
   @Get("/42/authorize")
   @UseGuards(FortyTwoAuthGuard)
   fortTwoAuthorize(@FortyTwoAuthResponse() response: FortyTwoAuthResponseType) {
-    this.mailService
-      .sendMail({
-        to: response.user.email,
-        subject: "Welcome to PongBoy",
-        template: "oauth-welcome",
-        context: {
-          firstName: response.user.firstName,
-          lastName: response.user.lastName,
-          provider: "42",
-        },
-      })
-      .catch((e) => console.error("sendMail error:", e));
+    if (response.isNew) {
+      this.mailService
+        .sendMail({
+          to: response.user.email,
+          subject: "Welcome to PongBoy",
+          template: "oauth-welcome",
+          context: {
+            firstName: response.user.firstName,
+            lastName: response.user.lastName,
+            provider: "42",
+          },
+        })
+        .catch((e) => console.error("sendMail error:", e));
+    }
 
     return {
       accessToken: response.accessToken,
