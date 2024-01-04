@@ -6,8 +6,8 @@ import { WsException } from "@nestjs/websockets";
 import { Socket } from "socket.io";
 import { User } from "@prisma/client";
 
-import { AppEnv } from "@config/env-configuration";
-import { JwtPayload } from "@modules/auth/strategies/jwt.strategy";
+import { AppEnv, JWTEnv } from "@config/env-configuration";
+import { AuthJWTPayload } from "@modules/auth/strategies/jwt.strategy";
 import { UsersService } from "@modules/users/users.service";
 
 @Injectable()
@@ -30,8 +30,8 @@ export class WSJwtAuthGuard implements CanActivate {
         socketClient.request as any,
       );
 
-      const payload = this.jwtService.verify<JwtPayload>(jwtToken, {
-        secret: this.configService.get("jwtSecret"),
+      const payload = this.jwtService.verify<AuthJWTPayload>(jwtToken, {
+        secret: this.configService.get<JWTEnv>("jwt").authSecret,
       });
 
       socketClient.user = await this.usersService.findOneById(payload.sub);

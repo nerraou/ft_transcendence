@@ -1,5 +1,6 @@
 interface StatsBarProps {
-  matches: number;
+  winsPercentage: number;
+  lossesPercentage: number;
   losses: number;
   wins: number;
 }
@@ -38,7 +39,7 @@ function Percentage(props: PercentageProps) {
 
 function Bar(props: PercentageProps) {
   return (
-    <div className="flex border-2 box-border rounded-lg border-light-fg-primary w-full h-8 overflow-hidden">
+    <div className="flex border-2 box-border rounded-lg border-light-fg-primary w-full h-8 overflow-hidden bg-light-fg-tertiary">
       <div
         className="bg-light-bg-tertiary rounded-l-lg"
         style={{
@@ -56,13 +57,13 @@ function Bar(props: PercentageProps) {
 }
 
 function StatsBar(props: StatsBarProps) {
-  const losses = (100 * props.losses) / props.matches;
-  const wins = (100 * props.wins) / props.matches;
-
   return (
     <div className="w-full">
-      <Percentage losses={Math.trunc(losses)} wins={Math.trunc(wins)} />
-      <Bar losses={losses} wins={wins} />
+      <Percentage
+        losses={Math.trunc(props.lossesPercentage)}
+        wins={Math.trunc(props.winsPercentage)}
+      />
+      <Bar losses={props.lossesPercentage} wins={props.winsPercentage} />
       <Result losses={props.losses} wins={props.wins} />
     </div>
   );
