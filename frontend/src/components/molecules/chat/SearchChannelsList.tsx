@@ -38,7 +38,7 @@ function SearchChannelsList(props: SearchChannelsListProps) {
   const [searchChannel, setSearchChannel] = useState("");
 
   const { data } = useSuspenseQuery<ChannelsListProps>({
-    queryKey: ["channels"],
+    queryKey: ["chatChannels"],
     queryFn: () => {
       return getChannels(props.token);
     },

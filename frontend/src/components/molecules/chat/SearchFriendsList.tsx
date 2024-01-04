@@ -22,11 +22,7 @@ interface UsersProps {
 }
 
 async function getFriends(token: string | unknown) {
-  const limit = 1000;
-  const page = 1;
-  const url =
-    process.env.NEXT_PUBLIC_API_BASE_URL +
-    `/contacts?limit=${limit}&page=${page}`;
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/contacts`;
 
   const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -40,7 +36,7 @@ function SearchFriendsList(props: FriendsListProps) {
   const [searchFriend, setSearchFriend] = useState("");
 
   const { data } = useSuspenseQuery<UsersProps>({
-    queryKey: ["friends"],
+    queryKey: ["chatFriends"],
     queryFn: () => {
       return getFriends(props.token);
     },

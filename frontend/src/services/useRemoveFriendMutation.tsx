@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import baseQuery, { RequestError } from "@utils/baseQuery";
 
@@ -21,8 +21,14 @@ async function removeFriend(user: RemoveFriend) {
 }
 
 function useRemoveFriendMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation<Response, RequestError, RemoveFriend>({
     mutationFn: removeFriend,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
   });
 }
 

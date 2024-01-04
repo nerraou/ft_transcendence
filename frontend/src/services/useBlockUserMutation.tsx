@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import baseQuery, { RequestError } from "@utils/baseQuery";
 
 interface BlockUser {
@@ -18,7 +18,13 @@ async function blockUser(user: BlockUser) {
 }
 
 export function useBlockUserMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation<Response, RequestError, BlockUser>({
     mutationFn: blockUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
   });
 }

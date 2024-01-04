@@ -93,6 +93,8 @@ function FriendsList(props: FriendsListProps) {
                 return (
                   <FriendCard
                     key={value.id}
+                    id={value.id}
+                    token={props.token}
                     fullname={value.firstName + " " + value.lastName}
                     image={imageUrl + value.avatarPath}
                     username={value.username}
