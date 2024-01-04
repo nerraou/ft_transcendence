@@ -4,17 +4,7 @@ import baseQuery, { RequestError } from "@utils/baseQuery";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useEffect } from "react";
-
-// type Channel = {
-//   image?: File | undefined;
-//   id?: number | undefined;
-//   password?: string | undefined;
-//   type: NonNullable<ChannelType | undefined>;
-//   name: string;
-//   description: string;
-//   imagePath?: string;
-// };
+import { useEffect, useState } from "react";
 
 async function createChannel(channel: Channel, token: string | unknown) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels";
@@ -136,6 +126,7 @@ export function useChannelForm(
   formType: "create" | "update",
   token: string | unknown,
 ) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     register,
     handleSubmit,
@@ -144,6 +135,7 @@ export function useChannelForm(
     getValues,
     trigger,
     watch,
+    reset,
   } = useForm<Channel>({
     resolver: yupResolver(channelSchema),
     defaultValues,
@@ -165,15 +157,29 @@ export function useChannelForm(
 
   async function onSubmit(channel: Channel) {
     if (formType === "create") {
-      await createChannelMutation.mutateAsync({ channel });
+      try {
+        await createChannelMutation.mutateAsync({ channel });
+        reset();
+        setIsModalOpen(true);
+      } catch (e) {
+        throw e;
+      }
     } else {
-      await editChannelMutation.mutateAsync({
-        channel,
-      });
+      try {
+        await editChannelMutation.mutateAsync({
+          channel,
+        });
+        setIsModalOpen(true);
+      } catch (e) {
+        throw e;
+      }
     }
   }
 
   return {
+    isLoading: createChannelMutation.isPending || editChannelMutation.isPending,
+    isModalOpen,
+    setIsModalOpen,
     register,
     handleSubmit: handleSubmit(onSubmit),
     formState,
