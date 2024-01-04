@@ -9,7 +9,7 @@ import {
 import { ErrorBoundary } from "react-error-boundary";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
-import { ChangeEvent, Suspense, useState } from "react";
+import { ChangeEvent, Suspense, useEffect, useState } from "react";
 import LoadingPage from "@app/loading";
 import { ChannelInformation } from "@app/chat/[[...username]]/page";
 
@@ -36,6 +36,7 @@ async function getChannels(token: string | unknown) {
 
 function SearchChannelsList(props: SearchChannelsListProps) {
   const [searchChannel, setSearchChannel] = useState("");
+  const [filtredChannels, setFiltredChannels] = useState<ChannelProps[]>([]);
 
   const { data } = useSuspenseQuery<ChannelsListProps>({
     queryKey: ["chatChannels"],
@@ -44,9 +45,11 @@ function SearchChannelsList(props: SearchChannelsListProps) {
     },
   });
 
-  const [filtredChannels, setFiltredChannels] = useState<ChannelProps[]>(
-    data.channels,
-  );
+  useEffect(() => {
+    if (data.channels) {
+      setFiltredChannels(data.channels);
+    }
+  }, [data.channels]);
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const searchTerm = e.target.value;
