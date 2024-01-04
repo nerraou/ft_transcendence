@@ -26,7 +26,7 @@ import { FortyTwoStrategy } from "./strategies/forty-two.strategy";
   ],
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_AUTH_SECRET,
     }),
     UsersModule,
     PassportModule,

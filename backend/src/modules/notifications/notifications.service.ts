@@ -17,6 +17,10 @@ type MessageNotificationMetadata = Prisma.JsonObject & {
   sender: string;
 };
 
+type InvitationNotificationMetadata = Prisma.JsonObject & {
+  type: "channel-invitation";
+};
+
 @Injectable()
 export class NotificationsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -35,6 +39,18 @@ export class NotificationsService {
   }
 
   createMessageNotification(id: number, metadata: MessageNotificationMetadata) {
+    return this.prisma.notification.create({
+      data: {
+        userId: id,
+        metadata: metadata,
+      },
+    });
+  }
+
+  createInvitationNotification(
+    id: number,
+    metadata: InvitationNotificationMetadata,
+  ) {
     return this.prisma.notification.create({
       data: {
         userId: id,

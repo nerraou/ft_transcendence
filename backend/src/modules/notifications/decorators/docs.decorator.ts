@@ -75,11 +75,9 @@ export function MarkNotificationsAsReadyApiDocumentation() {
     ApiTags("Notifications"),
     ApiBearerAuth(),
     ApiBody({
-      type: "object",
       schema: {
         properties: {
           ids: {
-            type: "array",
             example: [1, 2],
           },
         },
