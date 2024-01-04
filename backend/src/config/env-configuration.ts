@@ -6,6 +6,12 @@ export interface RedisEnv {
   port: number;
 }
 
+export interface JWTEnv {
+  authSecret: string;
+  gameChallengeSecret: string;
+  invitationSecret: string;
+}
+
 export interface GoogleEnv {
   clientId: string;
   clientSecret: string;
@@ -22,7 +28,7 @@ export interface AppEnv {
   appHostName: string;
   assetsPath: string;
   imagesPath: string;
-  jwtSecret: string;
+  jwt: JWTEnv;
   redis: RedisEnv;
   google: GoogleEnv;
   fortyTwo: FortyTwoEnv;
@@ -37,7 +43,9 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     "SMTP_PORT",
     "SMTP_USER",
     "SMTP_PASSWORD",
-    "JWT_SECRET",
+    "JWT_AUTH_SECRET",
+    "JWT_GAME_CHALLENGE_SECRET",
+    "JWT_INVITATION_SECRET",
     "REDIS_HOST",
     "REDIS_PORT",
     "GOOGLE_CLIENT_ID",
@@ -65,7 +73,11 @@ export default async function envConfigFactory(): Promise<AppEnv> {
     appHostName: process.env.APP_HOSTNAME,
     assetsPath,
     imagesPath,
-    jwtSecret: process.env.JWT_SECRET,
+    jwt: {
+      authSecret: process.env.JWT_AUTH_SECRET,
+      gameChallengeSecret: process.env.JWT_GAME_CHALLENGE_SECRET,
+      invitationSecret: process.env.JWT_INVITATION_SECRET,
+    },
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,

@@ -256,6 +256,23 @@ export class UsersService {
     });
   }
 
+  unfriendUser(userId: number, userToUnfriend: number) {
+    return this.prisma.contact.deleteMany({
+      where: {
+        OR: [
+          {
+            followerId: userId,
+            followingId: userToUnfriend,
+          },
+          {
+            followerId: userToUnfriend,
+            followingId: userId,
+          },
+        ],
+      },
+    });
+  }
+
   async getUserGamesStats(id: number) {
     const gamesCount = await this.prisma.game.aggregate({
       _count: true,
@@ -347,5 +364,101 @@ export class UsersService {
     }
 
     return null;
+  }
+
+  async isUsersFriend(connectedUserId: number, userId: number) {
+    const count = await this.prisma.contact.count({
+      where: {
+        OR: [
+          {
+            followerId: connectedUserId,
+            followingId: userId,
+          },
+          {
+            followerId: userId,
+            followingId: connectedUserId,
+          },
+        ],
+      },
+    });
+
+    return count == 1;
+  }
+
+  async isUsersBlocked(connectedUserId: number, userId: number) {
+    const count = await this.prisma.block.count({
+      where: {
+        OR: [
+          {
+            blocked: connectedUserId,
+            blockedBy: userId,
+          },
+          {
+            blocked: userId,
+            blockedBy: connectedUserId,
+          },
+        ],
+      },
+    });
+
+    return count == 1;
+  }
+
+  async searchUsers(
+    searchQuery: string,
+    channelId: number,
+    connectedUserId: number,
+  ) {
+    const blockedUsers = await this.prisma.block.findMany({
+      where: {
+        OR: [
+          {
+            blocked: connectedUserId,
+          },
+          {
+            blockedBy: connectedUserId,
+          },
+        ],
+      },
+      select: {
+        blocked: true,
+        blockedBy: true,
+      },
+    });
+
+    const channelMemebersIds = await this.prisma.channelMember.findMany({
+      where: {
+        channelId,
+      },
+    });
+
+    const excludeIds: number[] = [];
+
+    blockedUsers.forEach((block) => {
+      excludeIds.push(block.blocked);
+      excludeIds.push(block.blockedBy);
+    });
+
+    channelMemebersIds.forEach((member) => {
+      excludeIds.push(member.memberId);
+    });
+
+    return this.prisma.user.findMany({
+      where: {
+        username: {
+          startsWith: searchQuery,
+          mode: "insensitive",
+        },
+        id: {
+          notIn: excludeIds,
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarPath: true,
+      },
+      take: 10,
+    });
   }
 }

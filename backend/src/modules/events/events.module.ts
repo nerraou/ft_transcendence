@@ -8,6 +8,7 @@ import { GamesModule } from "@modules/games/games.module";
 import { ChannelsModule } from "@modules/channels/channels.module";
 import { MessagesModule } from "@modules/messages/messages.module";
 import { AchievementsModule } from "@modules/achievements/achievements.module";
+import { NotificationsModule } from "@modules/notifications/notifications.module";
 
 import { EventsService } from "./events.service";
 import { EventsGateway } from "./events.gateway";
@@ -23,6 +24,7 @@ import { EventsGateway } from "./events.gateway";
     ChannelsModule,
     MessagesModule,
     AchievementsModule,
+    NotificationsModule,
   ],
 })
 export class EventsModule {}

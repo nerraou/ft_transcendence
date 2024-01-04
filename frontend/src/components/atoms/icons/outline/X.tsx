@@ -1,8 +1,13 @@
+import clsx from "clsx";
+
 interface XProps {
   className?: string;
+  width?: string;
+  height?: string;
+  color?: string;
 }
 
-function X({ className }: XProps) {
+function X(props: XProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +19,7 @@ function X({ className }: XProps) {
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
+      className={clsx(props.className, props.width, props.height, props.color)}
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
       <path d="M18 6l-12 12"></path>

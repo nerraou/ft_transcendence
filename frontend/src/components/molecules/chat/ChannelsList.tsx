@@ -5,6 +5,7 @@ import Channel from "@components/atoms/chat/Channel";
 import Add from "@components/atoms/icons/outline/Add";
 import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
 import { useState } from "react";
+import Link from "next/link";
 
 export interface ChannelProps {
   id: number;
@@ -12,6 +13,7 @@ export interface ChannelProps {
   imagePath: string;
   description: string;
   membersCount: number;
+  connectedMemberRole: "MEMBER" | "OWNER" | "ADMIN";
   type?: "PUBLIC";
 }
 
@@ -21,6 +23,7 @@ interface ChannelAddUserProps {
   imagePath: string;
   description: string;
   membersCount: number;
+  connectedMemberRole: "MEMBER" | "OWNER" | "ADMIN";
   type?: "PUBLIC";
   onChannelClick: (channelInformation: ChannelInformation) => void;
 }
@@ -66,6 +69,7 @@ function ChannelAddUser(props: ChannelAddUserProps) {
             description: props.description,
             imagePath: props.imagePath,
             name: props.name,
+            role: props.connectedMemberRole,
           });
         }}
       >
@@ -96,12 +100,14 @@ function ChannelsList(props: ChannelsListProps) {
     <div className="bg-light-fg-tertiary border-2 border-light-fg-primary rounded-lg p-4 space-y-4">
       <div className="flex justify-between px-4 py-2 bg-dark-bg-secondary border-2 border-light-fg-primary">
         <h3 className="text-base text-light-bg-secondary">#CHANNELS</h3>
-        <Add
-          color="stroke-light-fg-primary"
-          onClick={() => {
-            return;
-          }}
-        />
+        <Link href={`/chat/channels/create`}>
+          <Add
+            color="stroke-light-fg-primary"
+            onClick={() => {
+              return;
+            }}
+          />
+        </Link>
       </div>
       <div className="space-y-4 px-3 scrollbar-thin h-56 overflow-auto scrollbar-thumb-light-fg-primary">
         {props.channels.map((channel) => {
@@ -110,6 +116,7 @@ function ChannelsList(props: ChannelsListProps) {
               <ChannelAddUser
                 id={channel.id}
                 name={channel.name}
+                connectedMemberRole={channel.connectedMemberRole}
                 imagePath={imageUrl + channel.imagePath}
                 membersCount={channel.membersCount}
                 description={channel.description}

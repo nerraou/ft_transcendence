@@ -15,7 +15,8 @@ import { GamesModule } from "@modules/games/games.module";
 import { GameLoopModule } from "@/modules/game-loop/game-loop.module";
 import { PostsModule } from "@modules/posts/posts.module";
 import { ChannelsModule } from "@modules/channels/channels.module";
-import { AchievementsModule } from "./modules/achievements/achievements.module";
+import { AchievementsModule } from "@modules/achievements/achievements.module";
+import { NotificationsModule } from "@modules/notifications/notifications.module";
 
 import { AppController } from "./app.controller";
 
@@ -30,6 +31,8 @@ import { AppController } from "./app.controller";
     GameLoopModule,
     PostsModule,
     ChannelsModule,
+    AchievementsModule,
+    NotificationsModule,
     ConfigModule.forRoot({
       load: [envConfigFactory],
       isGlobal: true,
@@ -59,7 +62,6 @@ import { AppController } from "./app.controller";
         },
       },
     }),
-    AchievementsModule,
   ],
   controllers: [AppController],
 })

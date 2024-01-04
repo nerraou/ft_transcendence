@@ -23,11 +23,14 @@ export interface UserHeaderProps {
   avatarPath: string;
   status: "ONLINE" | "OFFLINE" | "IN_GAME";
   createdAt: string;
+  isBlocked: boolean;
+  isFriend: boolean;
+  isProfileOwner: boolean;
 }
 
 export function useFriendQuery(token: string | unknown, username: string) {
   return useSuspenseQuery<UserHeaderProps>({
-    queryKey: ["friend", username],
+    queryKey: ["chatContatct", username],
     queryFn: () => {
       return getUserHeader(token, username);
     },

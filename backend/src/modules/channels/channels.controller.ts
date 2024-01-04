@@ -1,18 +1,15 @@
 import {
   Body,
+  ConflictException,
   Controller,
   ForbiddenException,
   Get,
   Param,
-  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
-  PayloadTooLargeException,
   Post,
   Query,
   UnauthorizedException,
-  UnprocessableEntityException,
-  UnsupportedMediaTypeException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -22,13 +19,15 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { ConfigService } from "@nestjs/config";
 import { writeFile, unlink } from "fs/promises";
 import { v4 as uuid4 } from "uuid";
+import { JwtService } from "@nestjs/jwt";
 
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User } from "@modules/users/decorators/user.decorators";
 import { HashService } from "@common/services/hash.service";
-import { AppEnv } from "@config/env-configuration";
-import { ONE_MEGA } from "@common/constants";
-import { ImageValidator } from "@common/ImageValidator";
+import { AppEnv, JWTEnv } from "@config/env-configuration";
+import { NotificationsService } from "@modules/notifications/notifications.service";
+import { buildParseFilePipe } from "@common/ImageValidator";
+import { UsersService } from "@modules/users/users.service";
 
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { JoinChannelDto } from "./dto/join-channel.dto";
@@ -48,6 +47,8 @@ import {
   GetPublicChannelsApiDocumentation,
   LeaveChannelApiDocumentation,
   GetChannelApiDocumentation,
+  AcceptChannelInvitationApiDocumentation,
+  InviteUserApiDocumentation,
 } from "./decorators/docs.decorator";
 import { BanMemberDto } from "./dto/ban-member.dto";
 import { KickMemberDto } from "./dto/kick-member.dto";
@@ -55,25 +56,8 @@ import { MuteMemberDto } from "./dto/mute-member.dto";
 import { ChangeMemberRoleDto } from "./dto/change-member-role.dto";
 import { GetPublicChannelsDto } from "./dto/get-public-channels.dto";
 import { LeaveChannelDto } from "./dto/leave-channel.dto";
-
-const ImageValidatorPipe = new ParseFilePipeBuilder()
-  .addMaxSizeValidator({
-    maxSize: ONE_MEGA,
-    message: "size",
-  })
-  .addValidator(new ImageValidator())
-  .build({
-    fileIsRequired: true,
-    exceptionFactory(error) {
-      if (error == "size") {
-        return new PayloadTooLargeException();
-      } else if (error == "type") {
-        return new UnsupportedMediaTypeException();
-      } else if (error == "File is required") {
-        return new UnprocessableEntityException();
-      }
-    },
-  });
+import { InviteUserDto } from "./dto/invite-user.dto";
+import { AcceptChannelInvitationDto } from "./dto/accept-channel-invitation.dto";
 
 @Controller("channels")
 export class ChannelsController {
@@ -81,6 +65,9 @@ export class ChannelsController {
     private readonly channelsService: ChannelsService,
     private readonly configService: ConfigService<AppEnv>,
     private readonly hashService: HashService,
+    private readonly notificationsService: NotificationsService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Post()
@@ -90,7 +77,8 @@ export class ChannelsController {
   async createChannel(
     @User() user: UserEntity,
     @Body() createChannelDto: CreateChannelDto,
-    @UploadedFile(ImageValidatorPipe) file: Express.Multer.File,
+    @UploadedFile(buildParseFilePipe({ required: true }))
+    file: Express.Multer.File,
   ) {
     const filename = uuid4() + ".png";
     const imagePath = `${this.configService.get("imagesPath")}/${filename}`;
@@ -115,7 +103,7 @@ export class ChannelsController {
   async updateChannel(
     @User() user: UserEntity,
     @Body() updateChannelDto: UpdateChannelDto,
-    @UploadedFile(ImageValidatorPipe)
+    @UploadedFile(buildParseFilePipe({ required: false }))
     file: Express.Multer.File,
   ) {
     let filename: string | undefined;
@@ -224,6 +212,63 @@ export class ChannelsController {
     };
   }
 
+  @Post("/users/invite")
+  @InviteUserApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async inviteUser(
+    @User("id") userId: number,
+    @Body() inviteUserDto: InviteUserDto,
+  ) {
+    const userToInvite = await this.usersService.findOneByUsername(
+      inviteUserDto.username,
+    );
+
+    if (!userToInvite) {
+      throw new ForbiddenException();
+    }
+
+    const isInviterHasRight = await this.channelsService.isChannelMember(
+      inviteUserDto.channelId,
+      userId,
+    );
+
+    if (!isInviterHasRight) {
+      throw new ForbiddenException();
+    }
+
+    const isAlreadyMember = await this.channelsService.isChannelMember(
+      inviteUserDto.channelId,
+      userToInvite.id,
+    );
+
+    if (isAlreadyMember) {
+      throw new ConflictException();
+    }
+
+    const invitationToken = this.jwtService.sign(
+      {
+        channelId: inviteUserDto.channelId,
+        userId: userToInvite.id,
+      },
+      {
+        secret: this.configService.get<JWTEnv>("jwt").invitationSecret,
+        expiresIn: "2 days",
+      },
+    );
+
+    await this.notificationsService.createInvitationNotification(
+      userToInvite.id,
+      {
+        type: "channel-invitation",
+        token: invitationToken,
+      },
+    );
+
+    return {
+      message: "success",
+    };
+  }
+
   @Post("/join")
   @JoinChannelApiDocumentation()
   @UseGuards(JwtAuthGuard)
@@ -268,6 +313,42 @@ export class ChannelsController {
     return {
       message: "success",
     };
+  }
+
+  @Post("/invitations/accept")
+  @AcceptChannelInvitationApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async acceptChannelInvitation(
+    @User("id") userId: number,
+    @Body() acceptChannelInvitationDto: AcceptChannelInvitationDto,
+  ) {
+    try {
+      const { userId: inviatedUserId, channelId } = this.jwtService.verify(
+        acceptChannelInvitationDto.token,
+        {
+          secret: this.configService.get<JWTEnv>("jwt").invitationSecret,
+        },
+      );
+
+      if (userId != inviatedUserId) {
+        throw new ForbiddenException();
+      }
+
+      const isChannelMember = await this.channelsService.isChannelMember(
+        channelId,
+        userId,
+      );
+
+      if (!isChannelMember) {
+        await this.channelsService.joinChannel(userId, channelId);
+      }
+
+      return {
+        message: "success",
+      };
+    } catch {
+      throw new ForbiddenException();
+    }
   }
 
   @Patch("/leave")

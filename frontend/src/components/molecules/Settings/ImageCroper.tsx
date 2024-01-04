@@ -12,6 +12,7 @@ interface ImageCroperProps {
   isPending: boolean;
   isSuccess: boolean;
   onClose: () => void;
+  isChannelModal?: boolean;
 }
 
 function readFile(file: File): Promise<string> {
@@ -62,6 +63,9 @@ export default function ImageCroper(props: ImageCroperProps) {
       props.onCropComplete(croppendImage);
     } catch (e) {
       //   console.error(e);
+    }
+    if (props.isChannelModal) {
+      props.onClose();
     }
   }
 
@@ -117,7 +121,9 @@ export default function ImageCroper(props: ImageCroperProps) {
                   </div>
                   <div className="space-y-5">
                     <div className="flex justify-between items-center space-x-14">
-                      <label className="text-light-fg-primary">Zoom</label>
+                      <label className="text-light-fg-primary dark:text-light-bg-tertiary">
+                        Zoom
+                      </label>
                       <Slider
                         step={0.01}
                         min={1}
@@ -129,7 +135,9 @@ export default function ImageCroper(props: ImageCroperProps) {
                       />
                     </div>
                     <div className="flex justify-between items-center space-x-9">
-                      <label className="text-light-fg-primary">Rotation</label>
+                      <label className="text-light-fg-primary dark:text-light-bg-tertiary">
+                        Rotation
+                      </label>
                       <Slider
                         step={1}
                         min={1}

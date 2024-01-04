@@ -1,9 +1,14 @@
-import EditImage from "../Settings/EditImage";
+import { ErrorMessage } from "@hookform/error-message";
+import EditImage from "./EditImage";
+import { FieldErrors } from "react-hook-form";
 
 interface LableImageProps {
   labelValue: string;
-  jwt: string | unknown;
-  image: string;
+  originalImage: string;
+  image?: File;
+  setImage: (image: File) => void;
+  errors?: FieldErrors<any>;
+  name?: string;
 }
 
 function LabelImage(props: LableImageProps) {
@@ -14,7 +19,22 @@ function LabelImage(props: LableImageProps) {
           {props.labelValue}
         </label>
       </div>
-      <EditImage image={props.image} jwt={props.jwt} />
+      <div>
+        <EditImage
+          image={props.image}
+          originalImage={props.originalImage}
+          setImage={props.setImage}
+        />
+        {props.errors ? (
+          <ErrorMessage
+            errors={props.errors}
+            name={props.name as any}
+            render={({ message }) => (
+              <p className="text-light-fg-secondary">{message}</p>
+            )}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -17,15 +17,22 @@ import { CreateMessageDto } from "@modules/messages/dto/create-message.dto";
 import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-message.dto";
 import { MovePlayerDto } from "@modules/game-loop/dto/move-player.dto";
 import { JoinQueueDto } from "@modules/game-loop/dto/join-queue.dto";
+import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
+import { ChallengePlayerResponseDto } from "@modules/game-loop/dto/challenge-player-response.dto";
+import { CancelChallengePlayerDto } from "@modules/game-loop/dto/cancel-challenge-player.dto";
 
 type EventName =
   | "direct-message"
   | "player-join-queue"
   | "player-moved"
-  | "channel-chat-message";
+  | "channel-chat-message"
+  | "challenge-player"
+  | "challenge-player-response"
+  | "challenge-player-cancel"
+  | "leave-queue";
 
 @WebSocketGateway({ cors: true })
 @UsePipes(
@@ -52,7 +59,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     this.eventsService.userDisonnected(client).catch((e) => {
-      console.error("userDisonnected: failed to update disconnect data", e);
+      console.error("userDisonnected:", e);
     });
 
     // TODO: broadcast online status using client.broadcast.emit()
@@ -111,5 +118,68 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @User() user: UserEntity,
   ) {
     return this.eventsService.handlePlayerMovement(client, user, data);
+  }
+
+  @SubscribeMessage<EventName>("challenge-player")
+  @UseGuards(WSJwtAuthGuard)
+  challengePlayer(
+    @MessageBody() challengePlayerDto: ChallengePlayerDto,
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+  ) {
+    return this.eventsService.handleChallengePlayer(
+      client,
+      user,
+      challengePlayerDto,
+    );
+  }
+
+  @SubscribeMessage<EventName>("challenge-player-response")
+  @UseGuards(WSJwtAuthGuard)
+  acceptChallenge(
+    @MessageBody() challengePlayerResponseDto: ChallengePlayerResponseDto,
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+  ) {
+    try {
+      if (challengePlayerResponseDto.action == "accept") {
+        const { socketId, username, scoreToWin } =
+          this.eventsService.verifyGameChallengeJWT(
+            challengePlayerResponseDto.token,
+          );
+
+        return this.eventsService.acceptChallenge(
+          client,
+          user,
+          socketId,
+          username,
+          scoreToWin,
+          this.server,
+          challengePlayerResponseDto.token,
+        );
+      } else {
+        return this.eventsService.cancelChallenge(
+          challengePlayerResponseDto.token,
+        );
+      }
+    } catch {}
+  }
+
+  @SubscribeMessage<EventName>("challenge-player-cancel")
+  @UseGuards(WSJwtAuthGuard)
+  cancelChallenge(
+    @MessageBody() cancelChallengePlayerDto: CancelChallengePlayerDto,
+  ) {
+    try {
+      this.eventsService.verifyGameChallengeJWT(cancelChallengePlayerDto.token);
+
+      this.eventsService.cancelChallenge(cancelChallengePlayerDto.token);
+    } catch {}
+  }
+
+  @SubscribeMessage<EventName>("leave-queue")
+  @UseGuards(WSJwtAuthGuard)
+  leaveQueue(@ConnectedSocket() client: Socket) {
+    return this.eventsService.leaveQueue(client);
   }
 }

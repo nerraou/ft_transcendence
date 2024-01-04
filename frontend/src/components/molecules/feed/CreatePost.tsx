@@ -43,7 +43,7 @@ const CreatePost = ({
   };
 
   return (
-    <div className="flex flex-col items-start justify-center gap-8 rounded-lg px-8 sm:px-2 sm:py-2 py-4 border-2 shadow-light-lg border-light-fg-link dark:border-dark-bg-primary4 bg-light-bg-tertiary dark:bg-dark-fg-primary w-full">
+    <div className="flex flex-col items-start justify-center gap-8 rounded-lg px-8 sm:px-2 sm:py-2 py-4 border-2 shadow-light-lg border-light-fg-link dark:border-dark-bg-primary bg-light-bg-tertiary dark:bg-dark-fg-primary w-full">
       <div className="flex flex-row items-start justify-center gap-4 w-full sm:flex-col">
         <Image
           src={avatar || "/default/user-circle.png"}
@@ -87,7 +87,7 @@ const CreatePost = ({
             <button
               disabled={createPostMutation.status === "pending"}
               onClick={() => hiddenFileInput.current?.click()}
-              className="flex flex-row items-center justify-center gap-2 rounded-2xl bg-light-fg-secondary text-light-fg-tertiary h-10 w-24 border border-light-fg-link dark:border-dark-bg-primary4 dark:bg-dark-fg-primary"
+              className="flex flex-row items-center justify-center gap-2 rounded-2xl bg-light-fg-secondary text-light-fg-tertiary h-10 w-24 border border-light-fg-link"
             >
               <Photo className="w-4 h-4 text-light-bg-tertiary" />
               Photo

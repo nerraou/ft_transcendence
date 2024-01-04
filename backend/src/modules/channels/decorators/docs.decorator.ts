@@ -2,6 +2,7 @@ import { applyDecorators } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConflictResponse,
   ApiConsumes,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -196,6 +197,7 @@ export function GetChannelsApiDocumentation() {
               imagePath: "80188ab1-b599-4c9b-b452-aeafda41b995.png",
               type: "PUBLIC",
               membersCount: 1,
+              connectedMemberRole: "ADMIN",
             },
           ],
         },
@@ -722,6 +724,124 @@ export function GetChannelApiDocumentation() {
         example: {
           message: "Forbidden",
           statusCode: 403,
+        },
+      },
+    }),
+  );
+}
+
+export function InviteUserApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          channelId: {
+            type: "number",
+          },
+          username: {
+            type: "string",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiConflictResponse({
+      description: "Conflict",
+      schema: {
+        example: {
+          message: "Conflict",
+          statusCode: 409,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["channelId must be a number"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function AcceptChannelInvitationApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Channels"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        type: "object",
+        properties: {
+          token: {
+            type: "string",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiForbiddenResponse({
+      description: "Forbidden",
+      schema: {
+        example: {
+          message: "Forbidden",
+          statusCode: 403,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: ["token must be a valid jwt"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
         },
       },
     }),

@@ -2,17 +2,14 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
-  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
-  PayloadTooLargeException,
   Post,
   Query,
-  UnprocessableEntityException,
-  UnsupportedMediaTypeException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,8 +23,7 @@ import { v4 as uuid4 } from "uuid";
 import { AppEnv } from "@config/env-configuration";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { HashService } from "@common/services/hash.service";
-import { ONE_MEGA } from "@common/constants";
-import { ImageValidator } from "@common/ImageValidator";
+import { buildParseFilePipe } from "@common/ImageValidator";
 
 import {
   MeApiDocumentation,
@@ -39,6 +35,8 @@ import {
   GetUserByUsernameDocumentation,
   BlockUserApiDocumentation,
   UnblockUserApiDocumentation,
+  UnfriendUserApiDocumentation,
+  SearchUsersDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -47,25 +45,7 @@ import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
 import { GetUserDto } from "./dto/get-user.dto";
-
-const ImageValidatorPipe = new ParseFilePipeBuilder()
-  .addMaxSizeValidator({
-    maxSize: ONE_MEGA,
-    message: "size",
-  })
-  .addValidator(new ImageValidator())
-  .build({
-    fileIsRequired: true,
-    exceptionFactory(error) {
-      if (error == "size") {
-        return new PayloadTooLargeException();
-      } else if (error == "type") {
-        return new UnsupportedMediaTypeException();
-      } else if (error == "File is required") {
-        return new UnprocessableEntityException();
-      }
-    },
-  });
+import { SearchUsersDto } from "./dto/search-users.dto";
 
 @Controller("users")
 export class UsersController {
@@ -113,6 +93,20 @@ export class UsersController {
 
     const ranking = await this.usersService.getUserRanking(user.id);
 
+    const isFriend = await this.usersService.isUsersFriend(
+      connectedUserId,
+      user.id,
+    );
+
+    let isBlocked = false;
+
+    if (!isFriend) {
+      isBlocked = await this.usersService.isUsersBlocked(
+        connectedUserId,
+        user.id,
+      );
+    }
+
     let stats: any = {};
     if (getUserDto.includeStats) {
       stats = await this.usersService.getUserGamesStats(user.id);
@@ -130,7 +124,41 @@ export class UsersController {
       rating: user.rating,
       ranking,
       isProfileOwner: connectedUserId == user.id,
+      isFriend,
+      isBlocked,
       gamesStats: stats,
+    };
+  }
+
+  @Get("/search")
+  @SearchUsersDocumentation()
+  @UseGuards(JwtAuthGuard)
+  searchUsers(
+    @Query() searchUsersDto: SearchUsersDto,
+    @User("id") connectedUserId: number,
+  ) {
+    return this.usersService.searchUsers(
+      searchUsersDto.searchQuery,
+      searchUsersDto.channelId,
+      connectedUserId,
+    );
+  }
+
+  @Delete("/:id/unfriend")
+  @UnfriendUserApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async unfriendUser(
+    @Param("id", ParseIntPipe) userToUnfriend: number,
+    @User("id") connectedUserId: number,
+  ) {
+    if (connectedUserId == userToUnfriend) {
+      throw new ForbiddenException();
+    }
+
+    await this.usersService.unfriendUser(connectedUserId, userToUnfriend);
+
+    return {
+      message: "success",
     };
   }
 
@@ -279,7 +307,7 @@ export class UsersController {
   @UseInterceptors(FileInterceptor("image"))
   async updateAvatar(
     @User() user: UserEntity,
-    @UploadedFile(ImageValidatorPipe)
+    @UploadedFile(buildParseFilePipe({ required: true }))
     file: Express.Multer.File,
   ) {
     const oldAvatarPath = `${this.configService.get("imagesPath")}/${

@@ -1,6 +1,6 @@
 import InputText from "@components/atoms/InputText";
 import { ChangeEvent, forwardRef } from "react";
-// import { ErrorMessage } from "@hookform/error-message";
+import { ErrorMessage } from "@hookform/error-message";
 import { FieldErrors } from "react-hook-form";
 
 interface LabelInputTextProps {
@@ -33,13 +33,13 @@ const LabelInputText = forwardRef<HTMLInputElement, LabelInputTextProps>(
             height="base"
             onChange={props.onChange}
           />
-          {/* <ErrorMessage
+          <ErrorMessage
             errors={props.errors}
             name={props.name as any}
             render={({ message }) => (
               <p className="text-light-fg-secondary">{message}</p>
             )}
-          /> */}
+          />
         </div>
       </div>
     );

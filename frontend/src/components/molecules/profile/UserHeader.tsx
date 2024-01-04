@@ -16,7 +16,9 @@ import { Fragment } from "react";
 import { UserStatus } from "../FriendCard";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useBlockUser } from "@app/profile/[username]/userProfile";
+import useAddFriendMutation from "@services/useAddFriendMutation";
+import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
+import { useBlockUserMutation } from "@services/useBlockUserMutation";
 
 interface UserHeaderProps {
   fullname: string;
@@ -46,12 +48,10 @@ interface UserPopoverProps {
 function UserPopover(props: UserPopoverProps) {
   const { data: session } = useSession();
   const token = session?.user.accessToken;
-  const blockUser = useBlockUser(token, props.id);
-  let action = "Add";
 
-  if (props.isFriend) {
-    action = "Remove";
-  }
+  const blockUserMutation = useBlockUserMutation();
+  const addUserMutation = useAddFriendMutation();
+  const removeUserMutation = useRemoveFriendMutation();
 
   return (
     <Popover className="relative">
@@ -73,17 +73,48 @@ function UserPopover(props: UserPopoverProps) {
       >
         <Popover.Panel className="absolute">
           <div className="flex flex-col bg-light-fg-tertiary p-sm rounded-base">
-            <button className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm">
-              {!props.isFriend && <UserPlus color="stroke-light-fg-link" />}
-              {props.isFriend && <UserMinus color="stroke-light-fg-link" />}
-              <label className="text-sm text-light-fg-primary ml-sm">
-                {action}
-              </label>
-            </button>
+            {!props.isFriend && (
+              <button
+                disabled={addUserMutation.isPending}
+                onClick={() =>
+                  addUserMutation.mutate({
+                    token: token,
+                    userId: props.id,
+                  })
+                }
+                className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm"
+              >
+                <UserPlus color="stroke-light-fg-link" />
+                <label className="text-sm text-light-fg-primary ml-sm">
+                  Add
+                </label>
+              </button>
+            )}
+
+            {props.isFriend && (
+              <button
+                disabled={removeUserMutation.isPending}
+                onClick={() =>
+                  removeUserMutation.mutate({
+                    token: token,
+                    userId: props.id,
+                  })
+                }
+                className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm"
+              >
+                <UserMinus color="stroke-light-fg-link" />
+                <label className="text-sm text-light-fg-primary ml-sm">
+                  Remove
+                </label>
+              </button>
+            )}
+
             <button
-              disabled={blockUser.status === "pending"}
+              disabled={blockUserMutation.isPending}
               className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
-              onClick={() => blockUser.mutate({ token: token, id: props.id })}
+              onClick={() =>
+                blockUserMutation.mutate({ token: token, id: props.id })
+              }
             >
               <UserBlock color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">
@@ -116,6 +147,13 @@ function UserHeaderActions(props: UserHeaderActionsProps) {
           hover="hover:bg-light-fg-tertiary"
           round="rounded-sm"
           animated={props.status == "ONLINE"}
+          onClick={() => {
+            if (props.isProfileOwner) {
+              router.push("/game/make");
+            } else {
+              router.push(`/game/make?username=${props.username}`);
+            }
+          }}
         />
         <button
           className="flex"

@@ -73,6 +73,7 @@ export default class Game {
         opponentId: this.opponent.id,
         player: this.player,
         opponent: this.opponent,
+        scoreToWin: this.scoreToWin,
       });
     }
   }

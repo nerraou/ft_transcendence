@@ -3,6 +3,7 @@ import clsx from "clsx";
 interface ButtonContainerProps {
   backgroundColor: string;
   children?: React.ReactNode;
+  onClick?: () => void;
 }
 
 function ButtonContainer(props: ButtonContainerProps) {
@@ -12,6 +13,7 @@ function ButtonContainer(props: ButtonContainerProps) {
         props.backgroundColor,
         "flex justify-center items-center w-36 h-36 sm:w-24 sm:h-24 rounded-full border-4 border-light-fg-primary dark:border-dark-fg-primary",
       )}
+      onClick={props.onClick}
     >
       {props.children}
     </div>

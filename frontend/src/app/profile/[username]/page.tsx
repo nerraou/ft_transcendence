@@ -55,8 +55,8 @@ function Profile({ token, username }: ProfileProps) {
               username={user.username}
               image={imageUrl + user.avatarPath}
               id={user.id}
-              isProfileOwner={false}
-              isFriend
+              isProfileOwner={user.isProfileOwner}
+              isFriend={user.isFriend}
               level={user.ranking}
               userStatus={user.status}
             />
@@ -64,7 +64,8 @@ function Profile({ token, username }: ProfileProps) {
             <StatsBar
               wins={user.gamesStats.wins}
               losses={user.gamesStats.losses}
-              matches={user.gamesStats.wins + user.gamesStats.losses}
+              lossesPercentage={user.gamesStats.lossesPercentage}
+              winsPercentage={user.gamesStats.winsPercentage}
             />
             <div className="self-center w-4/6 sm:w-full">
               <UserAchievements
@@ -94,9 +95,18 @@ function Profile({ token, username }: ProfileProps) {
             />
           </div>
           <div className="flex justify-around my-10">
-            <ButtonPlay backgroundColor="bg-light-bg-secondary" />
+            <ButtonPlay
+              backgroundColor="bg-light-bg-secondary"
+              onClick={() => {
+                if (user.isProfileOwner) {
+                  router.push("/game/make");
+                } else {
+                  router.push(`/game/make?username=${username}`);
+                }
+              }}
+            />
             <ButtonHistory
-              backgroundColor=" bg-light-bg-secondary"
+              backgroundColor="bg-light-bg-secondary"
               onClick={() => router.push(`/history/${user.username}`)}
             />
           </div>
