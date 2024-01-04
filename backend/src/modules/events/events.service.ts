@@ -8,8 +8,8 @@ import { Mutex } from "async-mutex";
 import { GameWinner, User as UserEntity } from "@prisma/client";
 
 import { RedisService } from "@common/modules/redis/redis.service";
-import { AppEnv } from "@config/env-configuration";
-import { JwtPayload } from "@modules/auth/strategies/jwt.strategy";
+import { AppEnv, JWTEnv } from "@config/env-configuration";
+import { AuthJWTPayload } from "@modules/auth/strategies/jwt.strategy";
 import { UsersService } from "@modules/users/users.service";
 import { PlayerEntity } from "@modules/game-loop/types";
 import Game from "@modules/game-loop/classes/Game";
@@ -29,6 +29,12 @@ import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto"
 import { NotificationsService } from "@modules/notifications/notifications.service";
 
 import claimAchievements from "./utils/claimAchievements";
+
+interface GameChallengeJWTPayload {
+  socketId: string;
+  scoreToWin: number;
+  username: string;
+}
 
 @Injectable()
 export class EventsService {
@@ -51,7 +57,7 @@ export class EventsService {
   ) {}
 
   async userConnected(client: Socket) {
-    const payload = this.verifyJwt(client.request);
+    const payload = this.verifyAuthJWT(client.request);
 
     if (!payload) {
       return client.disconnect();
@@ -86,7 +92,7 @@ export class EventsService {
   }
 
   async userDisonnected(client: Socket) {
-    const payload = this.verifyJwt(client.request);
+    const payload = this.verifyAuthJWT(client.request);
 
     if ("challengeToken" in client.data) {
       this.cancelChallenge(client.data.challengeToken);
@@ -353,16 +359,11 @@ export class EventsService {
 
     const socketsIds: string[] = JSON.parse(socketsIdsString);
 
-    const token = this.jwtService.sign(
-      {
-        socketId: client.id,
-        scoreToWin: challengePlayerDto.scoreToWin,
-        username: user.username,
-      },
-      {
-        secret: "some-random-string",
-      },
-    );
+    const token = this.signGameChallengeJWT({
+      socketId: client.id,
+      scoreToWin: challengePlayerDto.scoreToWin,
+      username: user.username,
+    });
 
     try {
       await this.challengesSetMutex.waitForUnlock();
@@ -604,18 +605,32 @@ export class EventsService {
     }
   }
 
-  private verifyJwt(request: any): JwtPayload | undefined {
+  private verifyAuthJWT(request: any): AuthJWTPayload | undefined {
     const jwtToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
 
     if (jwtToken) {
       try {
-        const payload = this.jwtService.verify<JwtPayload>(jwtToken, {
-          secret: this.configService.get("jwtSecret"),
+        const payload = this.jwtService.verify<AuthJWTPayload>(jwtToken, {
+          secret: this.configService.get<JWTEnv>("jwt").authSecret,
         });
         return payload;
       } catch {
         return undefined;
       }
     }
+  }
+
+  verifyGameChallengeJWT(jwtToken: string): GameChallengeJWTPayload {
+    const payload = this.jwtService.verify<GameChallengeJWTPayload>(jwtToken, {
+      secret: this.configService.get<JWTEnv>("jwt").gameChallengeSecret,
+    });
+
+    return payload;
+  }
+
+  signGameChallengeJWT(payload: GameChallengeJWTPayload) {
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<JWTEnv>("jwt").gameChallengeSecret,
+    });
   }
 }
