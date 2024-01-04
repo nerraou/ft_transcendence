@@ -7,10 +7,13 @@ import {
   UseGuards,
   Request,
   Get,
+  UnauthorizedException,
+  HttpStatus,
 } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import { ConfigService } from "@nestjs/config";
-import { User } from "@prisma/client";
+import { User as UserEntity } from "@prisma/client";
+import { authenticator } from "otplib";
 
 import { AppEnv } from "@config/env-configuration";
 import { GoogleAuthResponse } from "@modules/users/decorators/google-user.decorators";
@@ -29,7 +32,13 @@ import {
   ConfirmApiDocumentation,
   SignInApiDocumentation,
   SignUpApiDocumentation,
+  GetTOTPSecretApiDocumentation,
+  VerifyOTPApiDocumentation,
+  DisableTFAApiDocumentation,
 } from "./decorators/docs.decorator";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { User } from "@modules/users/decorators/user.decorators";
+import { VerifyTOTPDto } from "./dto/verify-totp.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -43,7 +52,7 @@ export class AuthController {
   @SignInApiDocumentation()
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
-  async signIn(@Request() req: Request & { user: User }) {
+  async signIn(@Request() req: Request & { user: UserEntity }) {
     return this.authService.signIn(req.user);
   }
 
@@ -142,5 +151,58 @@ export class AuthController {
 
       throw error;
     }
+  }
+
+  @Get("/totp/secret")
+  @GetTOTPSecretApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  genetateTOTPSecret(@User() user: UserEntity) {
+    const secret = authenticator.generateSecret(32);
+
+    const accountName = user.username || user.email;
+    const service = "PongBoy";
+
+    const keyuri = authenticator.keyuri(accountName, service, secret);
+
+    return {
+      secret,
+      keyuri,
+    };
+  }
+
+  @Post("/totp/verify")
+  @VerifyOTPApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async verifyTOTPSecret(
+    @User() user: UserEntity,
+    @Body() verifyTOTPDto: VerifyTOTPDto,
+  ) {
+    const isValid = authenticator.verify({
+      token: verifyTOTPDto.token,
+      secret: verifyTOTPDto.secret,
+    });
+
+    if (!isValid) {
+      throw new UnauthorizedException();
+    }
+
+    await this.authService.enable2FA(user.id, verifyTOTPDto.secret);
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Post("/tfa/disable")
+  @DisableTFAApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async disable2FA(@User() user: UserEntity) {
+    await this.authService.disable2FA(user.id);
+
+    return {
+      message: "success",
+    };
   }
 }

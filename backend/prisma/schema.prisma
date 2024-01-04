@@ -23,6 +23,7 @@ model User {
   fortyTwoAccountId String?    @unique @map("forty_two_account_id") @db.VarChar(255)
   googleAccountId   String?    @unique @map("google_account_id") @db.VarChar(255)
   is2faEnabled      Boolean    @default(false) @map("is_2fa_enabled")
+  tfaSecret         String?    @map("tfa_secret")
   verifyEmailToken  String?    @unique() @map("verify_email_token") @db.VarChar(255)
   isEmailVerified   Boolean    @default(false) @map("is_email_verified")
   createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamp()

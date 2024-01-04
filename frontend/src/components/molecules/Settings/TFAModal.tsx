@@ -3,24 +3,47 @@
 import { useState, Fragment, useRef } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import QRCode from "react-qr-code";
+
 import Button from "@components/atoms/Button";
 import InputText from "@components/atoms/InputText";
 
+import useVerifyTOTPMutation from "./useVerifyTOTPMutation";
+import useTOTPQuery from "./useTOTPQuery";
+
 interface TFAModalProps {
   isOpen: boolean;
+  jwt: string | unknown;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
 function TFAModal(props: TFAModalProps) {
   const completeDevRef = useRef(null);
-  const [isHidden, setHiden] = useState(false);
+  const [isHidden, setHidden] = useState(false);
+  const [token, seToken] = useState("");
+
+  const { data: totpData } = useTOTPQuery({ jwt: props.jwt });
+
+  const verifyTOTPMutation = useVerifyTOTPMutation({ jwt: props.jwt });
 
   function hideButton() {
     if (isHidden) {
-      setHiden(false);
+      setHidden(false);
     } else {
-      setHiden(true);
+      setHidden(true);
     }
+  }
+
+  async function verifyTOTPHandler() {
+    try {
+      await verifyTOTPMutation.mutateAsync({
+        secret: totpData.secret,
+        token,
+      });
+
+      props.onSuccess();
+      props.onClose();
+    } catch {}
   }
 
   return (
@@ -63,7 +86,7 @@ function TFAModal(props: TFAModalProps) {
                 </span>
 
                 <div className="border-solid border-4 rounded-lg dark:bg-light-bg-tertiary border-light-fg-primary dark:border-dark-fg-primary p-4">
-                  <QRCode value="hello world" bgColor="none" />
+                  <QRCode value={totpData.keyuri} bgColor="none" />
                 </div>
 
                 <span className="text-lg sm:text-base text-light-fg-primary dark:text-light-fg-tertiary">
@@ -75,8 +98,7 @@ function TFAModal(props: TFAModalProps) {
                 )}
                 {isHidden && (
                   <output className="break-all text-lg sm:text-base text-light-fg-primary border-dashed border-2 rounded-xxl py-2 px-4 bg-light-fg-tertiary">
-                    DL545KSKNJSDLlksfdjlksdjfkljlkjlksdf mnJNKJ
-                    SFHJKHKDSFHKJdsflkjlkdsjfkjklj
+                    {totpData.secret}
                   </output>
                 )}
 
@@ -91,12 +113,18 @@ function TFAModal(props: TFAModalProps) {
                   borderColor="border-light-fg-primary"
                   height="base"
                   width="w-96 sm:w-64"
-                  onChange={() => {
-                    return;
+                  value={token}
+                  onChange={(e) => {
+                    seToken(e.target.value);
                   }}
                 />
                 <div ref={completeDevRef}>
-                  <Button text="Verify" />
+                  <Button
+                    text="Verify"
+                    onClick={verifyTOTPHandler}
+                    loading={verifyTOTPMutation.isPending}
+                    isSuccess={verifyTOTPMutation.isSuccess}
+                  />
                 </div>
               </Dialog.Panel>
             </Transition.Child>

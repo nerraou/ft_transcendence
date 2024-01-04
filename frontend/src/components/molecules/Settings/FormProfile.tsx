@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 import ButtonsSaveRestore from "./ButtonsSaveRestore";
 import LabelInputText from "./LabelInputText";
@@ -9,6 +10,7 @@ import useProfileMutation from "./useProfileMutation";
 import { SubmitHandler } from "react-hook-form";
 import useProfileForm from "./useProfileForm";
 import clsx from "clsx";
+import useDisable2FA from "./useDisable2FA";
 
 interface FormInputProfileProps {
   jwt: string | unknown;
@@ -25,7 +27,7 @@ export interface FormInputProfile {
 }
 
 function FormProfile(props: FormInputProfileProps) {
-  const [enable2FA, setEnable2FA] = useState(false);
+  const [enable2FA, setEnable2FA] = useState(props.is2faEnabled);
   const [isOpen, setIsOpen] = useState(false);
 
   const { register, handleSubmit, formState, getFieldState, setError, reset } =
@@ -39,6 +41,8 @@ function FormProfile(props: FormInputProfileProps) {
     props.jwt,
   );
 
+  const disable2FAMutation = useDisable2FA({ jwt: props.jwt });
+
   useEffect(() => {
     if (error?.response?.status === 409) {
       setError("username", {
@@ -48,18 +52,27 @@ function FormProfile(props: FormInputProfileProps) {
     }
   }, [isError, error, setError]);
 
+  useEffect(() => {
+    if (disable2FAMutation.isSuccess) {
+      setEnable2FA(false);
+      toast.success("2FA disabled", {
+        position: "bottom-center",
+      });
+    }
+  }, [disable2FAMutation.isSuccess]);
+
   const onSubmit: SubmitHandler<FormInputProfile> = (data) => mutate(data);
-  const current2FA = false;
 
   const username = getFieldState("username");
   const firstName = getFieldState("firstName");
   const lastName = getFieldState("lastName");
 
   function onChange(value: boolean) {
-    if (!current2FA && value) {
+    if (value) {
       setIsOpen(true);
+    } else {
+      disable2FAMutation.mutate();
     }
-    setEnable2FA(true);
   }
 
   function onClose() {
@@ -111,7 +124,16 @@ function FormProfile(props: FormInputProfileProps) {
       />
 
       <Enable2FA checked={enable2FA} onChange={onChange} />
-      <TFAModal isOpen={isOpen} onClose={onClose} />
+      <Suspense fallback={null}>
+        <TFAModal
+          isOpen={isOpen}
+          onClose={onClose}
+          jwt={props.jwt}
+          onSuccess={() => {
+            setEnable2FA(true);
+          }}
+        />
+      </Suspense>
       <ButtonsSaveRestore
         isSaveLoading={isPending}
         isSavePenging={isPending}
