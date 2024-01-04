@@ -62,7 +62,7 @@ function NavbarLinkAction({ action, router, menu }: NavbarLinkActionProps) {
   return (
     <button
       className={clsx(
-        "flex items-center px-4 py-2 rounded-sm gap-2 text-base font-medium text-light-fg-link dark:text-light-bg-tertiary hover:bg-light-fg-tertiary dark:hover:bg-dark-fg-primary",
+        "flex items-center px-4 py-2 rounded-sm gap-2 text-base font-medium text-light-fg-link dark:text-light-bg-tertiary hover:bg-light-bg-tertiary dark:hover:bg-dark-fg-primary",
         { "w-full": menu },
       )}
       onClick={() => router.push(action.link)}
@@ -82,7 +82,7 @@ function ActionsMenu({ actions, router }: ActionsMenuProps) {
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-light-fg-tertiary border border-light-fg-link dark:border-dark-fg-primary">
+          <Popover.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-light-fg-tertiary border-2 border-dark-fg-primary dark:border-light-bg-primary">
             <BurgerMenu />
           </Popover.Button>
           <Transition
@@ -96,8 +96,8 @@ function ActionsMenu({ actions, router }: ActionsMenuProps) {
             leaveTo="opacity-0 scale-95"
             className="absolute z-10 w-56 max-w-sm px-4 mt-3 transform -translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl"
           >
-            <Popover.Panel className="absolute z-10 right-4">
-              <div className="w-72 w-max-full overflow-hidden rounded-sm relative flex flex-col items-start justify-start px-5 py-6 bg-light-bg-tertiary dark:bg-dark-bg-primary sm:p-8 border border-light-fg-link dark:border-dark-fg-primary">
+            <Popover.Panel className="absolute z-10 right-20">
+              <div className="w-60 overflow-hidden divide-solid divide-y-2 rounded-xl divide-dark-bg-primary dark:divide-light-bg-primary relative flex flex-col items-start justify-start p-3 bg-light-fg-tertiary dark:bg-dark-bg-primary sm:p-8 border-4 border-dark-bg-primary dark:border-light-bg-primary">
                 {actions.map((action) => (
                   <NavbarLinkAction
                     key={action.link}
