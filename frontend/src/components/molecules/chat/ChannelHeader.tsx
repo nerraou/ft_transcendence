@@ -11,6 +11,8 @@ import { useChannelQuery } from "@services/useChannelQuery";
 import ActionsOwner from "./ActionsOwner";
 import ActionsMember from "./ActionsMember";
 import ActionsAdmin from "./ActionsAdmin";
+import baseQuery, { RequestError } from "@utils/baseQuery";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ChannelHeaderProps {
   channelId: number;
@@ -18,6 +20,7 @@ interface ChannelHeaderProps {
   image: string;
   channelName: string;
   channelDescription: string;
+  onChannelLeave: () => void;
   role: "MEMBER" | "OWNER" | "ADMIN";
 }
 
@@ -26,6 +29,7 @@ interface MenuDotsPopoverProps {
   id: number;
   token: string | unknown;
   showMembers: () => void;
+  onChannelLeave: () => void;
 }
 
 interface ManageMemebersProps {
@@ -34,6 +38,37 @@ interface ManageMemebersProps {
   isMember: boolean;
   isOwner: boolean;
   isAdmin: boolean;
+}
+
+interface LeaveChannel {
+  channelId: number;
+  token: string | unknown;
+}
+
+async function leaveChannel(leave: LeaveChannel) {
+  const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/leave";
+
+  return await baseQuery(api, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${leave.token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      channelId: leave.channelId,
+    }),
+  });
+}
+
+function useLeaveChannelMutation() {
+  const queryClient = useQueryClient();
+  return useMutation<Response, RequestError, LeaveChannel>({
+    mutationFn: leaveChannel,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chatChannels"] });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
 }
 
 function ManageMemebers(props: ManageMemebersProps) {
@@ -71,6 +106,7 @@ function ManageMemebers(props: ManageMemebersProps) {
 
 function MenuDotsPopover(props: MenuDotsPopoverProps) {
   const isOwner = props.role == "OWNER";
+  const leaveChannelMutation = useLeaveChannelMutation();
 
   return (
     <Popover className="relative">
@@ -86,7 +122,7 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-1"
       >
-        <Popover.Panel className="absolute right-0">
+        <Popover.Panel className="absolute right-0 z-10">
           <div className="flex flex-col space-y-2 items-start border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-md bg-light-fg-tertiary p-base">
             <button
               onClick={props.showMembers}
@@ -94,9 +130,10 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
             >
               <label className="inline-block w-full">Members</label>
             </button>
+
             {isOwner && (
               <Link
-                href={`chat/channels/update/${props.id}`}
+                href={`/chat/channels/update/${props.id}`}
                 className="w-full"
               >
                 <label className="inline-block text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary px-2 w-full">
@@ -104,9 +141,22 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
                 </label>
               </Link>
             )}
-            <label className="inline-block text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary px-2 w-full">
-              Leave
-            </label>
+
+            <button
+              onClick={() => {
+                leaveChannelMutation.mutate({
+                  token: props.token,
+                  channelId: props.id,
+                });
+                props.onChannelLeave();
+              }}
+              disabled={leaveChannelMutation.isPending}
+              className="text-base px-2 text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary "
+            >
+              <Link href={`/chat`} className="w-full">
+                <label className="inline-block">Leave</label>
+              </Link>
+            </button>
           </div>
         </Popover.Panel>
       </Transition>
@@ -116,7 +166,6 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
 
 function ChannelHeader(props: ChannelHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
-
   function onClose() {
     return setIsOpen(false);
   }
@@ -129,10 +178,11 @@ function ChannelHeader(props: ChannelHeaderProps) {
         description={props.channelDescription}
       />
       <MenuDotsPopover
+        onChannelLeave={props.onChannelLeave}
         showMembers={() => setIsOpen(true)}
         id={props.channelId}
-        role="OWNER"
-        token=""
+        role={props.role}
+        token={props.token}
       />
       <Modal
         isOpen={isOpen}

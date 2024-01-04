@@ -62,7 +62,6 @@ function ChannelAddUser(props: ChannelAddUserProps) {
 }
 
 function ChannelsList(props: ChannelsListProps) {
-  console.log("my role is", props.channelInformation.role);
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
   return (
     <div className="bg-light-fg-tertiary border-2 border-light-fg-primary rounded-lg p-4 space-y-4">
