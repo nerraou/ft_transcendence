@@ -9,7 +9,7 @@ import { UserProps } from "@components/atoms/chat/User";
 import { ErrorBoundary } from "react-error-boundary";
 import Button from "@components/atoms/Button";
 import Modal from "@components/atoms/Modal";
-import { ChangeEvent, Suspense, useEffect, useState } from "react";
+import { ChangeEvent, Suspense, useState } from "react";
 import LoadingPage from "@app/loading";
 
 interface FriendsListProps {
@@ -34,7 +34,6 @@ async function getFriends(token: string | unknown) {
 
 function SearchFriendsList(props: FriendsListProps) {
   const [searchFriend, setSearchFriend] = useState("");
-  const [filtredFriends, setFiltredFriends] = useState<UserProps[]>([]);
 
   const { data } = useSuspenseQuery<UsersProps>({
     queryKey: ["chatFriends"],
@@ -43,11 +42,9 @@ function SearchFriendsList(props: FriendsListProps) {
     },
   });
 
-  useEffect(() => {
-    if (data.contacts) {
-      setFiltredFriends(data.contacts);
-    }
-  }, [data.contacts]);
+  const [filtredFriends, setFiltredFriends] = useState<UserProps[]>(
+    data.contacts,
+  );
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const searchTerm = e.target.value;
