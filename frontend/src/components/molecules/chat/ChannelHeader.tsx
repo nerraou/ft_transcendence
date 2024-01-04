@@ -86,22 +86,25 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-1"
       >
-        <Popover.Panel className="absolute">
+        <Popover.Panel className="absolute right-0">
           <div className="flex flex-col space-y-2 items-start border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-md bg-light-fg-tertiary p-base">
             <button
               onClick={props.showMembers}
-              className="text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary "
+              className="text-base px-2 text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary "
             >
-              <p>Members</p>
+              <label className="inline-block w-full">Members</label>
             </button>
             {isOwner && (
-              <Link href={`chat/channels/update/${props.id}`}>
-                <label className="text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary">
+              <Link
+                href={`chat/channels/update/${props.id}`}
+                className="w-full"
+              >
+                <label className="inline-block text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary px-2 w-full">
                   Update
                 </label>
               </Link>
             )}
-            <label className="text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary">
+            <label className="inline-block text-base text-light-fg-primary dark:text-dark-fg-primary hover:bg-light-bg-tertiary px-2 w-full">
               Leave
             </label>
           </div>
