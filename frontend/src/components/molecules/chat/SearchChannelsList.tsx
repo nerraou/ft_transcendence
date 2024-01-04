@@ -43,7 +43,6 @@ function SearchChannelsList(props: SearchChannelsListProps) {
       return getChannels(props.token);
     },
   });
-
   const [filtredChannels, setFiltredChannels] = useState<ChannelProps[]>(
     data.channels,
   );

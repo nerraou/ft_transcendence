@@ -71,6 +71,7 @@ export interface ChannelInformation {
   name: string;
   imagePath: string;
   description: string;
+  role: "MEMBER" | "OWNER" | "ADMIN";
 }
 
 function Chat(props: ChatProps) {
@@ -81,6 +82,7 @@ function Chat(props: ChatProps) {
       channelId: 0,
       imagePath: "",
       name: "",
+      role: "MEMBER",
     });
 
   const { data: userData } = useUserProfileQuery(props.token);
@@ -127,7 +129,7 @@ function Chat(props: ChatProps) {
       {isChannel && (
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
           <ChannelHeader
-            role="OWNER"
+            role={channelInformation.role}
             token={props.token}
             channelId={channelInformation.channelId}
             channelDescription={channelInformation.description}

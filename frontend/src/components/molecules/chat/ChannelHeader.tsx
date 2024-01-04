@@ -74,7 +74,7 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
 
   return (
     <Popover className="relative">
-      <Popover.Button className="outline-none">
+      <Popover.Button className="flex justify-center items-center outline-none rounded-full w-6 h-7">
         <MenuDots color="stroke-dark-bg-primary" />
       </Popover.Button>
       <Transition
