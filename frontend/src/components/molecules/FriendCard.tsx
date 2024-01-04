@@ -11,6 +11,7 @@ import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useBlockUserMutation } from "@services/useBlockUserMutation";
 import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
+import Link from "next/link";
 
 export type UserStatus = "ONLINE" | "OFFLINE" | "IN_GAME";
 
@@ -25,6 +26,7 @@ interface FriendCardProps {
 }
 interface FriendCardActionsProps {
   status: UserStatus;
+  username: string;
   token: string | unknown;
   id: number;
 }
@@ -91,18 +93,27 @@ function UserPopover(props: FriendCardActionsProps) {
 function FriendCardActions(props: FriendCardActionsProps) {
   return (
     <div className="flex gap-1">
-      <DeviceGamePad
-        color="stroke-light-fg-link"
-        hover="hover:bg-light-fg-tertiary"
-        round="rounded-sm"
-        animated={props.status == "ONLINE"}
+      <Link href={`/game/make?username=${props.username}`}>
+        <DeviceGamePad
+          color="stroke-light-fg-link"
+          hover="hover:bg-light-fg-tertiary"
+          round="rounded-sm"
+          animated={props.status == "ONLINE"}
+        />
+      </Link>
+      <Link href={`/chat/${props.username}`}>
+        <Email
+          color="stroke-light-fg-link"
+          hover="hover:bg-light-fg-tertiary"
+          round="rounded-sm"
+        />
+      </Link>
+      <UserPopover
+        id={props.id}
+        status={props.status}
+        token={props.token}
+        username={props.username}
       />
-      <Email
-        color="stroke-light-fg-link"
-        hover="hover:bg-light-fg-tertiary"
-        round="rounded-sm"
-      />
-      <UserPopover id={props.id} status={props.status} token={props.token} />
     </div>
   );
 }
@@ -118,14 +129,17 @@ function FriendCard(props: FriendCardProps) {
       </div>
       <div className="mb-lg mx-xl p-xl sm:px-2 lg:px-sm pb-4 bg-light-bg-tertiary border-4 border-light-fg-primary rounded-xl">
         <div className="flex justify-start">
-          <User
-            fullName={props.fullname}
-            username={props.username}
-            image={props.image}
-          />
+          <Link href={`/profile/${props.username}`}>
+            <User
+              fullName={props.fullname}
+              username={props.username}
+              image={props.image}
+            />
+          </Link>
         </div>
         <div className="flex justify-center">
           <FriendCardActions
+            username={props.username}
             token={props.token}
             status={props.userStatus}
             id={props.id}
