@@ -64,7 +64,8 @@ function Profile({ token, username }: ProfileProps) {
             <StatsBar
               wins={user.gamesStats.wins}
               losses={user.gamesStats.losses}
-              matches={user.gamesStats.wins + user.gamesStats.losses}
+              lossesPercentage={user.gamesStats.lossesPercentage}
+              winsPercentage={user.gamesStats.winsPercentage}
             />
             <div className="self-center w-4/6 sm:w-full">
               <UserAchievements
