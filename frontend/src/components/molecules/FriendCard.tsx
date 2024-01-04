@@ -9,11 +9,15 @@ import UserMinus from "@icons/outline/UserMinus";
 import User from "@atoms/UserCard";
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import { useBlockUserMutation } from "@services/useBlockUserMutation";
+import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
 
 export type UserStatus = "ONLINE" | "OFFLINE" | "IN_GAME";
 
 interface FriendCardProps {
   fullname: string;
+  token: string | unknown;
+  id: number;
   username: string;
   level: number;
   image: string;
@@ -21,9 +25,14 @@ interface FriendCardProps {
 }
 interface FriendCardActionsProps {
   status: UserStatus;
+  token: string | unknown;
+  id: number;
 }
 
-function UserPopover() {
+function UserPopover(props: FriendCardActionsProps) {
+  const blockUserMutation = useBlockUserMutation();
+  const removeUserMutation = useRemoveFriendMutation();
+
   return (
     <Popover className="relative">
       <Popover.Button className="outline-none">
@@ -44,18 +53,34 @@ function UserPopover() {
       >
         <Popover.Panel className="absolute">
           <div className="flex flex-col bg-light-fg-tertiary p-sm rounded-base">
-            <div className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm">
+            <button
+              disabled={removeUserMutation.isPending}
+              onClick={() =>
+                removeUserMutation.mutate({
+                  token: props.token,
+                  userId: props.id,
+                })
+              }
+              className="flex items-center p-xs hover:bg-light-bg-tertiary rounded-sm"
+            >
               <UserMinus color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">
                 Remove
               </label>
-            </div>
-            <div className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm">
+            </button>
+
+            <button
+              disabled={blockUserMutation.isPending}
+              className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
+              onClick={() =>
+                blockUserMutation.mutate({ token: props.token, id: props.id })
+              }
+            >
               <UserBlock color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">
                 Block
               </label>
-            </div>
+            </button>
           </div>
         </Popover.Panel>
       </Transition>
@@ -77,7 +102,7 @@ function FriendCardActions(props: FriendCardActionsProps) {
         hover="hover:bg-light-fg-tertiary"
         round="rounded-sm"
       />
-      <UserPopover />
+      <UserPopover id={props.id} status={props.status} token={props.token} />
     </div>
   );
 }
@@ -100,7 +125,11 @@ function FriendCard(props: FriendCardProps) {
           />
         </div>
         <div className="flex justify-center">
-          <FriendCardActions status={props.userStatus} />
+          <FriendCardActions
+            token={props.token}
+            status={props.userStatus}
+            id={props.id}
+          />
         </div>
       </div>
     </div>

@@ -78,7 +78,7 @@ function UserPopover(props: UserPopoverProps) {
                 disabled={addUserMutation.isPending}
                 onClick={() =>
                   addUserMutation.mutate({
-                    token: session?.user.accessToken,
+                    token: token,
                     userId: props.id,
                   })
                 }
@@ -96,7 +96,7 @@ function UserPopover(props: UserPopoverProps) {
                 disabled={removeUserMutation.isPending}
                 onClick={() =>
                   removeUserMutation.mutate({
-                    token: session?.user?.accessToken,
+                    token: token,
                     userId: props.id,
                   })
                 }
