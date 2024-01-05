@@ -8,9 +8,11 @@ import Image from "next/image";
 interface ActionsOwnerProps {
   members: MembersData[];
   token: string | unknown;
+  profileOwnerId: number;
 }
 
 interface OwnerProps {
+  profileOwnerId: number;
   channelId: number;
   memberId: number;
   imagePath: string;
@@ -21,6 +23,7 @@ interface OwnerProps {
 
 function Owner(props: OwnerProps) {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+  const isMe = props.profileOwnerId == props.memberId;
 
   return (
     <div className="flex flex-col items-center hover:bg-light-fg-tertiary border-2 rounded-md border-dark-fg-primary p-2 space-y-4">
@@ -41,27 +44,37 @@ function Owner(props: OwnerProps) {
         <p className="text-dark-fg-primary text-lg">{props.username}</p>
       </div>
       <div className="flex space-x-5">
-        <ActionMuteMember
-          channelId={props.channelId}
-          memberId={props.memberId}
-          token={props.token}
-        />
-        <ActionChallengeMember username={props.username} />
-        <ActionBanMember
-          channelId={props.channelId}
-          memberId={props.memberId}
-          token={props.token}
-        />
-        <ActionKickMember
-          channelId={props.channelId}
-          memberId={props.memberId}
-          token={props.token}
-        />
-        <ActionAddAdmin
-          channelId={props.channelId}
-          memberId={props.memberId}
-          token={props.token}
-        />
+        {!isMe && (
+          <ActionMuteMember
+            channelId={props.channelId}
+            memberId={props.memberId}
+            token={props.token}
+          />
+        )}
+        {!isMe && <ActionChallengeMember username={props.username} />}
+
+        {!isMe && (
+          <ActionBanMember
+            channelId={props.channelId}
+            memberId={props.memberId}
+            token={props.token}
+          />
+        )}
+
+        {!isMe && (
+          <ActionKickMember
+            channelId={props.channelId}
+            memberId={props.memberId}
+            token={props.token}
+          />
+        )}
+        {!isMe && (
+          <ActionAddAdmin
+            channelId={props.channelId}
+            memberId={props.memberId}
+            token={props.token}
+          />
+        )}
       </div>
     </div>
   );
@@ -73,6 +86,7 @@ function ActionsOwner(props: ActionsOwnerProps) {
       {props.members.map((member) => {
         return (
           <Owner
+            profileOwnerId={props.profileOwnerId}
             key={member.memberId}
             channelId={member.channelId}
             memberId={member.memberId}

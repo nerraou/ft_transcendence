@@ -13,6 +13,7 @@ import ActionsMember from "./ActionsMember";
 import ActionsAdmin from "./ActionsAdmin";
 import baseQuery, { RequestError } from "@utils/baseQuery";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useDecodeAccessToken from "@app/game/play/hooks/useDecodeAccessToken";
 
 interface ChannelHeaderProps {
   channelId: number;
@@ -93,6 +94,14 @@ function ManageMemebers(props: ManageMemebersProps) {
 
   const [searchMember, setSearchMember] = useState("");
   const [filtredMembers, setFiltredMembers] = useState<MembersData[]>([]);
+  const payload = useDecodeAccessToken({
+    accessToken: props.token,
+  });
+
+  let sub;
+  if (payload) {
+    sub = payload.sub;
+  }
 
   useEffect(() => {
     if (data.members) {
@@ -128,14 +137,26 @@ function ManageMemebers(props: ManageMemebersProps) {
         }}
       />
       <div className="px-2 overflow-scroll h-96 scrollbar-thin scrollbar-thumb-dark-bg-primary">
-        {props.isMember && (
-          <ActionsMember members={filtredMembers} token={props.token} />
+        {props.isMember && sub && (
+          <ActionsMember
+            members={filtredMembers}
+            token={props.token}
+            profileOwnerId={sub}
+          />
         )}
-        {props.isOwner && (
-          <ActionsOwner members={filtredMembers} token={props.token} />
+        {props.isOwner && sub && (
+          <ActionsOwner
+            members={filtredMembers}
+            token={props.token}
+            profileOwnerId={sub}
+          />
         )}
-        {props.isAdmin && (
-          <ActionsAdmin members={filtredMembers} token={props.token} />
+        {props.isAdmin && sub && (
+          <ActionsAdmin
+            members={filtredMembers}
+            token={props.token}
+            profileOwnerId={sub}
+          />
         )}
       </div>
     </div>
