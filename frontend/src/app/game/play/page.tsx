@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
 import dynamic from "next/dynamic";
 import * as yup from "yup";
 
@@ -17,6 +16,7 @@ import { GameConfig } from "./hooks/useGame";
 import ErrorModal from "./components/ErrorModal";
 import GameOverModal, { GameOverStatus } from "./components/GameOverModal";
 import PendingModal from "./components/PendingModal";
+import useDecodeAccessToken from "./hooks/useDecodeAccessToken";
 
 const Game = dynamic(() => import("./Game"), {
   ssr: false,
@@ -79,21 +79,6 @@ export interface MakeGameOptions {
 interface GameOverState {
   winnerId?: number;
   status?: "aborted" | "abandoned";
-}
-
-function useDecodeAccessToken(params: any) {
-  const [payload, setPayload] = useState<any>();
-
-  useEffect(() => {
-    if (!params.accessToken) {
-      return;
-    }
-
-    const decoded = jwtDecode(params.accessToken);
-    setPayload(decoded);
-  }, [params.accessToken]);
-
-  return payload;
 }
 
 export default function Page() {

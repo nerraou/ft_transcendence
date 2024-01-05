@@ -5,19 +5,27 @@ import Image from "next/image";
 interface ActionsMemberProps {
   members: MembersData[];
   token: string | unknown;
+  profileOwnerId: number;
 }
 
 interface MemberProps {
+  memberId: number;
   imagePath: string;
   username: string;
   token: string | unknown;
+  profileOwnerId: number;
+  role: "MEMBER" | "OWNER" | "ADMIN";
 }
 
 function Member(props: MemberProps) {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+  const isMe = props.profileOwnerId == props.memberId;
 
   return (
     <div className="flex justify-between hover:bg-light-fg-tertiary p-2">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+        {props.role}
+      </label>
       <div className="flex space-x-2">
         <div className="relative shrink-0 w-16 h-16">
           <Image
@@ -31,7 +39,7 @@ function Member(props: MemberProps) {
 
         <p className="text-light-fg-link text-lg">{props.username}</p>
       </div>
-      <ActionChallengeMember username={props.username} />
+      {!isMe && <ActionChallengeMember username={props.username} />}
     </div>
   );
 }
@@ -42,10 +50,13 @@ function ActionsMember(props: ActionsMemberProps) {
       {props.members.map((member) => {
         return (
           <Member
+            role={member.role}
             key={member.memberId}
+            memberId={member.memberId}
             imagePath={member.member.avatarPath}
             username={member.member.username}
             token={props.token}
+            profileOwnerId={props.profileOwnerId}
           />
         );
       })}

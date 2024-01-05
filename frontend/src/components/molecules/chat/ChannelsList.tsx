@@ -175,7 +175,7 @@ function ChannelAddUser(props: ChannelAddUserProps) {
     return setIsOpen(false);
   }
   return (
-    <div className="flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
+    <div className="px-2 flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
       <div
         onClick={() => {
           props.onChannelClick({
