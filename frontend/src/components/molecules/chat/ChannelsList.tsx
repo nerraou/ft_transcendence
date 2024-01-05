@@ -6,6 +6,12 @@ import Add from "@components/atoms/icons/outline/Add";
 import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
 import { useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
+import baseQuery from "@utils/baseQuery";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import User from "@components/atoms/chat/User";
+import UserPlus from "@components/atoms/icons/outline/UserPlus";
 
 export interface ChannelProps {
   id: number;
@@ -34,22 +40,86 @@ interface ChannelsListProps {
   onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
-function AddUser() {
+interface GetUser {
+  token: string | unknown;
+  username: string;
+  channelId: number;
+}
+
+interface AddUserProps {
+  channelId: number;
+}
+
+interface UserProps {
+  id: number;
+  status: "ONLINE" | "OFFLINE" | "IN_GAME";
+  username: string;
+  avatarPath: string;
+}
+
+async function getUser(invite: GetUser) {
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE_URL +
+    `/users/search?search_query=${invite.username}&channel_id=${invite.channelId}`;
+
+  const res = await baseQuery(url, {
+    headers: {
+      Authorization: `Bearer ${invite.token}`,
+    },
+  });
+  const response = res.json();
+  return response;
+}
+
+function AddUser(props: AddUserProps) {
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+
+  const [queryUsername, setQueryUsername] = useState("");
+  const session = useSession();
+
+  const users = useQuery<UserProps[]>({
+    queryKey: ["users/search", queryUsername],
+    enabled: queryUsername.length > 1,
+    queryFn: () => {
+      return getUser({
+        channelId: props.channelId,
+        username: queryUsername,
+        token: session.data?.user.accessToken,
+      });
+    },
+  });
+
   return (
-    <div className="bg-light-bg-tertiary">
+    <div className="bg-light-bg-tertiary flex flex-col space-y-6">
       <InputSearch
-        value=""
+        value={queryUsername}
         bgColor="bg-light-fg-tertiary"
         textColor="text-light-fg-primary"
         placeholder="Search"
         width="w-full"
-        onChange={() => {
-          return;
+        onChange={(e) => {
+          setQueryUsername(e.target.value);
         }}
         onClear={() => {
-          return;
+          setQueryUsername("");
         }}
       />
+      <div className="flex flex-col space-y-2">
+        {users.data?.map((user) => {
+          return (
+            <div key={user.id} className="flex justify-between items-center">
+              <User
+                avatarPath={imageUrl + user.avatarPath}
+                status={user.status}
+                username={user.username}
+              />
+              <button className="flex items-center justify-center w-10 h-10 hover:bg-light-fg-tertiary">
+                <UserPlus color="stroke-light-fg-primary" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -84,11 +154,11 @@ function ChannelAddUser(props: ChannelAddUserProps) {
         onClick={() => setIsOpen(true)}
       />
       <Modal
-        title="New users"
+        title="INVITE USERS"
         onClose={onClose}
         isOpen={isOpen}
-        description="Add Users To this channel"
-        action={<AddUser />}
+        description={clsx("Invite new Users To The", props.name)}
+        action={<AddUser channelId={props.id} />}
       />
     </div>
   );
