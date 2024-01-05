@@ -341,10 +341,40 @@ export class ChannelsService {
     });
   }
 
-  findChannelMessages(channelId: number, page: number, limit: number) {
-    return this.prisma.channelMessage.findMany({
+  async findChannelMessages(
+    channelId: number,
+    page: number,
+    limit: number,
+    userId: number,
+  ) {
+    const blocks = await this.prisma.block.findMany({
+      where: {
+        OR: [
+          {
+            blocked: userId,
+          },
+          {
+            blockedBy: userId,
+          },
+        ],
+      },
+    });
+
+    const blockedIds = [];
+
+    blocks.forEach((item) => {
+      blockedIds.push(item.blocked);
+      blockedIds.push(item.blockedBy);
+    });
+
+    return await this.prisma.channelMessage.findMany({
       where: {
         channelId: channelId,
+        sender: {
+          memberId: {
+            notIn: blockedIds,
+          },
+        },
       },
       skip: (page - 1) * limit,
       take: limit,
