@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Vector } from "p5";
 
 import Paddle from "../classes/Paddle";
+import { Vector } from "../classes/Vector";
 
 interface UsePaddleParams {
   width: number;
