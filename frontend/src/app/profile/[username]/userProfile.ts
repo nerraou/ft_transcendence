@@ -42,6 +42,12 @@ interface History {
   }[];
 }
 
+interface Acheivement {
+  id: number;
+  name: string;
+  userId: number;
+}
+
 export const useProfile = (token: string | unknown, username: string) => {
   const fetchHistory = async () => {
     const url =
@@ -83,6 +89,29 @@ export const useProfile = (token: string | unknown, username: string) => {
     queryFn: fetchProfile,
   });
 
+  const fetchAchievements = async () => {
+    const url =
+      process.env.NEXT_PUBLIC_API_BASE_URL + `/achievements/${username}`;
+
+    const res = await baseQuery(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-cache",
+    });
+    const response = res.json();
+    return response;
+  };
+
+  const {
+    data: achievements,
+    isLoading: achievementsLoading,
+    isError: achievementsError,
+  } = useSuspenseQuery<Acheivement[]>({
+    queryKey: ["achievements", username],
+    queryFn: fetchAchievements,
+  });
+
   const {
     data: history,
     isLoading: historyLoading,
@@ -98,7 +127,8 @@ export const useProfile = (token: string | unknown, username: string) => {
 
   return {
     data,
-    isLoading,
-    isError,
+    achievements,
+    isLoading: isLoading || achievementsLoading,
+    isError: isError || achievementsError,
   };
 };

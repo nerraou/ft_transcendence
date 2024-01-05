@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 
-import useP5 from "../../play/hooks/useP5";
+import useCanvas from "../../play/hooks/useCanvas";
 import usePlayer from "../../play/hooks/usePlayer";
 
 interface GameBoardProps {
@@ -33,36 +33,34 @@ export default function GameBoard(props: GameBoardProps) {
   });
 
   const [canvasRef, setCanvasRef] = useState<HTMLCanvasElement>();
-  const { elementRef: boardRef } = useP5<HTMLDivElement>({
-    setup(p5) {
-      const instance = p5.createCanvas(width, height);
-      setCanvasRef(instance.canvas);
+  const { elementRef: boardRef } = useCanvas<HTMLDivElement>({
+    setup(instance) {
+      instance.create(width, height);
+      setCanvasRef(instance.getCanvas());
     },
-    draw(p5) {
-      player.paddle.setP5(p5);
-      opponent.paddle.setP5(p5);
+    draw(canvas) {
+      player.paddle.setCanvas(canvas);
+      opponent.paddle.setCanvas(canvas);
 
-      p5.background(boardColor);
-
+      canvas.background(boardColor);
       player.updatePosition(height);
 
       player.paddle.draw(paddleColor);
       opponent.paddle.draw(paddleColor);
 
-      p5.stroke(paddleColor);
-      p5.drawingContext.setLineDash([3, 3]);
-      p5.line(width / 2, height - 10, width / 2, 10);
+      canvas.stroke(paddleColor);
+      canvas.getContext()?.setLineDash([3, 3]);
+      canvas.line(width / 2, height - 10, width / 2, 10);
 
-      p5.noStroke();
-      p5.circle(width / 2 + 100, height / 2 - 50, 20);
+      canvas.circle(width / 2 + 100, height / 2 - 50, 20);
     },
 
-    keyPressed(p5) {
-      switch (p5.keyCode) {
-        case p5.DOWN_ARROW:
+    keyPressed(e) {
+      switch (e.code) {
+        case "ArrowDown":
           player.moveDown();
           break;
-        case p5.UP_ARROW:
+        case "ArrowUp":
           player.moveUp();
           break;
       }

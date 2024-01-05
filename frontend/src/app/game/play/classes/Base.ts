@@ -1,12 +1,14 @@
+import { Canvas } from "./Canvas";
+
 export default abstract class Base {
-  public p5: Record<string, any> | null;
+  public canvas: Canvas | null;
 
   constructor() {
-    this.p5 = null;
+    this.canvas = null;
   }
 
-  setP5(instance: any) {
-    this.p5 = instance;
+  setCanvas(instance: Canvas) {
+    this.canvas = instance;
   }
 
   abstract draw(): void;
