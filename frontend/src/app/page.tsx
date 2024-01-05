@@ -47,12 +47,12 @@ export default function Home() {
       >
         <h1>
           This is a game where you will find yourself inside a GameBoy and your
-          the mission is to be the best Ponger ever!
+          mission is to be the best Ponger ever!
         </h1>
         <ul>
           First, choose your way to create your account
           <li>Email and password</li>
-          <li>Goole or 42 acount</li>
+          <li>Google or 42 acount</li>
         </ul>
         <ul>
           what is waiting for you?
