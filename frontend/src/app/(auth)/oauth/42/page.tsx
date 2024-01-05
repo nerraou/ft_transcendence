@@ -2,10 +2,11 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 import Loading from "@app/loading";
 import { useBoolean } from "@hooks/useBoolean";
-import TOOTPModal from "@components/atoms/TOTPModal";
+import TOTPModal from "@components/atoms/TOTPModal";
 
 import useSignUpWith42Mutation from "./useSignUpWith42Mutation";
 
@@ -23,6 +24,7 @@ export default function GoogleAuth() {
   const {
     mutate: signUpWith42,
     data,
+    isPending,
     isSuccess,
     isError,
     error,
@@ -44,6 +46,8 @@ export default function GoogleAuth() {
         if (errorJson.code == "2FA_ENABLED") {
           if (errorJson.key) {
             setKey(errorJson.key);
+          } else {
+            toast.error("invalid otp");
           }
 
           return showTOTPModal();
@@ -75,19 +79,22 @@ export default function GoogleAuth() {
 
   if (isTOTPModalVisible) {
     return (
-      <TOOTPModal
-        isOpen={isTOTPModalVisible}
-        isPending={false}
-        onVerify={(totp) => {
-          if (key) {
-            signUpWith42({
-              provider: "oauth-totp-verify",
-              token: totp,
-              key: key,
-            });
-          }
-        }}
-      />
+      <>
+        <TOTPModal
+          isOpen={isTOTPModalVisible}
+          isPending={isPending}
+          onVerify={(totp) => {
+            if (key) {
+              signUpWith42({
+                provider: "oauth-totp-verify",
+                token: totp,
+                key: key,
+              });
+            }
+          }}
+        />
+        <Toaster position="top-right" />
+      </>
     );
   }
 

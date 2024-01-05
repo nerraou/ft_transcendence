@@ -3,6 +3,7 @@
 import useTheme from "@hooks/useTheme";
 import clsx from "clsx";
 import { ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
 
 interface LayoutAuthProps {
   children: ReactNode | ReactNode[];
@@ -30,6 +31,7 @@ function LayoutAuth(props: LayoutAuthProps) {
           {props.children}
         </section>
       </section>
+      <Toaster position="top-right" />
     </main>
   );
 }

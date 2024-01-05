@@ -6,6 +6,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import { SubmitHandler } from "react-hook-form";
 import { SignInResponse, signIn } from "next-auth/react";
 import clsx from "clsx";
+import toast from "react-hot-toast";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
@@ -14,7 +15,7 @@ import Button from "@atoms/Button";
 import Modal from "@atoms/Modal";
 import { useBoolean } from "@hooks/useBoolean";
 import useOAuthFlow from "@hooks/useOAuthFlow";
-import TOOTPModal from "@components/atoms/TOTPModal";
+import TOTPModal from "@components/atoms/TOTPModal";
 
 import ButtonOAuth from "./ButtonOAuth";
 import useSignInForm from "./useSignInForm";
@@ -115,7 +116,9 @@ function SignInForm() {
         showSuccessModal();
       } else {
         setRes(response);
-        showErrorModal();
+        toast.error("invalid top", {
+          position: "top-right",
+        });
       }
     } catch (error) {
       setLoading(false);
@@ -155,7 +158,7 @@ function SignInForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col items-center w-full"
     >
-      <TOOTPModal
+      <TOTPModal
         isOpen={isTOTPModalVisible}
         isPending={isLoading}
         onVerify={(totp) => {

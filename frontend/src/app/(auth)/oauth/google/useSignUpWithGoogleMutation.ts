@@ -22,7 +22,7 @@ export default function useSignUpWithGoogleMutation() {
   >({
     retry: false,
     mutationFn(oAuthParams) {
-      return signIn("google-auth", {
+      return signIn(oAuthParams.provider, {
         ...oAuthParams,
         redirect: false,
       });

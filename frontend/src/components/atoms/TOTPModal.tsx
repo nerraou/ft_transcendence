@@ -17,7 +17,7 @@ function noOp() {
   // no operation
 }
 
-export default function TOOTPModal(props: ModalProps) {
+export default function TOTPModal(props: ModalProps) {
   const completeDevRef = useRef(null);
   const [otp, setOTP] = useState("");
 
