@@ -15,6 +15,7 @@ interface OwnerProps {
   memberId: number;
   imagePath: string;
   username: string;
+  role: "MEMBER" | "OWNER" | "ADMIN";
   token: string | unknown;
 }
 
@@ -23,6 +24,9 @@ function Owner(props: OwnerProps) {
 
   return (
     <div className="flex flex-col items-center hover:bg-light-fg-tertiary border-2 rounded-md border-dark-fg-primary p-2 space-y-4">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+        {props.role}
+      </label>
       <div className="flex flex-col justify-center items-center">
         <div className="relative shrink-0 w-16 h-16">
           <Image
@@ -74,6 +78,7 @@ function ActionsOwner(props: ActionsOwnerProps) {
             memberId={member.memberId}
             imagePath={member.member.avatarPath}
             username={member.member.username}
+            role={member.role}
             token={props.token}
           />
         );

@@ -58,6 +58,7 @@ export interface MembersData {
   id: number;
   memberId: number;
   channelId: number;
+  role: "MEMBER" | "OWNER" | "ADMIN";
   member: Member;
 }
 
@@ -89,6 +90,7 @@ function useLeaveChannelMutation() {
 
 function ManageMemebers(props: ManageMemebersProps) {
   const { data } = useChannelQuery(props.token, props.channelId);
+
   const [searchMember, setSearchMember] = useState("");
   const [filtredMembers, setFiltredMembers] = useState<MembersData[]>([]);
 
@@ -107,6 +109,7 @@ function ManageMemebers(props: ManageMemebersProps) {
         .toLowerCase()
         .startsWith(searchTerm.toLowerCase());
     });
+
     setFiltredMembers(filtredItems);
   }
 

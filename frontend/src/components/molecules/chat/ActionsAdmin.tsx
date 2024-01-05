@@ -14,6 +14,7 @@ interface AdminProps {
   memberId: number;
   imagePath: string;
   username: string;
+  role: "MEMBER" | "OWNER" | "ADMIN";
   token: string | unknown;
 }
 
@@ -22,6 +23,10 @@ function Admin(props: AdminProps) {
 
   return (
     <div className="flex flex-col items-center hover:bg-light-fg-tertiary border-2 rounded-md border-dark-fg-primary p-2 space-y-4">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+        {props.role}
+      </label>
+
       <div className="flex flex-col justify-center items-center">
         <div className="relative shrink-0 w-16 h-16">
           <Image
@@ -35,6 +40,7 @@ function Admin(props: AdminProps) {
 
         <p className="text-dark-fg-primary text-lg">{props.username}</p>
       </div>
+
       <div className="flex space-x-5">
         <ActionMuteMember
           channelId={props.channelId}
@@ -69,6 +75,7 @@ function ActionsAdmin(props: ActionsAdminProps) {
             imagePath={member.member.avatarPath}
             username={member.member.username}
             token={props.token}
+            role={member.role}
           />
         );
       })}

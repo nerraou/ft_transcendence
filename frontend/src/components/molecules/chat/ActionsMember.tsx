@@ -11,6 +11,7 @@ interface MemberProps {
   imagePath: string;
   username: string;
   token: string | unknown;
+  role: "MEMBER" | "OWNER" | "ADMIN";
 }
 
 function Member(props: MemberProps) {
@@ -18,6 +19,9 @@ function Member(props: MemberProps) {
 
   return (
     <div className="flex justify-between hover:bg-light-fg-tertiary p-2">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+        {props.role}
+      </label>
       <div className="flex space-x-2">
         <div className="relative shrink-0 w-16 h-16">
           <Image
@@ -42,6 +46,7 @@ function ActionsMember(props: ActionsMemberProps) {
       {props.members.map((member) => {
         return (
           <Member
+            role={member.role}
             key={member.memberId}
             imagePath={member.member.avatarPath}
             username={member.member.username}
