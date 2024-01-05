@@ -261,12 +261,15 @@ export class UsersService {
   }
 
   blockUser(userToBlock: number, blockedBy: number) {
-    return this.prisma.block.create({
-      data: {
-        blocked: userToBlock,
-        blockedBy: blockedBy,
-      },
-    });
+    this.prisma.$transaction([
+      this.prisma.block.create({
+        data: {
+          blocked: userToBlock,
+          blockedBy: blockedBy,
+        },
+      }),
+      this.unfriendUser(userToBlock, blockedBy),
+    ]);
   }
 
   unblockUser(userToUnblock: number, blockedBy: number) {
