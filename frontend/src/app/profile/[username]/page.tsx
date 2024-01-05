@@ -28,6 +28,7 @@ interface ProfileProps {
 function Profile({ token, username }: ProfileProps) {
   const {
     data: { user, history },
+    achievements,
   } = useProfile(token, username);
   const router = useRouter();
 
@@ -69,16 +70,9 @@ function Profile({ token, username }: ProfileProps) {
             />
             <div className="self-center w-4/6 sm:w-full">
               <UserAchievements
-                achievements={[
-                  "CleanSheet",
-                  "FirstWin",
-                  "FiveWins",
-                  "OneHundredWins",
-                  "FirstRanked",
-                  "SecondRanked",
-                  "ThirdRanked",
-                  "LastRanked",
-                ]}
+                achievements={achievements?.map(
+                  (achievement) => achievement.name,
+                )}
               />
             </div>
             <GameHistoryBrief
