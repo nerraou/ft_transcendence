@@ -1,8 +1,17 @@
 import { ChannelInformation } from "@app/chat/[[...username]]/page";
+import InputSearch from "@components/atoms/InputSearch";
+import Modal from "@components/atoms/Modal";
 import Channel from "@components/atoms/chat/Channel";
 import Add from "@components/atoms/icons/outline/Add";
 import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
+import { useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
+import baseQuery, { RequestError } from "@utils/baseQuery";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import User from "@components/atoms/chat/User";
+import UserPlus from "@components/atoms/icons/outline/UserPlus";
 
 export interface ChannelProps {
   id: number;
@@ -31,7 +40,140 @@ interface ChannelsListProps {
   onChannelClick: (channelInformation: ChannelInformation) => void;
 }
 
+interface GetUser {
+  token: string | unknown;
+  username: string;
+  channelId: number;
+}
+
+interface AddUserProps {
+  channelId: number;
+}
+
+interface UserProps {
+  id: number;
+  status: "ONLINE" | "OFFLINE" | "IN_GAME";
+  username: string;
+  avatarPath: string;
+}
+
+interface InviteMember {
+  channelId: number;
+  username: string;
+  token: string | unknown;
+}
+
+async function getUser(invite: GetUser) {
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE_URL +
+    `/users/search?search_query=${invite.username}&channel_id=${invite.channelId}`;
+
+  const res = await baseQuery(url, {
+    headers: {
+      Authorization: `Bearer ${invite.token}`,
+    },
+  });
+  const response = res.json();
+  return response;
+}
+
+async function inviteMember(invite: InviteMember) {
+  const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/users/invite";
+
+  return await baseQuery(api, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${invite.token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      channelId: invite.channelId,
+      username: invite.username,
+    }),
+  });
+}
+
+function useInviteMemberMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Response, RequestError, InviteMember>({
+    mutationFn: inviteMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chatChannels"] });
+    },
+  });
+}
+
+function AddUser(props: AddUserProps) {
+  const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+
+  const [queryUsername, setQueryUsername] = useState("");
+  const inviteMemberMutation = useInviteMemberMutation();
+  const session = useSession();
+
+  const token = session.data?.user.accessToken;
+  const users = useQuery<UserProps[]>({
+    queryKey: ["users/search", queryUsername],
+    enabled: queryUsername.length > 1,
+    queryFn: () => {
+      return getUser({
+        channelId: props.channelId,
+        username: queryUsername,
+        token: token,
+      });
+    },
+  });
+
+  return (
+    <div className="bg-light-bg-tertiary flex flex-col space-y-6">
+      <InputSearch
+        value={queryUsername}
+        bgColor="bg-light-fg-tertiary"
+        textColor="text-light-fg-primary"
+        placeholder="Search"
+        width="w-full"
+        onChange={(e) => {
+          setQueryUsername(e.target.value);
+        }}
+        onClear={() => {
+          setQueryUsername("");
+        }}
+      />
+      <div className="flex flex-col space-y-2">
+        {users.data?.map((user) => {
+          return (
+            <div key={user.id} className="flex justify-between items-center">
+              <User
+                avatarPath={imageUrl + user.avatarPath}
+                status={user.status}
+                username={user.username}
+              />
+              <button
+                onClick={() =>
+                  inviteMemberMutation.mutate({
+                    channelId: props.channelId,
+                    username: user.username,
+                    token: token,
+                  })
+                }
+                className="flex items-center justify-center w-10 h-10 hover:bg-light-fg-tertiary"
+              >
+                <UserPlus color="stroke-light-fg-primary" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ChannelAddUser(props: ChannelAddUserProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  function onClose() {
+    return setIsOpen(false);
+  }
   return (
     <div className="flex justify-between items-center space-x-2 hover:bg-light-bg-tertiary cursor-pointer">
       <div
@@ -53,9 +195,14 @@ function ChannelAddUser(props: ChannelAddUserProps) {
       </div>
       <UsersAdd
         color="stroke-light-fg-primary"
-        onClick={() => {
-          return;
-        }}
+        onClick={() => setIsOpen(true)}
+      />
+      <Modal
+        title="INVITE USERS"
+        onClose={onClose}
+        isOpen={isOpen}
+        description={clsx("Invite new Users To The", props.name)}
+        action={<AddUser channelId={props.id} />}
       />
     </div>
   );
