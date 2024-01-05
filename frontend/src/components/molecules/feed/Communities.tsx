@@ -34,7 +34,7 @@ function PasswordPopover({
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className="flex items-center justify-center w-20 h-10 rounded-lg bg-light-fg-link text-light-fg-tertiary min-w-min">
+          <Popover.Button className="flex items-center justify-center w-24 h-10 rounded-lg bg-light-fg-link text-light-fg-tertiary min-w-min">
             Join
           </Popover.Button>
           <Transition
@@ -171,7 +171,7 @@ const Communities = ({
               chnnelMembers={channel.membersCount}
               channelImage={imageUrl + channel.imagePath}
             />
-            {channel.type === ChannelType.PROTECTED ? (
+            {channel.type !== ChannelType.PROTECTED ? (
               <PasswordPopover
                 onJoin={join}
                 id={channel.id}
