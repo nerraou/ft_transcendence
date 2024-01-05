@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Vector } from "p5";
 
 import { useSocket } from "@contexts/socket";
 
 import useBall from "./useBall";
 import usePlayer, { PaddleSide } from "./usePlayer";
+import { Vector } from "../classes/Vector";
 
 export interface PlayerEntity {
   id: number;

@@ -1,20 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import P5 from "p5";
+import { useCallback, useEffect, useRef } from "react";
 
-type SetupFunction = (p5: any) => void;
-type DrawFunction = (p5: any) => void;
+import {
+  Canvas,
+  DrawFunction,
+  KeyPressedFunction,
+  KeyReleasedFunction,
+  SetupFunction,
+} from "../classes/Canvas";
 
-type KeyPressedFunction = (p5: any, e: KeyboardEvent) => void;
-type KeyReleasedFunction = (p5: any, e: KeyboardEvent) => void;
-
-interface UseP5Params {
+interface UseCanvasParams {
   draw: SetupFunction;
   setup: DrawFunction;
   keyPressed?: KeyPressedFunction;
   keyReleased?: KeyReleasedFunction;
 }
 
-export default function useP5<T extends HTMLElement>(params: UseP5Params) {
+export default function useCanvas<T extends HTMLElement>(
+  params: UseCanvasParams,
+) {
   const { setup, draw } = params;
 
   const elementRef = useRef<T>(null);
@@ -24,8 +27,6 @@ export default function useP5<T extends HTMLElement>(params: UseP5Params) {
   const keyPressedFunctionRef = useRef<KeyPressedFunction>();
   const keyReleasedFunctionRef = useRef<KeyReleasedFunction>();
 
-  const [p5Instance, setP5Instance] = useState<any>(null);
-
   useEffect(() => {
     setupFunctionRef.current = setup;
     drawFunctionRef.current = draw;
@@ -34,30 +35,30 @@ export default function useP5<T extends HTMLElement>(params: UseP5Params) {
     keyReleasedFunctionRef.current = params.keyReleased;
   });
 
-  const sketch = useCallback(function sketch(p: any) {
-    p.setup = () => {
+  const sketch = useCallback(function sketch(canvas: Canvas) {
+    canvas.onSetup(() => {
       if (setupFunctionRef.current) {
-        setupFunctionRef.current(p);
+        setupFunctionRef.current(canvas);
       }
-    };
+    });
 
-    p.draw = () => {
+    canvas.onDraw(() => {
       if (drawFunctionRef.current) {
-        drawFunctionRef.current(p);
+        drawFunctionRef.current(canvas);
       }
-    };
+    });
 
-    p.keyPressed = (e: KeyboardEvent) => {
+    canvas.onKeyPressed((e) => {
       if (keyPressedFunctionRef.current) {
-        keyPressedFunctionRef.current(p, e);
+        keyPressedFunctionRef.current(e, canvas);
       }
-    };
+    });
 
-    p.keyReleased = (e: KeyboardEvent) => {
+    canvas.onKeyReleased((e) => {
       if (keyReleasedFunctionRef.current) {
-        keyReleasedFunctionRef.current(p, e);
+        keyReleasedFunctionRef.current(e, canvas);
       }
-    };
+    });
   }, []);
 
   useEffect(() => {
@@ -65,8 +66,7 @@ export default function useP5<T extends HTMLElement>(params: UseP5Params) {
       return;
     }
 
-    const instance = new P5(sketch, elementRef.current);
-    setP5Instance(instance);
+    const instance = new Canvas(sketch, elementRef.current);
 
     return () => {
       instance.remove();
@@ -74,7 +74,6 @@ export default function useP5<T extends HTMLElement>(params: UseP5Params) {
   }, [sketch]);
 
   return {
-    p5: p5Instance,
     elementRef,
   };
 }

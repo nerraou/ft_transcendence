@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import { Vector } from "p5";
 
 import usePaddle from "./usePaddle";
 import { PADDLE_PADDING, PADDLE_SPEED } from "../../constants";
+import { Vector } from "../classes/Vector";
 
 export const PADDLE_WIDTH = 15;
 export const PADDLE_HEIGHT = 100;

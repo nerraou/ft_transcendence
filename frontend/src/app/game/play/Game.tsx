@@ -9,7 +9,7 @@ import Layout from "@components/templates/Layout";
 import Bar from "@components/atoms/decoration/Bar";
 
 import useGame, { GameConfig } from "./hooks/useGame";
-import useP5 from "./hooks/useP5";
+import useCanvas from "./hooks/useCanvas";
 import { MakeGameOptions } from "./page";
 
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../constants";
@@ -42,19 +42,18 @@ export default function Game(props: GameProps) {
     canvasRef.style.height = "auto";
   }, [canvasRef]);
 
-  const { elementRef } = useP5<HTMLDivElement>({
-    setup(p5) {
-      p5.background(0);
-      const instance = p5.createCanvas(BOARD_WIDTH, BOARD_HEIGHT);
-      setCanvasRef(instance.canvas);
+  const { elementRef } = useCanvas<HTMLDivElement>({
+    setup(canvas) {
+      canvas.create(BOARD_WIDTH, BOARD_HEIGHT);
+      setCanvasRef(canvas.getCanvas());
     },
 
-    draw(p5) {
-      p5.background(preferences.boardColor);
+    draw(canvas) {
+      canvas.background(preferences.boardColor);
 
-      player.paddle.setP5(p5);
-      opponent.paddle.setP5(p5);
-      ball.setP5(p5);
+      player.paddle.setCanvas(canvas);
+      opponent.paddle.setCanvas(canvas);
+      ball.setCanvas(canvas);
 
       //   bounceBall();
       player.updatePosition(BOARD_HEIGHT);
@@ -72,22 +71,21 @@ export default function Game(props: GameProps) {
       player.paddle.draw(preferences.paddleColor);
       opponent.paddle.draw(preferences.paddleColor);
 
-      p5.stroke(preferences.paddleColor);
-      p5.drawingContext.setLineDash([3, 3]);
-      p5.line(BOARD_WIDTH / 2, BOARD_HEIGHT - 10, BOARD_WIDTH / 2, 10);
+      canvas.stroke(preferences.paddleColor);
+      canvas.getContext()?.setLineDash([3, 3]);
+      canvas.line(BOARD_WIDTH / 2, BOARD_HEIGHT - 10, BOARD_WIDTH / 2, 10);
 
-      p5.noStroke();
       ball.draw();
     },
 
-    keyPressed(p5) {
+    keyPressed(e) {
       const p = gameConfig.isPlayer ? player : opponent;
 
-      switch (p5.keyCode) {
-        case p5.DOWN_ARROW:
+      switch (e.code) {
+        case "ArrowDown":
           p.moveDown();
           break;
-        case p5.UP_ARROW:
+        case "ArrowUp":
           p.moveUp();
           break;
       }

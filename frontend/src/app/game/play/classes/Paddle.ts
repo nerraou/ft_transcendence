@@ -1,7 +1,6 @@
-import { Vector } from "p5";
-
 import Base from "./Base";
-import UninitializedP5InstanceError from "./UninitializedP5InstanceError";
+import { Vector } from "./Vector";
+import UninitializedCanvasInstanceError from "./UninitializedCanvasInstanceError";
 
 export default class Paddle extends Base {
   public position: Vector;
@@ -17,12 +16,11 @@ export default class Paddle extends Base {
   }
 
   draw(color = "#fff") {
-    if (!this.p5) {
-      throw new UninitializedP5InstanceError();
+    if (!this.canvas) {
+      throw new UninitializedCanvasInstanceError();
     }
 
-    this.p5.fill(color);
-    this.p5.noStroke();
-    this.p5.rect(this.position.x, this.position.y, this.width, this.height);
+    this.canvas.fill(color);
+    this.canvas.rect(this.position.x, this.position.y, this.width, this.height);
   }
 }
