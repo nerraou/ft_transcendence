@@ -171,7 +171,7 @@ const Communities = ({
               chnnelMembers={channel.membersCount}
               channelImage={imageUrl + channel.imagePath}
             />
-            {channel.type !== ChannelType.PROTECTED ? (
+            {channel.type === ChannelType.PROTECTED ? (
               <PasswordPopover
                 onJoin={join}
                 id={channel.id}
