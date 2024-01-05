@@ -78,7 +78,7 @@ export class GamesService {
 
   async findGames(username: string, getGamesDto: GetGamesdDto) {
     const { searchQuery, filterQuery, sortOptions } =
-      this.getFindGamesQueryOptions(getGamesDto);
+      this.getFindGamesQueryOptions(getGamesDto, username);
 
     const games = await this.prisma.game.findMany({
       where: {
@@ -147,7 +147,7 @@ export class GamesService {
 
   async findGamesCount(username: string, getGamesDto: GetGamesdDto) {
     const { searchQuery, filterQuery, sortOptions } =
-      this.getFindGamesQueryOptions(getGamesDto);
+      this.getFindGamesQueryOptions(getGamesDto, username);
 
     return this.prisma.game.count({
       where: {
@@ -172,7 +172,10 @@ export class GamesService {
     });
   }
 
-  private getFindGamesQueryOptions(getGamesDto: GetGamesdDto) {
+  private getFindGamesQueryOptions(
+    getGamesDto: GetGamesdDto,
+    username: string,
+  ) {
     let searchQuery = {};
     let filterQuery = {};
     let sortOptions = {};
@@ -186,8 +189,14 @@ export class GamesService {
                 contains: getGamesDto.searchQuery,
               },
             },
+            opponent: {
+              username,
+            },
           },
           {
+            player: {
+              username,
+            },
             opponent: {
               username: {
                 contains: getGamesDto.searchQuery,
