@@ -11,15 +11,15 @@ import Logo from "@components/atoms/icons/Logo";
 
 export default function Home() {
   return (
-    <main className="space-y-4 flex flex-col justify-center p-8 text-xxl text-light-fg-primary dark:text-light-bg-tertiary bg-light-fg-tertiary dark:bg-dark-bg-primary">
+    <main className="w-max-w space-y-4 flex flex-col justify-center items-center p-8 text-xxl text-light-fg-primary dark:text-light-bg-tertiary bg-light-fg-tertiary dark:bg-dark-bg-primary">
       <h1 className="text-center dark:text-light-bg-tertiary text-light-fg-primarytext-xxl">
         Welcome To PongBoy
       </h1>
-      <div className="flex justify-between px-10">
+      <div className="flex space-x-96 md:space-x-40 sm:space-x-16">
         <div className="flex flex-col">
           <SittingLogo />
           <Link href="/sign-up">
-            <button className="w-56 p-4 text-base text-center text-light-bg-tertiary bg-light-fg-link border rounded-lg border-light-fg-primary">
+            <button className="w-56 sm:w-full p-4 text-base text-center text-light-bg-tertiary bg-light-fg-link border rounded-lg border-light-fg-primary">
               Create acount
             </button>
           </Link>
@@ -27,7 +27,7 @@ export default function Home() {
         <div className="flex flex-col">
           <Logo />
           <Link href="/sign-in">
-            <button className="w-56 p-4 text-center text-base text-light-fg-link rounded-lg border border-light-fg-primary bg-light-bg-secondary">
+            <button className="w-56 sm:w-full p-4 text-center text-base text-light-fg-link rounded-lg border border-light-fg-primary bg-light-bg-secondary">
               Sign in
             </button>
           </Link>
@@ -45,7 +45,7 @@ export default function Home() {
         className="block self-center text-lg text-dark-bg-primary dark:text-light-fg-link border-4 bg-light-fg-tertiary rounded-lg p-8
 		border-dark-fg-primary"
       >
-        <h1 className="text-light-fg-primary">
+        <h1>
           This is a game where you will find yourself inside a GameBoy and your
           the mission is to be the best Ponger ever!
         </h1>
