@@ -7,8 +7,8 @@ import UsersAdd from "@components/atoms/icons/outline/UsersAdd";
 import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import baseQuery from "@utils/baseQuery";
-import { useQuery } from "@tanstack/react-query";
+import baseQuery, { RequestError } from "@utils/baseQuery";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import User from "@components/atoms/chat/User";
 import UserPlus from "@components/atoms/icons/outline/UserPlus";
@@ -57,6 +57,12 @@ interface UserProps {
   avatarPath: string;
 }
 
+interface InviteMember {
+  channelId: number;
+  username: string;
+  token: string | unknown;
+}
+
 async function getUser(invite: GetUser) {
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
@@ -71,12 +77,41 @@ async function getUser(invite: GetUser) {
   return response;
 }
 
+async function inviteMember(invite: InviteMember) {
+  const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/users/invite";
+
+  return await baseQuery(api, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${invite.token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      channelId: invite.channelId,
+      username: invite.username,
+    }),
+  });
+}
+
+function useInviteMemberMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Response, RequestError, InviteMember>({
+    mutationFn: inviteMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chatChannels"] });
+    },
+  });
+}
+
 function AddUser(props: AddUserProps) {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   const [queryUsername, setQueryUsername] = useState("");
+  const inviteMemberMutation = useInviteMemberMutation();
   const session = useSession();
 
+  const token = session.data?.user.accessToken;
   const users = useQuery<UserProps[]>({
     queryKey: ["users/search", queryUsername],
     enabled: queryUsername.length > 1,
@@ -84,7 +119,7 @@ function AddUser(props: AddUserProps) {
       return getUser({
         channelId: props.channelId,
         username: queryUsername,
-        token: session.data?.user.accessToken,
+        token: token,
       });
     },
   });
@@ -113,7 +148,16 @@ function AddUser(props: AddUserProps) {
                 status={user.status}
                 username={user.username}
               />
-              <button className="flex items-center justify-center w-10 h-10 hover:bg-light-fg-tertiary">
+              <button
+                onClick={() =>
+                  inviteMemberMutation.mutate({
+                    channelId: props.channelId,
+                    username: user.username,
+                    token: token,
+                  })
+                }
+                className="flex items-center justify-center w-10 h-10 hover:bg-light-fg-tertiary"
+              >
                 <UserPlus color="stroke-light-fg-primary" />
               </button>
             </div>
