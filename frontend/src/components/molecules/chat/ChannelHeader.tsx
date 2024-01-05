@@ -5,7 +5,7 @@ import MenuDots from "@components/atoms/icons/outline/MenuDots";
 import { Popover, Transition } from "@headlessui/react";
 import clsx from "clsx";
 import Link from "next/link";
-import { Fragment, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { useChannelQuery } from "@services/useChannelQuery";
 
 import ActionsOwner from "./ActionsOwner";
@@ -45,6 +45,22 @@ interface LeaveChannel {
   token: string | unknown;
 }
 
+interface Member {
+  id: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  avatarPath: string;
+  rating: number;
+}
+
+export interface MembersData {
+  id: number;
+  memberId: number;
+  channelId: number;
+  member: Member;
+}
+
 async function leaveChannel(leave: LeaveChannel) {
   const api = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels/leave";
 
@@ -73,31 +89,50 @@ function useLeaveChannelMutation() {
 
 function ManageMemebers(props: ManageMemebersProps) {
   const { data } = useChannelQuery(props.token, props.channelId);
+  const [searchMember, setSearchMember] = useState("");
+  const [filtredMembers, setFiltredMembers] = useState<MembersData[]>([]);
+
+  useEffect(() => {
+    if (data.members) {
+      setFiltredMembers(data.members);
+    }
+  }, [data.members]);
+
+  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+    const searchTerm = e.target.value;
+    setSearchMember(searchTerm);
+
+    const filtredItems = data.members.filter((member) => {
+      return member.member.username
+        .toLowerCase()
+        .startsWith(searchTerm.toLowerCase());
+    });
+    setFiltredMembers(filtredItems);
+  }
 
   return (
     <div className="flex flex-col space-y-4">
       <InputSearch
-        value={""}
+        value={searchMember}
         bgColor="bg-light-fg-tertiary"
         textColor="text-light-fg-primary"
         placeholder="Search"
         width="w-full"
-        onChange={() => {
-          return;
-        }}
+        onChange={handleInputChange}
         onClear={() => {
-          return;
+          setSearchMember("");
+          setFiltredMembers(data.members);
         }}
       />
       <div className="px-2 overflow-scroll h-96 scrollbar-thin scrollbar-thumb-dark-bg-primary">
         {props.isMember && (
-          <ActionsMember members={data.members} token={props.token} />
+          <ActionsMember members={filtredMembers} token={props.token} />
         )}
         {props.isOwner && (
-          <ActionsOwner members={data.members} token={props.token} />
+          <ActionsOwner members={filtredMembers} token={props.token} />
         )}
         {props.isAdmin && (
-          <ActionsAdmin members={data.members} token={props.token} />
+          <ActionsAdmin members={filtredMembers} token={props.token} />
         )}
       </div>
     </div>
