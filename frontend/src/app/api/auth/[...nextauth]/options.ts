@@ -1,5 +1,7 @@
 import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import CredentialsProvider, {
+  CredentialInput,
+} from "next-auth/providers/credentials";
 
 function singUpWithGoogle(oAuthParams: Record<string, string>) {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/google/authorize";
@@ -23,13 +25,39 @@ function singUpWith42(oAuthParams: Record<string, string>) {
   return fetch(url + "?" + searchParams.toString());
 }
 
+function oAuthTOTPVerify(body: Record<string, string>) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/totp/oauth/verify";
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+interface Credentials extends Record<string, CredentialInput> {
+  email: CredentialInput;
+  password: CredentialInput;
+  totp: CredentialInput;
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
-    CredentialsProvider({
+    CredentialsProvider<Credentials>({
       name: "credentials",
-      credentials: {},
+      credentials: {
+        email: {},
+        password: {},
+        totp: {},
+      },
 
       async authorize(credentials) {
+        if (!credentials) {
+          return;
+        }
+
         const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/sign-in";
 
         const res = await fetch(url, {
@@ -37,18 +65,28 @@ export const authOptions: NextAuthOptions = {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(credentials),
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+            token: credentials.token,
+          }),
         });
+
         if (res.status == 200) {
-          const user = await res.json();
-          return user;
+          const data = await res.json();
+
+          if (data.is2faEnabled) {
+            throw new Error("2FA_ENABLED");
+          }
+
+          return data;
         } else {
           return null;
         }
       },
     }),
 
-    CredentialsProvider({
+    CredentialsProvider<any>({
       id: "google-auth",
       name: "google-auth",
       credentials: {},
@@ -60,13 +98,22 @@ export const authOptions: NextAuthOptions = {
 
         const res = await singUpWithGoogle(oAuthParams);
 
-        if (res.ok) {
-          const user = await res.json();
+        if (res.status == 200) {
+          const data = await res.json();
 
-          return user;
-        } else {
-          return null;
+          if (data.is2faEnabled) {
+            throw new Error(
+              JSON.stringify({
+                code: "2FA_ENABLED",
+                key: data.key,
+              }),
+            );
+          }
+
+          return data;
         }
+
+        return null;
       },
     }),
 
@@ -82,13 +129,52 @@ export const authOptions: NextAuthOptions = {
 
         const res = await singUpWith42(oAuthParams);
 
-        if (res.ok) {
-          const user = await res.json();
+        if (res.status == 200) {
+          const data = await res.json();
 
-          return user;
+          if (data.is2faEnabled) {
+            throw new Error(
+              JSON.stringify({
+                code: "2FA_ENABLED",
+                key: data.key,
+              }),
+            );
+          }
+
+          return data;
         } else {
           return null;
         }
+      },
+    }),
+
+    CredentialsProvider<any>({
+      id: "oauth-totp-verify",
+      name: "oauth-totp-verify",
+      credentials: {},
+
+      async authorize(credentials) {
+        if (!credentials) {
+          return null;
+        }
+
+        const res = await oAuthTOTPVerify({
+          key: credentials.key,
+          token: credentials.token,
+        });
+
+        const data = await res.json();
+
+        if (data.is2faEnabled) {
+          throw new Error(
+            JSON.stringify({
+              code: "2FA_ENABLED",
+              key: data.key,
+            }),
+          );
+        }
+
+        return data;
       },
     }),
   ],

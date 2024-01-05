@@ -193,7 +193,7 @@ export class UsersService {
   findOneByFortyTwoId(fortyTwoId: string) {
     return this.prisma.user.findUnique({
       where: {
-        googleAccountId: fortyTwoId,
+        fortyTwoAccountId: fortyTwoId,
       },
     });
   }
@@ -481,6 +481,7 @@ export class UsersService {
         id: true,
         username: true,
         avatarPath: true,
+        status: true,
       },
       take: 10,
     });

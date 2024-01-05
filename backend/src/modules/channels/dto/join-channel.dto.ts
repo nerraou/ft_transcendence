@@ -7,6 +7,6 @@ export class JoinChannelDto {
 
   @IsOptional()
   @IsString()
-  @Length(8)
+  @Length(4)
   password?: string;
 }

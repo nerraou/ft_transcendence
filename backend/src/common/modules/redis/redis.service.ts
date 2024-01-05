@@ -1,7 +1,7 @@
 import { AppEnv, RedisEnv } from "@config/env-configuration";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { createClient } from "redis";
+import { SetOptions, createClient } from "redis";
 
 type RedisClient = ReturnType<typeof createClient>;
 
@@ -27,8 +27,12 @@ export class RedisService implements OnModuleInit {
     return this.client.get(key);
   }
 
-  set(key: RedisCommandArgument, value: RedisCommandArgument | number) {
-    return this.client.set(key, value);
+  set(
+    key: RedisCommandArgument,
+    value: RedisCommandArgument | number,
+    options?: SetOptions,
+  ) {
+    return this.client.set(key, value, options);
   }
 
   del(key: RedisCommandArgument) {

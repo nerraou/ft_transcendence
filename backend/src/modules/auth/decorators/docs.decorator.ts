@@ -219,3 +219,30 @@ export function DisableTFAApiDocumentation() {
     }),
   );
 }
+
+export function VerifyTOTPApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Authentication"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        properties: {
+          key: {
+            type: "string",
+          },
+          token: {
+            type: "string",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+  );
+}

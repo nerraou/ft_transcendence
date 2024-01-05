@@ -197,7 +197,9 @@ export class ChannelsService {
   findPublicChannels(searchQuery: string | undefined) {
     return this.prisma.channel.findMany({
       where: {
-        type: "PUBLIC",
+        type: {
+          not: "PRIVATE",
+        },
         OR: [
           {
             name: {
