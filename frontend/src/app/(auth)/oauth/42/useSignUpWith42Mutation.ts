@@ -19,11 +19,19 @@ export default function useSignUpWith42utation() {
     OAuthParamsProviderInput | OAuthParamsTOTPInput
   >({
     retry: false,
-    mutationFn(oAuthParams) {
-      return signIn(oAuthParams.provider, {
+    async mutationFn(oAuthParams) {
+      const response = await signIn(oAuthParams.provider, {
         ...oAuthParams,
         redirect: false,
       });
+
+      if (!response?.ok) {
+        throw new Error("server error", {
+          cause: response,
+        });
+      }
+
+      return response;
     },
   });
 }

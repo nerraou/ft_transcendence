@@ -19,7 +19,6 @@ import TOTPModal from "@components/atoms/TOTPModal";
 
 import ButtonOAuth from "./ButtonOAuth";
 import useSignInForm from "./useSignInForm";
-import { useRouter } from "next/navigation";
 
 export interface FormInput {
   email: string;
@@ -32,12 +31,13 @@ interface redirectProps {
 }
 
 function Redirect(props: redirectProps) {
-  const router = useRouter();
   return (
     <Button
       text={props.text}
       onClick={() => {
-        router.replace(props.path);
+        // this is necessary to update the session
+        // especially when connected using OAuth
+        window.location.replace(props.path);
       }}
     />
   );

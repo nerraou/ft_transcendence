@@ -14,6 +14,18 @@ function isString(data: any): data is string {
   return typeof data == "string";
 }
 
+function parseError(error: string | null | undefined) {
+  if (!error) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(error);
+  } catch {}
+
+  return null;
+}
+
 export default function GoogleAuth() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
@@ -40,10 +52,19 @@ export default function GoogleAuth() {
 
   useEffect(() => {
     if (isSuccess) {
-      if (data?.error) {
-        const errorJson = JSON.parse(data.error);
+      window.opener.postMessage({
+        isSuccess: true,
+      });
+      window.close();
+    }
+  }, [isSuccess, data]);
 
-        if (errorJson.code == "2FA_ENABLED") {
+  useEffect(() => {
+    if (isError) {
+      if (error.cause.error) {
+        const errorJson = parseError(error.cause.error);
+
+        if (errorJson?.code == "2FA_ENABLED") {
           if (errorJson.key) {
             setKey(errorJson.key);
           } else {
@@ -53,29 +74,15 @@ export default function GoogleAuth() {
           return showTOTPModal();
         }
       }
-
-      window.opener.postMessage({
-        isSuccess: true,
-      });
-      window.close();
-    }
-  }, [isSuccess, data, showTOTPModal]);
-
-  useEffect(() => {
-    async function postError() {
-      if (isError) {
-        try {
-          window.opener.postMessage({
-            isError: !error.response.ok,
-          });
-        } finally {
-          window.close();
-        }
+      try {
+        window.opener.postMessage({
+          isError: !error.cause.ok,
+        });
+      } finally {
+        window.close();
       }
     }
-
-    postError();
-  }, [isError, error]);
+  }, [isError, error, showTOTPModal]);
 
   if (isTOTPModalVisible) {
     return (

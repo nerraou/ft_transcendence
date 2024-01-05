@@ -198,6 +198,7 @@ export class AuthController {
   }
 
   @Post("/totp/oauth/verify")
+  @HttpCode(HttpStatus.OK)
   @VerifyTOTPApiDocumentation()
   async verifyTOTPOAuth(@Body() verifyTOTPOAuthDto: VerifyTOTPOAuthDto) {
     const { key, token } = verifyTOTPOAuthDto;
