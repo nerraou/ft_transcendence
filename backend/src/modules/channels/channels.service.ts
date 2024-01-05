@@ -147,17 +147,29 @@ export class ChannelsService {
     memberId: number,
     state: ChannelMemberState,
   ) {
-    return this.prisma.channelMember.update({
-      where: {
-        channelId_memberId: {
-          channelId,
-          memberId,
+    return this.prisma.$transaction([
+      this.prisma.channelMember.update({
+        where: {
+          channelId_memberId: {
+            channelId,
+            memberId,
+          },
         },
-      },
-      data: {
-        state,
-      },
-    });
+        data: {
+          state,
+        },
+      }),
+      this.prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          membersCount: {
+            decrement: 1,
+          },
+        },
+      }),
+    ]);
   }
 
   muteMember(channelId: number, memberId: number, minutes: number) {
