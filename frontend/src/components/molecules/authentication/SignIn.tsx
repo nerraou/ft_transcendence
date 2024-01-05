@@ -6,6 +6,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import { SubmitHandler } from "react-hook-form";
 import { SignInResponse, signIn } from "next-auth/react";
 import clsx from "clsx";
+import toast from "react-hot-toast";
 
 import InputPassword from "@atoms/InputPassword";
 import InputText from "@atoms/InputText";
@@ -14,10 +15,10 @@ import Button from "@atoms/Button";
 import Modal from "@atoms/Modal";
 import { useBoolean } from "@hooks/useBoolean";
 import useOAuthFlow from "@hooks/useOAuthFlow";
+import TOTPModal from "@components/atoms/TOTPModal";
 
 import ButtonOAuth from "./ButtonOAuth";
 import useSignInForm from "./useSignInForm";
-import { useRouter } from "next/navigation";
 
 export interface FormInput {
   email: string;
@@ -30,12 +31,13 @@ interface redirectProps {
 }
 
 function Redirect(props: redirectProps) {
-  const router = useRouter();
   return (
     <Button
       text={props.text}
       onClick={() => {
-        router.replace(props.path);
+        // this is necessary to update the session
+        // especially when connected using OAuth
+        window.location.replace(props.path);
       }}
     />
   );
@@ -43,7 +45,8 @@ function Redirect(props: redirectProps) {
 
 function SignInForm() {
   const [isPasswordVisible, setPasswordVisibility] = useState(false);
-  const { register, formState, getFieldState, handleSubmit } = useSignInForm();
+  const { register, formState, getFieldState, handleSubmit, getValues } =
+    useSignInForm();
   const [res, setRes] = useState<SignInResponse | undefined>();
   const [isLoading, setLoading] = useState(false);
 
@@ -54,6 +57,8 @@ function SignInForm() {
     setTrue: showErrorModal,
     setFalse: hideErrorModal,
   } = useBoolean();
+
+  const { value: isTOTPModalVisible, setTrue: showTOTPModal } = useBoolean();
 
   const {
     isPending: isOAuthPending,
@@ -84,12 +89,41 @@ function SignInForm() {
         showSuccessModal();
       } else {
         setRes(response);
-        showErrorModal();
+        if (response?.error == "2FA_ENABLED") {
+          showTOTPModal();
+        } else {
+          showErrorModal();
+        }
       }
     } catch (error) {
       setLoading(false);
     }
   };
+
+  async function submitWithTOTP(data: FormInput, totp: string) {
+    try {
+      setLoading(true);
+      setRes(undefined);
+      const response = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        token: totp,
+        redirect: false,
+      });
+      setLoading(false);
+
+      if (response?.ok) {
+        showSuccessModal();
+      } else {
+        setRes(response);
+        toast.error("invalid top", {
+          position: "top-right",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+    }
+  }
 
   function changePasswordVisibility() {
     if (isPasswordVisible == false) {
@@ -124,6 +158,15 @@ function SignInForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="m-6 flex flex-col items-center w-full"
     >
+      <TOTPModal
+        isOpen={isTOTPModalVisible}
+        isPending={isLoading}
+        onVerify={(totp) => {
+          const data = getValues();
+          submitWithTOTP(data, totp);
+        }}
+      />
+
       <Modal
         isOpen={isErrorModalVisible}
         onClose={onErrorModalClose}

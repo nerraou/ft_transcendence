@@ -7,14 +7,20 @@ import {
   UseGuards,
   Request,
   Get,
+  UnauthorizedException,
+  HttpStatus,
+  ForbiddenException,
 } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import { ConfigService } from "@nestjs/config";
-import { User } from "@prisma/client";
+import { User as UserEntity } from "@prisma/client";
+import { authenticator } from "otplib";
+import { v4 as uuid4 } from "uuid";
 
 import { AppEnv } from "@config/env-configuration";
 import { GoogleAuthResponse } from "@modules/users/decorators/google-user.decorators";
 import { FortyTwoAuthResponse } from "@modules/users/decorators/forty-two-user.decorators";
+import { RedisService } from "@common/modules/redis/redis.service";
 
 import { AuthService } from "./auth.service";
 import { SignUpDto } from "./dto/sign-up.dto";
@@ -29,7 +35,15 @@ import {
   ConfirmApiDocumentation,
   SignInApiDocumentation,
   SignUpApiDocumentation,
+  GetTOTPSecretApiDocumentation,
+  VerifyOTPApiDocumentation,
+  DisableTFAApiDocumentation,
+  VerifyTOTPApiDocumentation,
 } from "./decorators/docs.decorator";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { User } from "@modules/users/decorators/user.decorators";
+import { VerifyTOTPDto } from "./dto/verify-totp.dto";
+import { VerifyTOTPOAuthDto } from "./dto/verify.totp.oauth.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -37,14 +51,33 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly mailService: MailerService,
     private readonly configService: ConfigService<AppEnv>,
+    private readonly redisService: RedisService,
   ) {}
 
   @Post("sign-in")
   @SignInApiDocumentation()
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
-  async signIn(@Request() req: Request & { user: User }) {
-    return this.authService.signIn(req.user);
+  async signIn(
+    @Request() req: Request & { user: UserEntity },
+    @Body() body: any,
+  ) {
+    const { user } = req;
+
+    if (user.is2faEnabled) {
+      const isValid = authenticator.verify({
+        secret: user.tfaSecret,
+        token: body.token,
+      });
+
+      if (!isValid) {
+        return {
+          is2faEnabled: user.is2faEnabled,
+        };
+      }
+    }
+
+    return this.authService.signIn(user);
   }
 
   @Post("sign-up")
@@ -76,7 +109,9 @@ export class AuthController {
 
   @Get("/google/authorize")
   @UseGuards(GoogleAuthGuard)
-  googleAuthorize(@GoogleAuthResponse() response: GoogleAuthResponseType) {
+  async googleAuthorize(
+    @GoogleAuthResponse() response: GoogleAuthResponseType,
+  ) {
     if (response.isNew) {
       this.mailService
         .sendMail({
@@ -90,6 +125,26 @@ export class AuthController {
           },
         })
         .catch((e) => console.error("sendMail error:", e));
+    } else {
+      if (response.user.is2faEnabled) {
+        const redisKey = uuid4();
+
+        await this.redisService.set(
+          redisKey,
+          JSON.stringify({
+            secret: response.user.tfaSecret,
+            accessToken: response.accessToken,
+          }),
+          {
+            EX: 180, // 3 minutes
+          },
+        );
+
+        return {
+          key: redisKey,
+          is2faEnabled: true,
+        };
+      }
     }
 
     return {
@@ -99,7 +154,9 @@ export class AuthController {
 
   @Get("/42/authorize")
   @UseGuards(FortyTwoAuthGuard)
-  fortTwoAuthorize(@FortyTwoAuthResponse() response: FortyTwoAuthResponseType) {
+  async fortTwoAuthorize(
+    @FortyTwoAuthResponse() response: FortyTwoAuthResponseType,
+  ) {
     if (response.isNew) {
       this.mailService
         .sendMail({
@@ -113,10 +170,60 @@ export class AuthController {
           },
         })
         .catch((e) => console.error("sendMail error:", e));
+    } else {
+      if (response.user.is2faEnabled) {
+        const redisKey = uuid4();
+
+        await this.redisService.set(
+          redisKey,
+          JSON.stringify({
+            secret: response.user.tfaSecret,
+            accessToken: response.accessToken,
+          }),
+          {
+            EX: 180, // 3 minutes
+          },
+        );
+
+        return {
+          key: redisKey,
+          is2faEnabled: true,
+        };
+      }
     }
 
     return {
       accessToken: response.accessToken,
+    };
+  }
+
+  @Post("/totp/oauth/verify")
+  @HttpCode(HttpStatus.OK)
+  @VerifyTOTPApiDocumentation()
+  async verifyTOTPOAuth(@Body() verifyTOTPOAuthDto: VerifyTOTPOAuthDto) {
+    const { key, token } = verifyTOTPOAuthDto;
+
+    const savedDataString = await this.redisService.get(key);
+
+    if (!savedDataString) {
+      throw new ForbiddenException();
+    }
+
+    const savedData = JSON.parse(savedDataString);
+
+    const isValid = authenticator.verify({
+      secret: savedData.secret,
+      token: token,
+    });
+
+    if (!isValid) {
+      return {
+        is2faEnabled: true,
+      };
+    }
+
+    return {
+      accessToken: savedData.accessToken,
     };
   }
 
@@ -142,5 +249,58 @@ export class AuthController {
 
       throw error;
     }
+  }
+
+  @Get("/totp/secret")
+  @GetTOTPSecretApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  genetateTOTPSecret(@User() user: UserEntity) {
+    const secret = authenticator.generateSecret(32);
+
+    const accountName = user.username || user.email;
+    const service = "PongBoy";
+
+    const keyuri = authenticator.keyuri(accountName, service, secret);
+
+    return {
+      secret,
+      keyuri,
+    };
+  }
+
+  @Post("/totp/verify")
+  @VerifyOTPApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async verifyTOTPSecret(
+    @User() user: UserEntity,
+    @Body() verifyTOTPDto: VerifyTOTPDto,
+  ) {
+    const isValid = authenticator.verify({
+      token: verifyTOTPDto.token,
+      secret: verifyTOTPDto.secret,
+    });
+
+    if (!isValid) {
+      throw new UnauthorizedException();
+    }
+
+    await this.authService.enable2FA(user.id, verifyTOTPDto.secret);
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Post("/tfa/disable")
+  @DisableTFAApiDocumentation()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  async disable2FA(@User() user: UserEntity) {
+    await this.authService.disable2FA(user.id);
+
+    return {
+      message: "success",
+    };
   }
 }

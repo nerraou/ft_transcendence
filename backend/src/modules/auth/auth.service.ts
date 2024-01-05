@@ -107,6 +107,14 @@ export class AuthService {
     return this.usersService.confirmEmail(email, token);
   }
 
+  enable2FA(userId: number, secret: string) {
+    return this.usersService.enable2FA(userId, secret);
+  }
+
+  disable2FA(userId: number) {
+    return this.usersService.disable2FA(userId);
+  }
+
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findOneByEmail(email);
 

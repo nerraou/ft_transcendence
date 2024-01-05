@@ -124,6 +124,30 @@ export class UsersService {
     });
   }
 
+  enable2FA(userId: number, secret: string) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        is2faEnabled: true,
+        tfaSecret: secret,
+      },
+    });
+  }
+
+  disable2FA(userId: number) {
+    return this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        is2faEnabled: false,
+        tfaSecret: null,
+      },
+    });
+  }
+
   findOneById(id: number) {
     return this.prisma.user.findUnique({
       where: {
@@ -169,7 +193,7 @@ export class UsersService {
   findOneByFortyTwoId(fortyTwoId: string) {
     return this.prisma.user.findUnique({
       where: {
-        googleAccountId: fortyTwoId,
+        fortyTwoAccountId: fortyTwoId,
       },
     });
   }
@@ -457,6 +481,7 @@ export class UsersService {
         id: true,
         username: true,
         avatarPath: true,
+        status: true,
       },
       take: 10,
     });

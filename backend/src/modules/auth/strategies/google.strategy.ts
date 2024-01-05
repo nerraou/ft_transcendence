@@ -18,7 +18,7 @@ export interface GoogleAuthResponse {
 export class GoogleStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService<AppEnv>,
+    readonly configService: ConfigService<AppEnv>,
   ) {
     const googleEnv = configService.get<GoogleEnv>("google");
 

@@ -13,8 +13,9 @@ type Story = StoryObj<typeof StatsBar>;
 
 export const Default: Story = {
   args: {
-    wins: 45,
-    losses: 55,
-    matches: 100,
+    wins: 100,
+    losses: 25,
+    lossesPercentage: 25,
+    winsPercentage: 100,
   },
 };

@@ -1,5 +1,6 @@
 import { applyDecorators } from "@nestjs/common";
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -75,7 +76,7 @@ export function SignUpApiDocumentation() {
         example: {
           message: ["email must be an email", "password is not strong enough"],
           error: "Unprocessable Entity",
-          statusCode: 400,
+          statusCode: 422,
         },
       },
     }),
@@ -122,6 +123,124 @@ export function ConfirmApiDocumentation() {
           message: ["token must be a UUID"],
           error: "Unprocessable Entity",
           statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function GetTOTPSecretApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Authentication"),
+    ApiBearerAuth(),
+    ApiOkResponse({
+      description: "success",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function VerifyOTPApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Authentication"),
+    ApiBearerAuth(),
+    ApiBody({
+      description: "verify totp",
+      schema: {
+        properties: {
+          secret: { type: "string" },
+          token: { type: "string" },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Invalid data",
+      schema: {
+        example: {
+          message: ["token must be a string"],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function DisableTFAApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Authentication"),
+    ApiBearerAuth(),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
+export function VerifyTOTPApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Authentication"),
+    ApiBearerAuth(),
+    ApiBody({
+      schema: {
+        properties: {
+          key: {
+            type: "string",
+          },
+          token: {
+            type: "string",
+          },
+        },
+      },
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: {
+          message: "success",
         },
       },
     }),
