@@ -9,6 +9,7 @@ interface ButtonProps {
   loading?: boolean;
   isSuccess?: boolean;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
+  customStyle?: string;
 }
 
 function Button(props: ButtonProps) {
@@ -20,6 +21,7 @@ function Button(props: ButtonProps) {
         "border-light-fg-primary flex justify-center items-center",
         "dark:border-dark-fg-primary bg-light-fg-link border",
         "rounded-full w-52 h-14 text-light-bg-tertiary text-base",
+        props.customStyle,
       )}
     >
       {props.loading ? <Loading /> : props.isSuccess ? <Check /> : props.text}

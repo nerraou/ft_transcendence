@@ -7,6 +7,7 @@ import baseQuery, { RequestError } from "@utils/baseQuery";
 import { FullPostData } from "./page";
 import { useState } from "react";
 import { User } from "@components/molecules/feed/Ranking";
+import { Channel } from "@components/molecules/feed/Communities";
 
 /**
  * Fetches posts from the API based on the specified page number and token.
@@ -192,9 +193,11 @@ export const useRankingQuery = (
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function fetchCommunities(token: string | unknown) {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/channels";
+async function fetchCommunities(token: string | unknown, query: string) {
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE_URL +
+    "/channels/public" +
+    `${query.length > 1 ? "?search_query=" + query : ""}`;
 
   const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -202,6 +205,72 @@ async function fetchCommunities(token: string | unknown) {
 
   const response = await res.json();
   return response;
+}
+
+interface CommunitiesResponse {
+  channels: Channel[];
+}
+export function useCommunitiesQuery(token: string | unknown) {
+  const [query, setQuery] = useState("");
+
+  const { data, isLoading, isError } = useSuspenseQuery<CommunitiesResponse>({
+    queryKey: ["communities", query],
+    queryFn: () => fetchCommunities(token, query),
+  });
+
+  return {
+    channels: data?.channels?.slice(0, 3),
+    isLoading,
+    isError,
+    setQuery,
+  };
+}
+
+function joinCommunity(
+  token: string | unknown,
+  channelId: number,
+  password?: string,
+) {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + `/channels/join`;
+  const body = {
+    channelId,
+    password,
+  };
+
+  const res = baseQuery(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  return res;
+}
+
+export function useJoinCommunity(token: string | unknown) {
+  const joinMutation = useMutation<
+    Response,
+    RequestError,
+    { channelId: number; password?: string }
+  >({
+    mutationFn: ({ channelId, password }) =>
+      joinCommunity(token, channelId, password),
+  });
+
+  const join = (channelId: number, password?: string) => {
+    joinMutation.mutate({ channelId, password });
+  };
+
+  return {
+    join,
+    isLoading: joinMutation.isPending,
+    isError: joinMutation.isError,
+    isSuccess: joinMutation.isSuccess,
+    error: joinMutation.error,
+    reset: joinMutation.reset,
+  };
 }
 
 interface UserProps {
