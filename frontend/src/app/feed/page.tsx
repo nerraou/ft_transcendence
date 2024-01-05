@@ -2,7 +2,7 @@
 
 import Layout from "@templates/Layout";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSession } from "next-auth/react";
 import Loading from "@components/atoms/icons/outline/Loading";
 import LoadingPage from "../loading";
@@ -25,10 +25,12 @@ import RankingModal from "@components/molecules/feed/RankingModal";
 import { useUserProfileQuery } from "@services/useUserProfileQuery";
 import {
   CreatePostResponse,
+  useCommunitiesQuery,
   useFeedQuery,
   useRankingQuery,
 } from "./feedApiService";
 import CustomModal from "@components/atoms/CustomModal";
+import debounce from "lodash/debounce";
 
 export interface FullPostData {
   id: number;
@@ -88,17 +90,8 @@ interface RightSideProps {
 const RightSide = ({ rankingProps, communitiesProps }: RightSideProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-8 w-1/3 lg:w-1/2 md:w-full sm:w-full ">
-      <Ranking
-        users={rankingProps.users}
-        onViewMore={rankingProps.onViewMore}
-      />
-      <Communities
-        channels={communitiesProps.channels}
-        onJoin={communitiesProps.onJoin}
-        query={communitiesProps.query}
-        onSearchChange={communitiesProps.onSearchChange}
-        onSearchClear={communitiesProps.onSearchClear}
-      />
+      <Ranking {...rankingProps} />
+      <Communities {...communitiesProps} />
     </div>
   );
 };
@@ -108,12 +101,12 @@ interface FeedPageProps {
 }
 function FeedPage(props: FeedPageProps) {
   const { token } = props;
-  const [query, setQuery] = useState("");
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
-  // const [rankingPage, setRankingPage] = useState(1);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [message, setMessage] = useState("Something went wrong");
   const [posts, setPosts] = useState<FullPostData[]>([]);
+  const { channels, setQuery } = useCommunitiesQuery(token);
+  const [vquery, setVQuery] = useState<string>("");
 
   const { data: topPlayers } = useRankingQuery(token, true);
 
@@ -174,6 +167,12 @@ function FeedPage(props: FeedPageProps) {
     }
   }, [fetchNextPagePosts, inView]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSetQuery = useCallback(
+    debounce((q) => setQuery(q), 1000),
+    [],
+  );
+
   return (
     <div className="flex flex-col justify-center">
       <div
@@ -216,17 +215,17 @@ function FeedPage(props: FeedPageProps) {
             },
           }}
           communitiesProps={{
-            channels: [],
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            onJoin: (_id) => {
-              // TODO: implement join
-            },
-            query: query,
+            currentUserId: currentUser?.id || -1,
+            channels: channels || [],
+            query: vquery,
             onSearchChange: (e) => {
-              setQuery(e?.target?.value || "");
+              setVQuery(e?.target?.value || "");
+              debouncedSetQuery(e?.target?.value || "");
             },
+            token: token,
             onSearchClear: () => {
-              setQuery("");
+              setVQuery("");
+              debouncedSetQuery("");
             },
           }}
         />
