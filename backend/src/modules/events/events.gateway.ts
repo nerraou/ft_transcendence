@@ -18,11 +18,11 @@ import { CreateChannelMessageDto } from "@modules/channels/dto/create-channel-me
 import { MovePlayerDto } from "@modules/game-loop/dto/move-player.dto";
 import { JoinQueueDto } from "@modules/game-loop/dto/join-queue.dto";
 import { ChallengePlayerDto } from "@modules/game-loop/dto/challenge-player.dto";
+import { CancelChallengePlayerDto } from "@modules/game-loop/dto/cancel-challenge-player.dto";
+import { ChallengePlayerResponseDto } from "@modules/game-loop/dto/challenge-player-response.dto";
 
 import { EventsService } from "./events.service";
 import { WSJwtAuthGuard } from "./guards/ws-jwt-auth.guard";
-import { ChallengePlayerResponseDto } from "@modules/game-loop/dto/challenge-player-response.dto";
-import { CancelChallengePlayerDto } from "@modules/game-loop/dto/cancel-challenge-player.dto";
 
 type EventName =
   | "direct-message"

@@ -202,7 +202,8 @@ export class EventsService {
 
     if (channelMember.mutedUntil) {
       const now = new Date();
-      if (channelMember.mutedUntil < now) {
+
+      if (now < channelMember.mutedUntil) {
         throw new WsException("member is muted");
       }
     }
