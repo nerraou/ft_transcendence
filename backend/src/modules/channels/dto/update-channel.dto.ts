@@ -6,6 +6,7 @@ import {
   IsPositive,
   IsString,
   Length,
+  Max,
   ValidateIf,
 } from "class-validator";
 import { Type } from "class-transformer";
@@ -16,6 +17,7 @@ export class UpdateChannelDto {
   @IsInt()
   @Type(() => Number)
   @IsPositive()
+  @Max(2147483627)
   channelId: number;
 
   @IsString()

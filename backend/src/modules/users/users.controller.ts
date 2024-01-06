@@ -159,7 +159,7 @@ export class UsersController {
     );
   }
 
-  @Delete("/:id/unfriend")
+  @Delete("/:id([0-9]{1,11})/unfriend")
   @UnfriendUserApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async unfriendUser(

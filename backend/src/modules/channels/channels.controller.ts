@@ -378,7 +378,7 @@ export class ChannelsController {
     };
   }
 
-  @Get("/:id/messages")
+  @Get("/:id([0-9]{1,11})/messages")
   @GetChannelsMessagesApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async getChannelMessages(

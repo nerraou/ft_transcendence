@@ -1,7 +1,8 @@
-import { IsInt, Min } from "class-validator";
+import { IsInt, IsPositive, Max } from "class-validator";
 
 export class LeaveChannelDto {
   @IsInt()
-  @Min(1)
+  @IsPositive()
+  @Max(2147483627)
   channelId: number;
 }
