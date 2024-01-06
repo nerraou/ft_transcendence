@@ -138,7 +138,6 @@ export default function Game(props: GameProps) {
             }}
           />
         </section>
-        {/* <div ref={debugElementRef} className="flex justify-center pt-10" /> */}
       </section>
     </Layout>
   );
