@@ -25,7 +25,7 @@ export default function GameOverModal(props: GameOverModalProps) {
       return "YOU LOST";
     }
 
-    return "GAME ABORTED";
+    return "ABORTED";
   }
 
   return (

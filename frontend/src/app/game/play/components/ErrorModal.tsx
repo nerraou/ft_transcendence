@@ -50,7 +50,7 @@ export default function ErrorModal(props: ErrorModalProps) {
                 className="bg-light-bg-tertiary dark:bg-dark-bg-primary p-8 rounded-lg sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl sm:px-2"
               >
                 <section className="flex flex-col items-center gap-4">
-                  <output className="text-xxl text-light-fg-secondary sm:text-xl">
+                  <output className="text-xl text-light-fg-secondary">
                     {props.message}
                   </output>
 
