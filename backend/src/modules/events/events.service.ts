@@ -267,6 +267,10 @@ export class EventsService {
       await this.playersQueueMutex.waitForUnlock();
       await this.playersQueueMutex.acquire();
 
+      if (this.isInPlayersQueue(user.id)) {
+        throw new WsException("cannot join queue twice");
+      }
+
       const { scoreToWin } = joinQueueDto;
       client.data.scoreToWin = scoreToWin;
 
@@ -288,12 +292,12 @@ export class EventsService {
       } else if (playersQueue.length == 0) {
         playersQueue.push(incommingPlayer);
       } else {
-        if (playersQueue.at(0).id == user.id) {
-          console.log("cannot join queue");
-          throw new WsException("cannot join the same queue twice");
+        const player = await this.pickPlayerFromQueue(scoreToWin, user.id);
+
+        if (!player) {
+          throw new Error("no player to play");
         }
 
-        const player = playersQueue.shift();
         const opponent: PlayerEntity = {
           id: user.id,
           rating: user.rating,
@@ -323,7 +327,7 @@ export class EventsService {
         this.registerGameEvents(game, player, opponent, serverSocket);
       }
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     } finally {
       this.playersQueueMutex.release();
     }
@@ -651,5 +655,41 @@ export class EventsService {
     return this.jwtService.sign(payload, {
       secret: this.configService.get<JWTEnv>("jwt").gameChallengeSecret,
     });
+  }
+
+  isInPlayersQueue(userId: number) {
+    for (const [, queue] of this.playersQueue) {
+      const player = queue.find((p) => p.id == userId);
+
+      if (player) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async pickPlayerFromQueue(scoreToWin: number, userId: number) {
+    const playersQueue = this.playersQueue.get(scoreToWin);
+
+    if (!playersQueue) {
+      return null;
+    }
+
+    const blockList = await this.usersService.findUserBlockListById(userId);
+
+    const playerIndex = playersQueue.findIndex(
+      (p) => !blockList.includes(p.id),
+    );
+
+    if (playerIndex == -1) {
+      return null;
+    }
+
+    const player = playersQueue.at(playerIndex);
+
+    playersQueue.splice(playerIndex, 1);
+
+    return player;
   }
 }

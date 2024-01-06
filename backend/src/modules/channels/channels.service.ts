@@ -363,8 +363,11 @@ export class ChannelsService {
     const blockedIds = [];
 
     blocks.forEach((item) => {
-      blockedIds.push(item.blocked);
-      blockedIds.push(item.blockedBy);
+      if (item.blocked != userId) {
+        blockedIds.push(item.blocked);
+      } else {
+        blockedIds.push(item.blockedBy);
+      }
     });
 
     return await this.prisma.channelMessage.findMany({
