@@ -17,6 +17,7 @@ import { RedisService } from "@common/modules/redis/redis.service";
 import { EventsGateway } from "@modules/events/events.gateway";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
 import { User } from "@modules/users/decorators/user.decorators";
+import { UsersService } from "@modules/users/users.service";
 
 import { ContactsService } from "./contacts.service";
 import UserExistsPipe from "./pipes/user-exists.pipe";
@@ -35,6 +36,7 @@ export class ContactsController {
     private readonly contactsService: ContactsService,
     private readonly eventsGateway: EventsGateway,
     private readonly redisService: RedisService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post()
@@ -55,6 +57,15 @@ export class ContactsController {
 
     if (contact) {
       throw new ConflictException();
+    }
+
+    const isBlocked = await this.usersService.isUsersBlocked(
+      connectedUser.id,
+      contactToCreate.userId,
+    );
+
+    if (isBlocked) {
+      throw new ForbiddenException();
     }
 
     const newContact = await this.contactsService.createContact(

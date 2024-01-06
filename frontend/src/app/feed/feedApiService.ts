@@ -307,6 +307,10 @@ export function useFeedQuery(token: string | unknown) {
 }
 
 const fetchUsers = async (token: string | unknown, query: string) => {
+  if (query.length <= 1) {
+    return [];
+  }
+
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
     "/users/search" +
@@ -320,9 +324,7 @@ const fetchUsers = async (token: string | unknown, query: string) => {
   return response;
 };
 
-interface UsersResponse {
-  users: User[];
-}
+type UsersResponse = User[];
 
 export function useUsersQuery(token: string | unknown) {
   const [query, setQuery] = useState("");
@@ -333,7 +335,7 @@ export function useUsersQuery(token: string | unknown) {
   });
 
   return {
-    users: data?.users,
+    users: data,
     isLoading,
     isError,
     setQuery,

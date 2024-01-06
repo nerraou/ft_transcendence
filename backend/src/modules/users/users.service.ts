@@ -174,7 +174,7 @@ export class UsersService {
 
   async getUserRanking(id: number) {
     const sqlQuery = Prisma.sql`SELECT ranking
-    FROM (SELECT RANK() OVER (ORDER BY rating DESC, created_at DESC, id ASC) as ranking, id FROM users) ranked_users
+    FROM (SELECT RANK() OVER (ORDER BY rating DESC, created_at DESC, id ASC) as ranking, id FROM users WHERE username IS NOT NULL) ranked_users
     WHERE id = ${id}`;
 
     const data = await this.prisma.$queryRaw<{ ranking: number }[]>(sqlQuery);
@@ -514,8 +514,11 @@ export class UsersService {
     const blockedIds = [];
 
     blocks.forEach((item) => {
-      blockedIds.push(item.blocked);
-      blockedIds.push(item.blockedBy);
+      if (item.blocked != userId) {
+        blockedIds.push(item.blocked);
+      } else {
+        blockedIds.push(item.blockedBy);
+      }
     });
 
     return blockedIds;
