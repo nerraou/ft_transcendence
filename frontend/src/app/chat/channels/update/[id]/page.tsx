@@ -11,6 +11,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
 import SittingLogo from "@components/atoms/icons/SittingLogo";
+import { useUserProfileQuery } from "@services/useUserProfileQuery";
 
 interface UpdateChannelProps {
   token: string | unknown;
@@ -18,10 +19,11 @@ interface UpdateChannelProps {
 }
 function UpdateChannel({ token, id }: UpdateChannelProps) {
   const { data: defaultChannel } = useChannel(id, token);
+  const { data: user } = useUserProfileQuery(token);
 
   return (
     <>
-      {defaultChannel?.isOwner ? (
+      {defaultChannel.creatorId === user.id ? (
         <ChannelForm
           title="Update Channel"
           defaultChannel={defaultChannel}
@@ -48,7 +50,6 @@ interface updateChannelProps {
 
 function Page({ params }: updateChannelProps) {
   const { data: session, status: sessionStatus } = useSession();
-
   if (sessionStatus === "unauthenticated") {
     redirect("/sign-in");
   }
