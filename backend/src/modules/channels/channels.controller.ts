@@ -304,16 +304,18 @@ export class ChannelsController {
       }
     }
 
-    const isChannelMember = await this.channelsService.isChannelMember(
+    const channelMember = await this.channelsService.findChannelMember(
       channel.id,
       userId,
     );
 
-    if (isChannelMember) {
+    if (!channelMember) {
+      await this.channelsService.joinChannel(userId, channel.id);
+    } else if (channelMember.isLeft) {
+      await this.channelsService.rejoinChannel(channelMember.id, channel.id);
+    } else {
       throw new ForbiddenException();
     }
-
-    await this.channelsService.joinChannel(userId, channel.id);
 
     return {
       message: "success",

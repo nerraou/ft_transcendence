@@ -91,6 +91,30 @@ export class ChannelsService {
     ]);
   }
 
+  rejoinChannel(memberId: number, channelId: number) {
+    return this.prisma.$transaction([
+      this.prisma.channelMember.update({
+        where: {
+          id: memberId,
+        },
+        data: {
+          role: "MEMBER",
+          isLeft: false,
+        },
+      }),
+      this.prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          membersCount: {
+            increment: 1,
+          },
+        },
+      }),
+    ]);
+  }
+
   leaveChannel(memberId: number, channelId: number) {
     return this.prisma.$transaction([
       this.prisma.channelMember.update({
