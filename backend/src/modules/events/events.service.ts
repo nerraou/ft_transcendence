@@ -288,6 +288,11 @@ export class EventsService {
       } else if (playersQueue.length == 0) {
         playersQueue.push(incommingPlayer);
       } else {
+        if (playersQueue.at(0).id == user.id) {
+          console.log("cannot join queue");
+          throw new WsException("cannot join the same queue twice");
+        }
+
         const player = playersQueue.shift();
         const opponent: PlayerEntity = {
           id: user.id,
