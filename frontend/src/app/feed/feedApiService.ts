@@ -306,4 +306,38 @@ export function useFeedQuery(token: string | unknown) {
   };
 }
 
+const fetchUsers = async (token: string | unknown, query: string) => {
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE_URL +
+    "/users/search" +
+    `${query.length > 1 ? "?search_query=" + query : ""}`;
+
+  const res = await baseQuery(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const response = await res.json();
+  return response;
+};
+
+interface UsersResponse {
+  users: User[];
+}
+
+export function useUsersQuery(token: string | unknown) {
+  const [query, setQuery] = useState("");
+
+  const { data, isLoading, isError } = useSuspenseQuery<UsersResponse>({
+    queryKey: ["users", query],
+    queryFn: () => fetchUsers(token, query),
+  });
+
+  return {
+    users: data?.users,
+    isLoading,
+    isError,
+    setQuery,
+  };
+}
+
 export { postPost, likePost, fetchCommunities };

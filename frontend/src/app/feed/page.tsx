@@ -28,9 +28,11 @@ import {
   useCommunitiesQuery,
   useFeedQuery,
   useRankingQuery,
+  useUsersQuery,
 } from "./feedApiService";
 import CustomModal from "@components/atoms/CustomModal";
 import debounce from "lodash/debounce";
+import Users, { UsersProps } from "@components/molecules/feed/Users";
 
 export interface FullPostData {
   id: number;
@@ -86,12 +88,18 @@ const Feed = (props: FeedProps) => {
 interface RightSideProps {
   rankingProps: RankingProps;
   communitiesProps: CommunitiesProps;
+  usersProps: UsersProps;
 }
-const RightSide = ({ rankingProps, communitiesProps }: RightSideProps) => {
+const RightSide = ({
+  rankingProps,
+  communitiesProps,
+  usersProps,
+}: RightSideProps) => {
   return (
     <div className="flex flex-col items-center justify-center gap-8 w-1/3 lg:w-1/2 md:w-full sm:w-full ">
       <Ranking {...rankingProps} />
       <Communities {...communitiesProps} />
+      <Users {...usersProps} />
     </div>
   );
 };
@@ -106,9 +114,11 @@ function FeedPage(props: FeedPageProps) {
   const [message, setMessage] = useState("Something went wrong");
   const [posts, setPosts] = useState<FullPostData[]>([]);
   const { channels, setQuery } = useCommunitiesQuery(token);
-  const [vquery, setVQuery] = useState<string>("");
+  const [vCommunitiesQuery, setVCommunitiesQuery] = useState("");
+  const [usersVQuery, setVUsersQuery] = useState("");
 
   const { data: topPlayers } = useRankingQuery(token, true);
+  const { users } = useUsersQuery(token);
 
   const onPostSuccess = (post: CreatePostResponse) => {
     setPosts([
@@ -168,7 +178,13 @@ function FeedPage(props: FeedPageProps) {
   }, [fetchNextPagePosts, inView]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedSetQuery = useCallback(
+  const debouncedCummunitiesQuery = useCallback(
+    debounce((q) => setQuery(q), 1000),
+    [],
+  );
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedUsersQuery = useCallback(
     debounce((q) => setQuery(q), 1000),
     [],
   );
@@ -217,15 +233,27 @@ function FeedPage(props: FeedPageProps) {
           communitiesProps={{
             currentUserId: currentUser?.id || -1,
             channels: channels || [],
-            query: vquery,
+            query: vCommunitiesQuery,
             onSearchChange: (e) => {
-              setVQuery(e?.target?.value || "");
-              debouncedSetQuery(e?.target?.value || "");
+              setVCommunitiesQuery(e?.target?.value || "");
+              debouncedCummunitiesQuery(e?.target?.value || "");
             },
             token: token,
             onSearchClear: () => {
-              setVQuery("");
-              debouncedSetQuery("");
+              setVCommunitiesQuery("");
+              debouncedCummunitiesQuery("");
+            },
+          }}
+          usersProps={{
+            users: users || [],
+            query: usersVQuery,
+            onSearchChange: (e) => {
+              setVUsersQuery(e?.target?.value || "");
+              debouncedUsersQuery(e?.target?.value || "");
+            },
+            onSearchClear: () => {
+              setVUsersQuery("");
+              debouncedUsersQuery("");
             },
           }}
         />
