@@ -1,6 +1,14 @@
-export default function Logo() {
+import clsx from "clsx";
+
+interface LogoProps {
+  width?: string;
+  height?: string;
+}
+
+export default function Logo(props: LogoProps) {
   return (
     <svg
+      className={clsx(props.width, props.height)}
       width="164"
       height="191"
       viewBox="0 0 164 191"

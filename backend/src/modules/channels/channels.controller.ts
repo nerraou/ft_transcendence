@@ -245,6 +245,10 @@ export class ChannelsController {
       throw new ConflictException();
     }
 
+    const channel = await this.channelsService.findChannelById(
+      inviteUserDto.channelId,
+    );
+
     const invitationToken = this.jwtService.sign(
       {
         channelId: inviteUserDto.channelId,
@@ -261,6 +265,7 @@ export class ChannelsController {
       {
         type: "channel-invitation",
         token: invitationToken,
+        name: channel.name,
       },
     );
 
@@ -373,7 +378,7 @@ export class ChannelsController {
     };
   }
 
-  @Get("/:id/messages")
+  @Get("/:id([0-9]{1,11})/messages")
   @GetChannelsMessagesApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async getChannelMessages(
@@ -394,10 +399,6 @@ export class ChannelsController {
       throw new ForbiddenException();
     }
 
-    const count = await this.channelsService.findChannelMessagesCount(
-      channelId,
-    );
-
     const messages = await this.channelsService.findChannelMessages(
       channelId,
       getChannelMessagesDto.page,
@@ -406,7 +407,7 @@ export class ChannelsController {
     );
 
     return {
-      count,
+      count: messages.length,
       messages: messages.reverse(),
     };
   }

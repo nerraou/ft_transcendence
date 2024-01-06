@@ -1,7 +1,7 @@
 import {
   useMutation,
+  useQuery,
   useSuspenseInfiniteQuery,
-  useSuspenseQuery,
 } from "@tanstack/react-query";
 import baseQuery, { RequestError } from "@utils/baseQuery";
 import { FullPostData } from "./page";
@@ -178,14 +178,14 @@ export const useRankingQuery = (
     return response;
   }
 
-  const { data, isLoading, isError } = useSuspenseQuery<RankingResponse>({
+  const { data, isLoading, isError } = useQuery<RankingResponse>({
     queryKey: ["ranking", topPlayers, page],
     queryFn: fetchRanking,
   });
 
   return {
-    data: data.players,
-    total: data.count,
+    data: data?.players,
+    total: data?.count,
     isLoading,
     isError,
     page,
@@ -213,7 +213,7 @@ interface CommunitiesResponse {
 export function useCommunitiesQuery(token: string | unknown) {
   const [query, setQuery] = useState("");
 
-  const { data, isLoading, isError } = useSuspenseQuery<CommunitiesResponse>({
+  const { data, isLoading, isError } = useQuery<CommunitiesResponse>({
     queryKey: ["communities", query],
     queryFn: () => fetchCommunities(token, query),
   });
@@ -327,7 +327,7 @@ interface UsersResponse {
 export function useUsersQuery(token: string | unknown) {
   const [query, setQuery] = useState("");
 
-  const { data, isLoading, isError } = useSuspenseQuery<UsersResponse>({
+  const { data, isLoading, isError } = useQuery<UsersResponse>({
     queryKey: ["users", query],
     queryFn: () => fetchUsers(token, query),
   });

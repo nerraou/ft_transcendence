@@ -103,6 +103,34 @@ export function AcceptContactApiDocumentation() {
   );
 }
 
+export function DeclineContactApiDocumentation() {
+  return applyDecorators(
+    ApiTags("Contacts"),
+    ApiBearerAuth(),
+    ApiParam({
+      name: "id",
+      type: "number",
+    }),
+    ApiOkResponse({
+      description: "Successful sign in response",
+      schema: {
+        example: {
+          message: "success",
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "bad jwt",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+  );
+}
+
 export function GetContactsApiDocumentation() {
   return applyDecorators(
     ApiTags("Contacts"),

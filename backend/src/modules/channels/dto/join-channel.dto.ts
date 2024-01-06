@@ -1,8 +1,16 @@
-import { IsInt, IsOptional, IsString, Length, Min } from "class-validator";
+import {
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Length,
+  Max,
+} from "class-validator";
 
 export class JoinChannelDto {
   @IsInt()
-  @Min(1)
+  @IsPositive()
+  @Max(2147483627)
   channelId: number;
 
   @IsOptional()

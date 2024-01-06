@@ -67,7 +67,7 @@ function EditImage(props: EditImageProps) {
       />
       {file && (
         <ImageCroper
-          isSuccess={true}
+          isSuccess={false}
           isPending={false}
           isOpen={isOpen}
           onClose={onClose}

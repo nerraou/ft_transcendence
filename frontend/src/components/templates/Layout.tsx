@@ -5,19 +5,20 @@ import { ReactNode, useMemo } from "react";
 import { Toaster } from "react-hot-toast";
 
 import Headphones from "@atoms/decoration/Headphones";
-import ThemeSwitch from "@components/atoms/ThemeSwitch";
+import ThemeSwitch from "@atoms/ThemeSwitch";
 import useTheme, { Theme } from "@hooks/useTheme";
 import useOnChallengeRecieved from "@hooks/useOnChallengeRecieved";
 import { useUserProfileQuery } from "@services/useUserProfileQuery";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Logo from "@components/atoms/icons/Logo";
+import Logo from "@icons/Logo";
 import { Popover, Transition } from "@headlessui/react";
-import BurgerMenu from "@components/atoms/icons/outline/BurgerMenu";
 import LoadingPage from "../../app/loading";
 import useCompleteProfile from "@services/useCompleteProfile";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
+import BurgerMenu from "@icons/outline/BurgerMenu";
+import NotificationPopover from "@organisms/NotificationPopover";
 
 interface NavbarLink {
   title: string;
@@ -126,7 +127,7 @@ interface LayoutProps {
 interface NavbarProps {
   token?: string | unknown;
 }
-function DummyNavBar({ token }: NavbarProps) {
+function NavBar({ token }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const { data: currentUser, isSuccess } = useUserProfileQuery(token);
@@ -161,8 +162,16 @@ function DummyNavBar({ token }: NavbarProps) {
           <ActionsMenu actions={routes} router={router} />
         </div>
         <div className="w-1 h-full bg-light-fg-tertiary" />
-        <div className="flex items-center justify-center w-14 h-full border-l-4 p-1 border-light-fg-primary dark:border-dark-fg-primary">
-          <Logo />
+        <div className="flex items-center justify-center border-l-4 p-1 border-light-fg-primary dark:border-dark-fg-primary">
+          <NotificationPopover
+            jwt={token}
+            onSignOut={signOut}
+            button={
+              <div className="flex items-center justify-center">
+                <Logo width="w-14" height="h-14" />
+              </div>
+            }
+          />
         </div>
       </nav>
     </header>
@@ -193,7 +202,7 @@ function LayoutContent(props: LayoutContentProps) {
 
   return (
     <>
-      <DummyNavBar token={props.token} />
+      <NavBar token={props.token} />
       <section
         className={clsx(
           "flex-grow pb-10 bg-light-bg-primary dark:bg-dark-bg-primary",

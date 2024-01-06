@@ -101,7 +101,7 @@ export class PostsController {
     };
   }
 
-  @Post("/like/:id")
+  @Post("/like/:id([0-9]{1,11})")
   @LikePostApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async likePost(

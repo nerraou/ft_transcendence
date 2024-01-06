@@ -4,6 +4,7 @@ import UserCard from "./UserCard";
 import FirstRanked from "@components/atoms/achievements/FirstRanked";
 import SecondRanked from "@components/atoms/achievements/SecondRanked";
 import ThirdRanked from "@components/atoms/achievements/ThirdRanked";
+import Loading from "@components/atoms/icons/outline/Loading";
 
 export interface User {
   id: number;
@@ -18,6 +19,7 @@ export interface User {
 export interface RankingProps {
   users: User[];
   onViewMore: () => void;
+  isLoading?: boolean;
 }
 
 const getRankIcon = (index: number) => {
@@ -33,7 +35,7 @@ const getRankIcon = (index: number) => {
   }
 };
 
-const Ranking = ({ users, onViewMore }: RankingProps) => {
+const Ranking = ({ users, onViewMore, isLoading }: RankingProps) => {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   return (
@@ -49,6 +51,11 @@ const Ranking = ({ users, onViewMore }: RankingProps) => {
           <DoubleArrowRight color="text-light-fg-primary" />
         </button>
       </div>
+      {isLoading && (
+        <div className="flex flex-row justify-center w-full">
+          <Loading height="h-20" width="w-20" />
+        </div>
+      )}
       {users.map((user, index) => (
         <div key={index} className="flex flex-row justify-between w-full">
           <UserCard

@@ -20,6 +20,7 @@ import DatePickerInterval, {
 import InputSearch from "@components/atoms/InputSearch";
 import { useMediaQuery } from "@hooks/useMediaQuery";
 import debounce from "lodash/debounce";
+import toast from "react-hot-toast";
 
 interface HistoryProps {
   token: string | unknown;
@@ -46,22 +47,43 @@ const History = ({ token, username }: HistoryProps) => {
       (q) => setFilters((oldFilters) => ({ ...oldFilters, query: q })),
       1000,
     ),
-    [filters.query],
+    [],
   );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedToastError = useCallback(
+    debounce((message) => toast.error(message), 300),
+    [],
+  );
+
+  const handleClearFilters = () => {
+    debouncedSetQuery.cancel();
+    setQuery("");
+    setIntervale(null);
+    setFilters({
+      ...filters,
+      query: "",
+      dateInterval: null,
+    });
+  };
+
+  const handlePeriodChange = (dateInterval: DateInterval) => {
+    if (dateInterval?.[0] && dateInterval?.[1]) {
+      if (dateInterval[0] >= dateInterval[1]) {
+        debouncedToastError("Start date must be before end date");
+        return;
+      }
+      setIntervale(dateInterval);
+      setFilters({ ...filters, dateInterval });
+    } else {
+      setIntervale(dateInterval);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-center self-stretch p-8 md:p-4 sm:p-2">
       <div className="flex flex-col h-full gap-16 bg-inherit w-full items-center justify-start">
         <div className="flex flex-row gap-6 w-full items-start justify-start sm:flex-col sm:items-center sm:justify-center">
-          <DatePickerInterval
-            value={intervale}
-            onChange={(dateInterval) => {
-              setIntervale(dateInterval);
-              if (dateInterval?.[0] && dateInterval?.[1]) {
-                setFilters({ ...filters, dateInterval });
-              }
-            }}
-          />
+          <DatePickerInterval value={intervale} onChange={handlePeriodChange} />
           <InputSearch
             bgColor="bg-light-fg-tertiary"
             borderColor="border-light-fg-primary"
@@ -77,6 +99,11 @@ const History = ({ token, username }: HistoryProps) => {
             }}
             placeholder="Search"
             textColor="text-light-fg-primary"
+          />
+          <Button
+            text="Clear filters"
+            onClick={handleClearFilters}
+            customStyle="h-9"
           />
         </div>
         {data.count > 0 ? (

@@ -36,6 +36,7 @@ import {
   BlockUserApiDocumentation,
   UnblockUserApiDocumentation,
   UnfriendUserApiDocumentation,
+  SearchChannelsUsersDocumentation,
   SearchUsersDocumentation,
 } from "./decorators/docs.decorator";
 import { User } from "./decorators/user.decorators";
@@ -45,6 +46,7 @@ import { UpdateEmailDto } from "./dto/update-email.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { GetLeaderboardDto } from "./dto/get-leaderboard.dto";
 import { GetUserDto } from "./dto/get-user.dto";
+import { SearchChannelsUsersDto } from "./dto/search-channels-users.dto";
 import { SearchUsersDto } from "./dto/search-users.dto";
 
 @Controller("users")
@@ -130,6 +132,20 @@ export class UsersController {
     };
   }
 
+  @Get("/channels/search")
+  @SearchChannelsUsersDocumentation()
+  @UseGuards(JwtAuthGuard)
+  searchChannelUsers(
+    @Query() searchUsersDto: SearchChannelsUsersDto,
+    @User("id") connectedUserId: number,
+  ) {
+    return this.usersService.searchChannelsUsers(
+      searchUsersDto.searchQuery,
+      searchUsersDto.channelId,
+      connectedUserId,
+    );
+  }
+
   @Get("/search")
   @SearchUsersDocumentation()
   @UseGuards(JwtAuthGuard)
@@ -139,12 +155,11 @@ export class UsersController {
   ) {
     return this.usersService.searchUsers(
       searchUsersDto.searchQuery,
-      searchUsersDto.channelId,
       connectedUserId,
     );
   }
 
-  @Delete("/:id/unfriend")
+  @Delete("/:id([0-9]{1,11})/unfriend")
   @UnfriendUserApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async unfriendUser(

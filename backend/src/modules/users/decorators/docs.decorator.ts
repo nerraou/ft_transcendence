@@ -428,7 +428,7 @@ export function UnfriendUserApiDocumentation() {
   );
 }
 
-export function SearchUsersDocumentation() {
+export function SearchChannelsUsersDocumentation() {
   return applyDecorators(
     ApiTags("Users"),
     ApiBearerAuth(),
@@ -455,6 +455,60 @@ export function SearchUsersDocumentation() {
             id: 5,
             username: "user3",
             avatarPath: "88ea7025-39bd-41bc-b838-793d2933145b.png",
+          },
+        ],
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: "Unauthorized",
+      schema: {
+        example: {
+          message: "Unauthorized",
+          statusCode: 401,
+        },
+      },
+    }),
+    ApiUnprocessableEntityResponse({
+      description: "Unprocessable Entity",
+      schema: {
+        example: {
+          message: [
+            "searchQuery must be shorter than or equal to 255 characters",
+          ],
+          error: "Unprocessable Entity",
+          statusCode: 422,
+        },
+      },
+    }),
+  );
+}
+
+export function SearchUsersDocumentation() {
+  return applyDecorators(
+    ApiTags("Users"),
+    ApiBearerAuth(),
+    ApiQuery({
+      name: "search_query",
+      type: "string",
+      required: true,
+    }),
+    ApiOkResponse({
+      description: "Successful",
+      schema: {
+        example: [
+          {
+            id: 4,
+            username: "user2",
+            avatarPath: "08b99582-f79a-46d8-b2c0-bde722413a7d.png",
+            firstName: "User2",
+            lastName: "User2",
+          },
+          {
+            id: 5,
+            username: "user3",
+            avatarPath: "88ea7025-39bd-41bc-b838-793d2933145b.png",
+            firstName: "User3",
+            lastName: "User3",
           },
         ],
       },
