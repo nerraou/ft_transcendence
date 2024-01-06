@@ -36,7 +36,7 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
 
   return (
     <Popover className="relative">
-      <Popover.Button className="outline-none">
+      <Popover.Button className="flex justify-center items-center outline-none rounded-full w-6 h-7">
         <MenuDots
           color="stroke-dark-bg-primary"
           hover="hover:bg-light-fg-tertiary"
@@ -51,7 +51,7 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-1"
       >
-        <Popover.Panel className="absolute">
+        <Popover.Panel className="absolute right-0 z-10">
           <div className="flex flex-col border-2 border-light-fg-primary dark:border-dark-fg-primary  rounded-md bg-light-fg-tertiary p-sm">
             {!props.isFriend && (
               <button
