@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -22,6 +23,7 @@ import UserExistsPipe from "./pipes/user-exists.pipe";
 import { CreateContactDto } from "./dto/create-contact.dto";
 import {
   AcceptContactApiDocumentation,
+  DeclineContactApiDocumentation,
   CreateContactApiDocumentation,
   GetContactsApiDocumentation,
 } from "./decorators/docs.decorator";
@@ -58,6 +60,7 @@ export class ContactsController {
     const newContact = await this.contactsService.createContact(
       connectedUser.id,
       contactToCreate.userId,
+      connectedUser.username,
     );
 
     const socketId = await this.redisService.get(
@@ -86,7 +89,7 @@ export class ContactsController {
   @AcceptContactApiDocumentation()
   @UseGuards(JwtAuthGuard)
   async acceptContactRequest(
-    @Param("id") contactId: number,
+    @Param("id", ParseIntPipe) contactId: number,
     @User() connectedUser: UserEntity,
   ) {
     const contact = await this.contactsService.findContactById(contactId);
@@ -99,7 +102,10 @@ export class ContactsController {
       throw new ForbiddenException();
     }
 
-    await this.contactsService.acceptContactRequest(contactId);
+    await this.contactsService.acceptContactRequest(
+      contactId,
+      connectedUser.username,
+    );
 
     const socketId = await this.redisService.get(`user-${contact.followerId}`);
 
@@ -114,6 +120,25 @@ export class ContactsController {
           ),
         );
     }
+
+    return {
+      message: "success",
+    };
+  }
+
+  @Patch(":id([0-9]{1,11})/decline")
+  @DeclineContactApiDocumentation()
+  @UseGuards(JwtAuthGuard)
+  async declineContactRequest(
+    @Param("id", ParseIntPipe) contactId: number,
+    @User() connectedUser: UserEntity,
+  ) {
+    try {
+      await this.contactsService.deleteUserContactById(
+        contactId,
+        connectedUser.id,
+      );
+    } catch {}
 
     return {
       message: "success",

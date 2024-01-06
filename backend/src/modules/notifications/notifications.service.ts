@@ -9,6 +9,7 @@ type TransactionPrismaClient = Omit<PrismaClient, ITXClientDenyList>;
 type ContactNotificationMetadata = Prisma.JsonObject & {
   type: "contact";
   id: number;
+  sender: string;
   status: ContactStatus;
 };
 
@@ -19,6 +20,7 @@ type MessageNotificationMetadata = Prisma.JsonObject & {
 
 type InvitationNotificationMetadata = Prisma.JsonObject & {
   type: "channel-invitation";
+  name: string;
 };
 
 @Injectable()

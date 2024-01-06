@@ -217,7 +217,13 @@ export class UsersService {
   }
 
   usersCount() {
-    return this.prisma.user.count();
+    return this.prisma.user.count({
+      where: {
+        username: {
+          not: null,
+        },
+      },
+    });
   }
 
   findChannelsIds(id: number) {

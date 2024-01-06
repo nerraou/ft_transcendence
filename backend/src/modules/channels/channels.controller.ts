@@ -245,6 +245,10 @@ export class ChannelsController {
       throw new ConflictException();
     }
 
+    const channel = await this.channelsService.findChannelById(
+      inviteUserDto.channelId,
+    );
+
     const invitationToken = this.jwtService.sign(
       {
         channelId: inviteUserDto.channelId,
@@ -261,6 +265,7 @@ export class ChannelsController {
       {
         type: "channel-invitation",
         token: invitationToken,
+        name: channel.name,
       },
     );
 

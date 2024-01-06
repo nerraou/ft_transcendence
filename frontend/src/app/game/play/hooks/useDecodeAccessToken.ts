@@ -1,15 +1,20 @@
-import { jwtDecode } from "jwt-decode";
+import { JwtPayload, jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 
-function useDecodeAccessToken(params: any) {
-  const [payload, setPayload] = useState<any>();
+interface UseDecodeAccessTokenParams {
+  accessToken: string | unknown;
+}
+
+function useDecodeAccessToken(params: UseDecodeAccessTokenParams) {
+  const [payload, setPayload] = useState<JwtPayload>();
 
   useEffect(() => {
-    if (!params.accessToken) {
+    if (typeof params.accessToken != "string") {
       return;
     }
 
     const decoded = jwtDecode(params.accessToken);
+
     setPayload(decoded);
   }, [params.accessToken]);
 
