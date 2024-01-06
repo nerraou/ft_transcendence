@@ -113,12 +113,19 @@ function FeedPage(props: FeedPageProps) {
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [message, setMessage] = useState("Something went wrong");
   const [posts, setPosts] = useState<FullPostData[]>([]);
-  const { channels, setQuery } = useCommunitiesQuery(token);
+  const {
+    channels,
+    setQuery,
+    isLoading: channelsLoading,
+  } = useCommunitiesQuery(token);
   const [vCommunitiesQuery, setVCommunitiesQuery] = useState("");
   const [usersVQuery, setVUsersQuery] = useState("");
 
-  const { data: topPlayers } = useRankingQuery(token, true);
-  const { users } = useUsersQuery(token);
+  const { data: topPlayers, isLoading: topPlayersLoading } = useRankingQuery(
+    token,
+    true,
+  );
+  const { users, isLoading: usersLoading } = useUsersQuery(token);
 
   const onPostSuccess = (post: CreatePostResponse) => {
     setPosts([
@@ -229,6 +236,7 @@ function FeedPage(props: FeedPageProps) {
             onViewMore: () => {
               setRankingModalOpen(true);
             },
+            isLoading: topPlayersLoading,
           }}
           communitiesProps={{
             currentUserId: currentUser?.id || -1,
@@ -243,6 +251,7 @@ function FeedPage(props: FeedPageProps) {
               setVCommunitiesQuery("");
               debouncedCummunitiesQuery("");
             },
+            isLoading: channelsLoading,
           }}
           usersProps={{
             users: users || [],
@@ -255,6 +264,7 @@ function FeedPage(props: FeedPageProps) {
               setVUsersQuery("");
               debouncedUsersQuery("");
             },
+            isLoading: usersLoading,
           }}
         />
       </div>

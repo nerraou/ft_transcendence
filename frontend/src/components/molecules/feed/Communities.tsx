@@ -6,6 +6,7 @@ import { ChannelType } from "@components/atoms/chat/ChannelForm";
 import { useJoinCommunity } from "@app/feed/feedApiService";
 import Modal from "@components/atoms/Modal";
 import Button from "@components/atoms/Button";
+import Loading from "@components/atoms/icons/outline/Loading";
 
 interface PasswordPopoverProps {
   onJoin: (id: number, password?: string) => void;
@@ -102,6 +103,7 @@ export interface CommunitiesProps {
   onSearchClear: () => void;
   currentUserId: number;
   token: string | unknown;
+  isLoading?: boolean;
 }
 
 const Communities = ({
@@ -110,10 +112,17 @@ const Communities = ({
   onSearchChange,
   onSearchClear,
   token,
+  isLoading,
 }: CommunitiesProps) => {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
-  const { join, isError, reset, isLoading, isSuccess, error } =
-    useJoinCommunity(token);
+  const {
+    join,
+    isError,
+    reset,
+    isLoading: isJoinLoading,
+    isSuccess,
+    error,
+  } = useJoinCommunity(token);
 
   const getErrorMessage = (status?: number) => {
     switch (status) {
@@ -161,6 +170,12 @@ const Communities = ({
         width="w-full"
       />
       <div className="flex flex-col align-start w-full min-h-[300px] gap-8">
+        {isLoading && (
+          <div className="flex flex-row justify-center w-full">
+            <Loading height="h-20" width="w-20" />
+          </div>
+        )}
+
         {channels.map((channel, index) => (
           <div
             key={index}
@@ -176,7 +191,7 @@ const Communities = ({
                 onJoin={join}
                 id={channel.id}
                 channelName={channel.name}
-                isLoading={isLoading}
+                isLoading={isJoinLoading}
               />
             ) : (
               <button

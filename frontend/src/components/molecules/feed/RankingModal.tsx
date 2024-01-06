@@ -103,7 +103,7 @@ const RankingModal = ({ token, isOpen, onClose }: RankingModalProps) => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex flex-col items-center justify-center w-full gap-4">
-                  {users.map((user, index) => (
+                  {users?.map((user, index) => (
                     <RankingPlayerCard key={index} user={user} />
                   ))}
                   {total === 0 && (
@@ -114,7 +114,7 @@ const RankingModal = ({ token, isOpen, onClose }: RankingModalProps) => {
                     </div>
                   )}
 
-                  {total > 0 && (
+                  {total && total > 0 && (
                     <Pagination
                       page={page}
                       total={Math.ceil(total / RANKING_ROWS_PER_PAGE)}
