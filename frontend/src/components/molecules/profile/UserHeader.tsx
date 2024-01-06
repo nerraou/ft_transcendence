@@ -11,7 +11,7 @@ import UserMinus from "@icons/outline/UserMinus";
 import UserPlus from "@icons/outline/UserPlus";
 import User from "@atoms/UserCard";
 import { Popover, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 
 import { UserStatus } from "../FriendCard";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import useAddFriendMutation from "@services/useAddFriendMutation";
 import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
 import { useBlockUserMutation } from "@services/useBlockUserMutation";
+import toast from "react-hot-toast";
 
 interface UserHeaderProps {
   fullname: string;
@@ -52,6 +53,20 @@ function UserPopover(props: UserPopoverProps) {
   const blockUserMutation = useBlockUserMutation();
   const addUserMutation = useAddFriendMutation();
   const removeUserMutation = useRemoveFriendMutation();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (addUserMutation.isSuccess) {
+      toast.success("Friend request sent");
+    }
+  }, [addUserMutation.isSuccess]);
+
+  useEffect(() => {
+    if (removeUserMutation.isSuccess) {
+      toast.success("Friend removed");
+    }
+  }, [removeUserMutation.isSuccess]);
 
   return (
     <Popover className="relative">
@@ -112,9 +127,10 @@ function UserPopover(props: UserPopoverProps) {
             <button
               disabled={blockUserMutation.isPending}
               className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
-              onClick={() =>
-                blockUserMutation.mutate({ token: token, id: props.id })
-              }
+              onClick={() => {
+                blockUserMutation.mutate({ token: token, id: props.id });
+                router.replace("/feed");
+              }}
             >
               <UserBlock color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">
