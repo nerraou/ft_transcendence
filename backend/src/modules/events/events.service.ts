@@ -5,7 +5,7 @@ import { WsException } from "@nestjs/websockets";
 import { ExtractJwt } from "passport-jwt";
 import { Server, Socket } from "socket.io";
 import { Mutex } from "async-mutex";
-import { GameWinner, User as UserEntity } from "@prisma/client";
+import { GameWinner, User as UserEntity, UserStatus } from "@prisma/client";
 
 import { RedisService } from "@common/modules/redis/redis.service";
 import { AppEnv, JWTEnv } from "@config/env-configuration";
@@ -91,6 +91,8 @@ export class EventsService {
       const channeRoomName = `chat-channel-${channel.channelId}`;
       client.join(channeRoomName);
     });
+
+    this.broadcastStatusChanged(client, payload.sub, "ONLINE");
   }
 
   async userDisonnected(client: Socket) {
@@ -113,6 +115,8 @@ export class EventsService {
       : [];
 
     if (userSocketsIds.length == 1) {
+      this.broadcastStatusChanged(client, payload.sub, "OFFLINE");
+
       this.redisService.del(redisKey).catch((e) => {
         console.error("can't remove key from redis", e);
       });
@@ -474,6 +478,7 @@ export class EventsService {
     opponentSocketClient.join(game.getSocketRoomName());
 
     this.registerGameEvents(game, player, opponent, serverSocket);
+    this.broadcastStatusChanged(client, player.id, "IN_GAME");
   }
 
   async cancelChallenge(token: string) {
@@ -691,5 +696,12 @@ export class EventsService {
     playersQueue.splice(playerIndex, 1);
 
     return player;
+  }
+
+  broadcastStatusChanged(client: Socket, userId: number, status: UserStatus) {
+    client.broadcast.emit("user-status-changed", {
+      userId: userId,
+      status: status,
+    });
   }
 }
