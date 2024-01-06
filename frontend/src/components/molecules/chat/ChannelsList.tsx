@@ -66,7 +66,7 @@ interface InviteMember {
 async function getUser(invite: GetUser) {
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
-    `/users/search?search_query=${invite.username}&channel_id=${invite.channelId}`;
+    `/users/channels/search?search_query=${invite.username}&channel_id=${invite.channelId}`;
 
   const res = await baseQuery(url, {
     headers: {

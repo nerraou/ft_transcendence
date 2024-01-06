@@ -11,7 +11,11 @@ export class ContactsService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  createContact(connectedUserId: number, followingId: number) {
+  createContact(
+    connectedUserId: number,
+    followingId: number,
+    senderUsername: string,
+  ) {
     return this.prisma.$transaction(async (tx) => {
       const contact = await tx.contact.create({
         data: {
@@ -27,6 +31,7 @@ export class ContactsService {
           type: "contact",
           id: contact.id,
           status: "PENDING",
+          sender: senderUsername,
         },
       );
 
@@ -53,7 +58,7 @@ export class ContactsService {
     });
   }
 
-  acceptContactRequest(id: number) {
+  acceptContactRequest(id: number, senderUsername: string) {
     return this.prisma.$transaction(async (tx) => {
       const contact = await this.prisma.contact.update({
         where: {
@@ -68,9 +73,26 @@ export class ContactsService {
         type: "contact",
         id: contact.id,
         status: "ACCEPTED",
+        sender: senderUsername,
       });
 
       return contact;
+    });
+  }
+
+  deleteUserContactById(contactId: number, userId: number) {
+    return this.prisma.contact.delete({
+      where: {
+        id: contactId,
+        OR: [
+          {
+            followerId: userId,
+          },
+          {
+            followingId: userId,
+          },
+        ],
+      },
     });
   }
 

@@ -227,7 +227,7 @@ export class ChannelsService {
           },
         ],
       },
-      take: 4,
+      take: 2,
       orderBy: [
         {
           membersCount: "desc",
@@ -400,14 +400,6 @@ export class ChannelsService {
             },
           },
         },
-      },
-    });
-  }
-
-  findChannelMessagesCount(channelId: number) {
-    return this.prisma.channelMessage.count({
-      where: {
-        channelId: channelId,
       },
     });
   }
