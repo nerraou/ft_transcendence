@@ -75,7 +75,9 @@ export class EventsService {
 
     userSocketsIds.push(client.id);
 
-    await this.redisService.set(redisKey, JSON.stringify(userSocketsIds));
+    await this.redisService.set(redisKey, JSON.stringify(userSocketsIds), {
+      EX: 60 * 60 * 24,
+    });
 
     if (userSocketsIds.length == 1) {
       this.usersService.updateStatusById(payload.sub, "ONLINE").catch(() => {
@@ -110,7 +112,7 @@ export class EventsService {
       ? JSON.parse(socketsIdsString)
       : [];
 
-    if (userSocketsIds.length == 0) {
+    if (userSocketsIds.length == 1) {
       this.redisService.del(redisKey).catch((e) => {
         console.error("can't remove key from redis", e);
       });
@@ -165,12 +167,14 @@ export class EventsService {
 
     const socketsIdsString = await this.redisService.get(`user-${receiver.id}`);
 
-    if (!socketsIdsString) {
-      await this.notificationsSerivces.createMessageNotification(receiver.id, {
+    this.notificationsSerivces
+      .createMessageNotification(receiver.id, {
         type: "message",
         sender: user.username,
+      })
+      .catch((e) => {
+        console.error("cannot create message notification", e);
       });
-    }
 
     if (socketsIdsString) {
       const socketIds: string[] = JSON.parse(socketsIdsString);

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ReactNode } from "react";
 
 function DotsLoader() {
@@ -84,7 +85,9 @@ function NotificationMessageCard(props: NotificationMessageCardProps) {
         <span className="text-light-fg-link">{props.sender}</span>
       </p>
 
-      <LinkButton title="Got to chat" />
+      <Link href={`/chat/${props.sender}`}>
+        <LinkButton title="Got to chat" />
+      </Link>
     </section>
   );
 }

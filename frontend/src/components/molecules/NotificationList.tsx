@@ -33,6 +33,26 @@ interface NotificatinListParams {
   jwt: string | unknown;
 }
 
+async function getNotifications(page: number, jwt: string | unknown) {
+  const limit = 10;
+  const url =
+    process.env.NEXT_PUBLIC_API_BASE_URL +
+    `/notifications?limit=${limit}&page=${page}`;
+
+  const res = await baseQuery(url, {
+    headers: { Authorization: `Bearer ${jwt}` },
+  });
+
+  const response = await res.json();
+
+  let nextPage: number | null = page + 1;
+  if (response.notifications.length == 0) {
+    nextPage = null;
+  }
+
+  return { ...response, nextPage: nextPage };
+}
+
 export default function NotificatinList(params: NotificatinListParams) {
   const { ref, inView } = useInView();
 
@@ -45,25 +65,8 @@ export default function NotificatinList(params: NotificatinListParams) {
     RequestError
   >({
     queryKey: ["notifications"],
-    async queryFn({ pageParam }) {
-      const page = pageParam as number;
-      const limit = 10;
-      const url =
-        process.env.NEXT_PUBLIC_API_BASE_URL +
-        `/notifications?limit=${limit}&page=${page}`;
-
-      const res = await baseQuery(url, {
-        headers: { Authorization: `Bearer ${params.jwt}` },
-      });
-
-      const response = await res.json();
-
-      let nextPage: number | null = page + 1;
-      if (response.notifications.length == 0) {
-        nextPage = null;
-      }
-
-      return { ...response, nextPage: nextPage };
+    queryFn({ pageParam }) {
+      return getNotifications(pageParam as number, params.jwt);
     },
     initialPageParam: 1,
     getNextPageParam: (page) => {
@@ -104,64 +107,69 @@ export default function NotificatinList(params: NotificatinListParams) {
   }, [acceptChannelInvitationMutation.isError]);
 
   return (
-    <section className="flex flex-col space-y-4">
-      {data?.pages.map((page) => {
-        return page.notifications.map((notification) => {
-          if (notification.metadata.type == "contact") {
-            const metadata = notification.metadata;
+    <section
+      dir="rtl"
+      className="h-96 overflow-auto pl-4 scrollbar-thin scrollbar-thumb-dark-bg-primary"
+    >
+      <div dir="ltr" className="flex flex-col space-y-4">
+        {data?.pages.map((page) => {
+          return page.notifications.map((notification) => {
+            if (notification.metadata.type == "contact") {
+              const metadata = notification.metadata;
 
-            return (
-              <NotificationCard
-                key={notification.id}
-                {...notification.metadata}
-                isPending={
-                  acceptFriendMutation.isPending ||
-                  declineFriendMutation.isPending
-                }
-                onAccept={() => {
-                  acceptFriendMutation.mutate({
-                    contactId: metadata.id,
-                    token: params.jwt,
-                  });
-                }}
-                onDecline={() => {
-                  declineFriendMutation.mutate({
-                    contactId: metadata.id,
-                    token: params.jwt,
-                  });
-                }}
-              />
-            );
-          }
+              return (
+                <NotificationCard
+                  key={notification.id}
+                  {...notification.metadata}
+                  isPending={
+                    acceptFriendMutation.isPending ||
+                    declineFriendMutation.isPending
+                  }
+                  onAccept={() => {
+                    acceptFriendMutation.mutate({
+                      contactId: metadata.id,
+                      token: params.jwt,
+                    });
+                  }}
+                  onDecline={() => {
+                    declineFriendMutation.mutate({
+                      contactId: metadata.id,
+                      token: params.jwt,
+                    });
+                  }}
+                />
+              );
+            }
 
-          if (notification.metadata.type == "message") {
-            return (
-              <NotificationCard
-                key={notification.id}
-                {...notification.metadata}
-              />
-            );
-          }
+            if (notification.metadata.type == "message") {
+              return (
+                <NotificationCard
+                  key={notification.id}
+                  {...notification.metadata}
+                />
+              );
+            }
 
-          if (notification.metadata.type == "channel-invitation") {
-            const metadata = notification.metadata;
+            if (notification.metadata.type == "channel-invitation") {
+              const metadata = notification.metadata;
 
-            return (
-              <NotificationCard
-                key={notification.id}
-                {...notification.metadata}
-                isPending={acceptChannelInvitationMutation.isPending}
-                onJoin={() => {
-                  acceptChannelInvitationMutation.mutate({
-                    invitationToken: metadata.token,
-                    token: params.jwt,
-                  });
-                }}
-              />
-            );
-          }
-        });
-      })}
+              return (
+                <NotificationCard
+                  key={notification.id}
+                  {...notification.metadata}
+                  isPending={acceptChannelInvitationMutation.isPending}
+                  onJoin={() => {
+                    acceptChannelInvitationMutation.mutate({
+                      invitationToken: metadata.token,
+                      token: params.jwt,
+                    });
+                  }}
+                />
+              );
+            }
+          });
+        })}
+      </div>
       {hasNextPage && (
         <div className="flex justify-center" ref={ref}>
           <Loading height="h-5" width="w-5" />
