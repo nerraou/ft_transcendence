@@ -35,7 +35,7 @@ function PasswordPopover({
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className="flex items-center justify-center w-24 h-10 rounded-lg bg-light-fg-link text-light-fg-tertiary min-w-min">
+          <Popover.Button className="flex items-center justify-center px-4 min-w-min h-10 rounded-lg bg-light-fg-link text-light-fg-tertiary ">
             Join
           </Popover.Button>
           <Transition
@@ -196,7 +196,7 @@ const Communities = ({
             ) : (
               <button
                 onClick={() => join(channel.id)}
-                className="flex items-center justify-center w-24 h-10 rounded-lg bg-light-fg-link text-light-fg-tertiary min-w-min"
+                className="flex items-center justify-center px-4 h-10 rounded-lg bg-light-fg-link text-light-fg-tertiary min-w-min"
               >
                 Join
               </button>
