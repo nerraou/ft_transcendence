@@ -3,6 +3,7 @@ import Communities, {
 } from "@components/molecules/feed/Communities";
 import { Meta, StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
+import { ChannelType } from "@components/atoms/chat/ChannelForm";
 
 const meta: Meta<typeof Communities> = {
   title: "Feed/Communities",
@@ -24,26 +25,32 @@ Default.args = {
   channels: [
     {
       id: 1,
-      channelName: "1337",
-      channelMembers: 1,
-      channelImage: "/default/users-group.png",
+      name: "1337",
+      membersCount: 1,
+      imagePath: "/default/users-group.png",
+      creatorId: 1,
+      description: "this is a description",
+      type: ChannelType.PUBLIC,
     },
     {
       id: 2,
-      channelName: "CPC",
-      channelMembers: 1,
-      channelImage: "/default/users-group.png",
+      name: "CPC",
+      membersCount: 1,
+      imagePath: "/default/users-group.png",
+      creatorId: 1,
+      description: "this is a description",
+      type: ChannelType.PUBLIC,
     },
     {
       id: 3,
-      channelName: "Ft_transcendence",
-      channelMembers: 1,
-      channelImage: "/default/users-group.png",
+      name: "Ft_transcendence",
+      membersCount: 1,
+      imagePath: "/default/users-group.png",
+      creatorId: 1,
+      description: "this is a description",
+      type: ChannelType.PUBLIC,
     },
   ],
-  onJoin: () => {
-    action("onJoin");
-  },
   query: "",
   onSearchChange: () => {
     action("onSearchChange");

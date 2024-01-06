@@ -147,17 +147,29 @@ export class ChannelsService {
     memberId: number,
     state: ChannelMemberState,
   ) {
-    return this.prisma.channelMember.update({
-      where: {
-        channelId_memberId: {
-          channelId,
-          memberId,
+    return this.prisma.$transaction([
+      this.prisma.channelMember.update({
+        where: {
+          channelId_memberId: {
+            channelId,
+            memberId,
+          },
         },
-      },
-      data: {
-        state,
-      },
-    });
+        data: {
+          state,
+        },
+      }),
+      this.prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          membersCount: {
+            decrement: 1,
+          },
+        },
+      }),
+    ]);
   }
 
   muteMember(channelId: number, memberId: number, minutes: number) {
@@ -329,10 +341,40 @@ export class ChannelsService {
     });
   }
 
-  findChannelMessages(channelId: number, page: number, limit: number) {
-    return this.prisma.channelMessage.findMany({
+  async findChannelMessages(
+    channelId: number,
+    page: number,
+    limit: number,
+    userId: number,
+  ) {
+    const blocks = await this.prisma.block.findMany({
+      where: {
+        OR: [
+          {
+            blocked: userId,
+          },
+          {
+            blockedBy: userId,
+          },
+        ],
+      },
+    });
+
+    const blockedIds = [];
+
+    blocks.forEach((item) => {
+      blockedIds.push(item.blocked);
+      blockedIds.push(item.blockedBy);
+    });
+
+    return await this.prisma.channelMessage.findMany({
       where: {
         channelId: channelId,
+        sender: {
+          memberId: {
+            notIn: blockedIds,
+          },
+        },
       },
       skip: (page - 1) * limit,
       take: limit,

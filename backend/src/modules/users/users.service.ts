@@ -205,6 +205,7 @@ export class UsersService {
       first_name as "firstName", last_name as "lastName", avatar_path as "avatarPath",
       created_at as "createdAt", updated_at as "updatedAt"
     FROM users
+    WHERE username IS NOT NULL
     ORDER BY ranking ASC
     OFFSET ${(page - 1) * limit} 
     LIMIT ${limit}
@@ -261,12 +262,15 @@ export class UsersService {
   }
 
   blockUser(userToBlock: number, blockedBy: number) {
-    return this.prisma.block.create({
-      data: {
-        blocked: userToBlock,
-        blockedBy: blockedBy,
-      },
-    });
+    return this.prisma.$transaction([
+      this.prisma.block.create({
+        data: {
+          blocked: userToBlock,
+          blockedBy: blockedBy,
+        },
+      }),
+      this.unfriendUser(userToBlock, blockedBy),
+    ]);
   }
 
   unblockUser(userToUnblock: number, blockedBy: number) {

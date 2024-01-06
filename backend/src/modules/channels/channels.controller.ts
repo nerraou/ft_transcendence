@@ -402,6 +402,7 @@ export class ChannelsController {
       channelId,
       getChannelMessagesDto.page,
       getChannelMessagesDto.limit,
+      user.id,
     );
 
     return {
