@@ -14,6 +14,10 @@ import { useRouter } from "next/navigation";
 import Logo from "@components/atoms/icons/Logo";
 import { Popover, Transition } from "@headlessui/react";
 import BurgerMenu from "@components/atoms/icons/outline/BurgerMenu";
+import LoadingPage from "../../app/loading";
+import useCompleteProfile from "@services/useCompleteProfile";
+import Modal from "@components/atoms/Modal";
+import Button from "@components/atoms/Button";
 
 interface NavbarLink {
   title: string;
@@ -119,13 +123,13 @@ interface LayoutProps {
   children: ReactNode | ReactNode[];
 }
 
-function DummyNavBar() {
+interface NavbarProps {
+  token?: string | unknown;
+}
+function DummyNavBar({ token }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
-  const { data: session } = useSession();
-  const { data: currentUser, isSuccess } = useUserProfileQuery(
-    session?.user?.accessToken,
-  );
+  const { data: currentUser, isSuccess } = useUserProfileQuery(token);
   const routes = useMemo(
     () => getRoutes(currentUser?.username),
     [currentUser?.username],
@@ -165,8 +169,57 @@ function DummyNavBar() {
   );
 }
 
-export default function Layout(props: LayoutProps) {
+interface LayoutContentProps {
+  children: ReactNode | ReactNode[];
+  token?: string | unknown;
+}
+function LayoutContent(props: LayoutContentProps) {
   useOnChallengeRecieved();
+
+  const { isProfileComplete, onClick: redirect } = useCompleteProfile(
+    props.token,
+  );
+
+  if (!isProfileComplete) {
+    return (
+      <Modal
+        isOpen={!isProfileComplete}
+        title="Welcom to BongBoy"
+        description="please complete your profile to continue using the app"
+        action={<Button text="Settings" onClick={redirect} />}
+      />
+    );
+  }
+
+  return (
+    <>
+      <DummyNavBar token={props.token} />
+      <section
+        className={clsx(
+          "flex-grow pb-10 bg-light-bg-primary dark:bg-dark-bg-primary",
+          "relative h-full rounded-b-2xl border-t-4 border-l-4 border-light-fg-tertiary",
+          "bg-[position:right_bottom_,_center_bottom,_left_-4px_bottom] bg-no-repeat",
+          "bg-light-layout dark:bg-dark-layout",
+        )}
+      >
+        {props.children}
+      </section>
+    </>
+  );
+}
+
+export default function Layout(props: LayoutProps) {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <LoadingPage
+        bgColor=" bg-light-bg-tertiary dark:bg-dark-bg-primary"
+        width="w-screen"
+        height="h-screen"
+      />
+    );
+  }
 
   return (
     <main className="relative flex min-h-screen p-4 bg-light-bg-primary dark:bg-dark-bg-primary">
@@ -176,17 +229,9 @@ export default function Layout(props: LayoutProps) {
           "border-light-fg-primary dark:border-dark-fg-primary",
         )}
       >
-        <DummyNavBar />
-        <section
-          className={clsx(
-            "flex-grow pb-10 bg-light-bg-primary dark:bg-dark-bg-primary",
-            "relative h-full rounded-b-2xl border-t-4 border-l-4 border-light-fg-tertiary",
-            "bg-[position:right_bottom_,_center_bottom,_left_-4px_bottom] bg-no-repeat",
-            "bg-light-layout dark:bg-dark-layout",
-          )}
-        >
+        <LayoutContent token={session?.user.accessToken}>
           {props.children}
-        </section>
+        </LayoutContent>
       </section>
       <Toaster position="top-right" />
     </main>
