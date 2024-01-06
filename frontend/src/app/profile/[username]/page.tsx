@@ -27,6 +27,7 @@ interface ProfileProps {
 
 function Profile({ token, username }: ProfileProps) {
   const {
+    userStatus,
     data: { user, history },
     achievements,
   } = useProfile(token, username);
@@ -59,7 +60,7 @@ function Profile({ token, username }: ProfileProps) {
               isProfileOwner={user.isProfileOwner}
               isFriend={user.isFriend}
               level={user.ranking}
-              userStatus={user.status}
+              userStatus={userStatus}
             />
             <BarRating rating={user.rating} />
             <StatsBar
