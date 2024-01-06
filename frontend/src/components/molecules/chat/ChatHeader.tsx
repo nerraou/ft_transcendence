@@ -10,6 +10,7 @@ import UserBlock from "@components/atoms/icons/outline/UserBlock";
 import useAddFriendMutation from "@services/useAddFriendMutation";
 import useRemoveFriendMutation from "@services/useRemoveFriendMutation";
 import { useBlockUserMutation } from "@services/useBlockUserMutation";
+import Link from "next/link";
 interface ChatHeaderProps {
   id: number;
   status: "ONLINE" | "OFFLINE" | "IN_GAME";
@@ -110,14 +111,18 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
 function ChatHeader(props: ChatHeaderProps) {
   return (
     <div className="flex items-center justify-between py-3 px-8 sm:px-4 border-4 bg bg-light-fg-tertiary border-light-bg-tertiary rounded-tr-xl">
-      <User
-        username={props.username}
-        avatarPath={props.image}
-        status={props.status}
-      />
+      <Link href={`/profile/${props.username}`}>
+        <User
+          username={props.username}
+          avatarPath={props.image}
+          status={props.status}
+        />
+      </Link>
       {!props.isProfileOwner && (
         <div className="flex items-center space-x-5">
-          <DeviceGamePad color="stroke-dark-fg-primary" />
+          <Link href={`/game/make?username=${props.username}`}>
+            <DeviceGamePad color="stroke-dark-fg-primary" />
+          </Link>
           <MenuDotsPopover
             isFriend={props.isFriend}
             isBlocked={props.isBlocked}
