@@ -173,7 +173,7 @@ export default function Page() {
     function onGameStarted(data: GameConfig) {
       setGameStatus("started");
 
-      const isPlayer = data.opponentId != payload.sub;
+      const isPlayer = data.opponentId != payload?.sub;
 
       setGameConfig({
         ...data,
@@ -221,7 +221,7 @@ export default function Page() {
       return "aborted";
     }
 
-    if (gameOverState.winnerId == payload.sub) {
+    if (gameOverState.winnerId == payload?.sub) {
       return "win";
     }
 
