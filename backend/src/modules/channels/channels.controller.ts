@@ -394,10 +394,6 @@ export class ChannelsController {
       throw new ForbiddenException();
     }
 
-    const count = await this.channelsService.findChannelMessagesCount(
-      channelId,
-    );
-
     const messages = await this.channelsService.findChannelMessages(
       channelId,
       getChannelMessagesDto.page,
@@ -406,7 +402,7 @@ export class ChannelsController {
     );
 
     return {
-      count,
+      count: messages.length,
       messages: messages.reverse(),
     };
   }

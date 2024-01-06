@@ -148,6 +148,15 @@ export class EventsService {
       throw new WsException("receiver not found");
     }
 
+    const isBlocked = await this.usersService.isUsersBlocked(
+      user.id,
+      receiver.id,
+    );
+
+    if (isBlocked) {
+      throw new WsException("blocked user");
+    }
+
     const message = await this.messagesService.create(
       user.id,
       receiver.id,

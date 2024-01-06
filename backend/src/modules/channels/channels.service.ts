@@ -403,12 +403,4 @@ export class ChannelsService {
       },
     });
   }
-
-  findChannelMessagesCount(channelId: number) {
-    return this.prisma.channelMessage.count({
-      where: {
-        channelId: channelId,
-      },
-    });
-  }
 }
