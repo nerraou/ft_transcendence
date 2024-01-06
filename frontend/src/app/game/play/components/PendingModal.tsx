@@ -35,7 +35,7 @@ export default function PendingModal(props: PendingModalProps) {
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-center justify-center p-4 sm:p-2">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -47,10 +47,10 @@ export default function PendingModal(props: PendingModalProps) {
             >
               <Dialog.Panel
                 as="section"
-                className="bg-light-bg-tertiary dark:bg-dark-bg-primary p-8 rounded-lg"
+                className="bg-light-bg-tertiary dark:bg-dark-bg-primary p-8 rounded-lg sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl sm:px-2"
               >
                 <section className="flex flex-col items-center gap-4">
-                  <output className="text-xxl text-light-fg-tertiary">
+                  <output className="text-xxl text-light-fg-tertiary sm:text-xl">
                     {props.message}
                   </output>
 
