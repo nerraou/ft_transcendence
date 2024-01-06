@@ -13,6 +13,10 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Logo from "@icons/Logo";
 import { Popover, Transition } from "@headlessui/react";
+import LoadingPage from "../../app/loading";
+import useCompleteProfile from "@services/useCompleteProfile";
+import Modal from "@components/atoms/Modal";
+import Button from "@components/atoms/Button";
 import BurgerMenu from "@icons/outline/BurgerMenu";
 import NotificationPopover from "@organisms/NotificationPopover";
 
@@ -120,13 +124,13 @@ interface LayoutProps {
   children: ReactNode | ReactNode[];
 }
 
-function NavBar() {
+interface NavbarProps {
+  token?: string | unknown;
+}
+function NavBar({ token }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
-  const { data: currentUser, isSuccess } = useUserProfileQuery(
-    session?.user?.accessToken,
-  );
+  const { data: currentUser, isSuccess } = useUserProfileQuery(token);
   const routes = useMemo(
     () => getRoutes(currentUser?.username),
     [currentUser?.username],
@@ -159,25 +163,72 @@ function NavBar() {
         </div>
         <div className="w-1 h-full bg-light-fg-tertiary" />
         <div className="flex items-center justify-center border-l-4 p-1 border-light-fg-primary dark:border-dark-fg-primary">
-          {sessionStatus == "authenticated" && (
-            <NotificationPopover
-              jwt={session?.user.accessToken}
-              onSignOut={signOut}
-              button={
-                <div className="flex items-center justify-center">
-                  <Logo width="w-14" height="h-14" />
-                </div>
-              }
-            />
-          )}
+          <NotificationPopover
+            jwt={token}
+            onSignOut={signOut}
+            button={
+              <div className="flex items-center justify-center">
+                <Logo width="w-14" height="h-14" />
+              </div>
+            }
+          />
         </div>
       </nav>
     </header>
   );
 }
 
-export default function Layout(props: LayoutProps) {
+interface LayoutContentProps {
+  children: ReactNode | ReactNode[];
+  token?: string | unknown;
+}
+function LayoutContent(props: LayoutContentProps) {
   useOnChallengeRecieved();
+
+  const { isProfileComplete, onClick: redirect } = useCompleteProfile(
+    props.token,
+  );
+
+  if (!isProfileComplete) {
+    return (
+      <Modal
+        isOpen={!isProfileComplete}
+        title="Welcom to BongBoy"
+        description="please complete your profile to continue using the app"
+        action={<Button text="Settings" onClick={redirect} />}
+      />
+    );
+  }
+
+  return (
+    <>
+      <NavBar token={props.token} />
+      <section
+        className={clsx(
+          "flex-grow pb-10 bg-light-bg-primary dark:bg-dark-bg-primary",
+          "relative h-full rounded-b-2xl border-t-4 border-l-4 border-light-fg-tertiary",
+          "bg-[position:right_bottom_,_center_bottom,_left_-4px_bottom] bg-no-repeat",
+          "bg-light-layout dark:bg-dark-layout",
+        )}
+      >
+        {props.children}
+      </section>
+    </>
+  );
+}
+
+export default function Layout(props: LayoutProps) {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return (
+      <LoadingPage
+        bgColor=" bg-light-bg-tertiary dark:bg-dark-bg-primary"
+        width="w-screen"
+        height="h-screen"
+      />
+    );
+  }
 
   return (
     <main className="relative flex min-h-screen p-4 bg-light-bg-primary dark:bg-dark-bg-primary">
@@ -187,17 +238,9 @@ export default function Layout(props: LayoutProps) {
           "border-light-fg-primary dark:border-dark-fg-primary",
         )}
       >
-        <NavBar />
-        <section
-          className={clsx(
-            "flex-grow pb-10 bg-light-bg-primary dark:bg-dark-bg-primary",
-            "relative h-full rounded-b-2xl border-t-4 border-l-4 border-light-fg-tertiary",
-            "bg-[position:right_bottom_,_center_bottom,_left_-4px_bottom] bg-no-repeat",
-            "bg-light-layout dark:bg-dark-layout",
-          )}
-        >
+        <LayoutContent token={session?.user.accessToken}>
           {props.children}
-        </section>
+        </LayoutContent>
       </section>
       <Toaster position="top-right" />
     </main>
