@@ -6,7 +6,7 @@ import { useSocket } from "@contexts/socket";
 import { MembersData, useChannelQuery } from "@services/useChannelQuery";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import baseQuery from "@utils/baseQuery";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 interface ChatBoxChannelProps {
@@ -68,14 +68,14 @@ interface OldMessage {
 interface OldMessages {
   count: number;
   messages: OldMessage[];
-  nextPage: [];
+  nextPage: number;
 }
 
 async function getMessages(page: number, id: number, token: string | unknown) {
   const limit = 50;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
-    `/channels/${id}/messages/?limit=${limit}&page=${page}`;
+    `/channels/${id}/messages?limit=${limit}&page=${page}`;
 
   const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -83,7 +83,7 @@ async function getMessages(page: number, id: number, token: string | unknown) {
 
   let nextPage: number | null = page + 1;
   const response = await res.json();
-  if (response.count == 0) {
+  if (response.messages.length == 0) {
     nextPage = null;
   }
   return { ...response, nextPage: nextPage };
@@ -92,33 +92,31 @@ async function getMessages(page: number, id: number, token: string | unknown) {
 function MessagesList(props: MessagesListProps) {
   const { ref, inView } = useInView();
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
-
-  const { data, isFetchingPreviousPage, fetchPreviousPage } =
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useSuspenseInfiniteQuery<OldMessages>({
       queryKey: ["channelMessages", props.id],
       queryFn: ({ pageParam }) => {
         return getMessages(pageParam as number, props.id, props.token);
       },
       initialPageParam: 1,
-      getPreviousPageParam: (_, pages) => {
-        return pages.length + 1 ?? undefined;
-      },
-      getNextPageParam: (_, pages) => {
-        return pages.length + 1 ?? undefined;
+      getNextPageParam: (page) => {
+        return page.nextPage ?? undefined;
       },
     });
 
   useEffect(() => {
     if (inView) {
-      fetchPreviousPage();
+      fetchNextPage();
     }
-  }, [fetchPreviousPage, inView]);
+  }, [fetchNextPage, inView]);
 
   return (
     <section>
-      <div className="flex justify-center" ref={ref}>
-        {isFetchingPreviousPage ? <Loading height="h-5" width="w-5" /> : null}
-      </div>
+      {hasNextPage && (
+        <div className="flex justify-center" ref={ref}>
+          {isFetchingNextPage ? <Loading height="h-5" width="w-5" /> : null}
+        </div>
+      )}
       {data?.pages?.map((page, key) => {
         return (
           <Fragment key={key}>
@@ -151,6 +149,7 @@ function MessagesList(props: MessagesListProps) {
 function ChatBoxChannel(props: ChatBoxChannelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
+  const ref = useRef<HTMLElement>(null);
 
   const { data } = useChannelQuery(props.token, props.channelId);
 
@@ -222,7 +221,7 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
           token={props.token}
           members={data.members}
         />
-        <section>
+        <section ref={ref}>
           {messages.map((message, index) => {
             if (message.isReceived) {
               return (
@@ -253,6 +252,13 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
         onClick={(e) => {
           e.preventDefault();
           sendMessage();
+          if (ref.current) {
+            ref.current.scrollIntoView({
+              behavior: "instant",
+              block: "end",
+              inline: "end",
+            });
+          }
         }}
       />
     </div>

@@ -60,7 +60,7 @@ interface OldMessage {
 interface OldMessages {
   count: number;
   messages: OldMessage[];
-  nextPage: [];
+  nextPage: number;
 }
 
 async function getMessages(
@@ -68,7 +68,7 @@ async function getMessages(
   username: string,
   token: string | unknown,
 ) {
-  const limit = 50;
+  const limit = 100;
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
     `/users/messages/${username}?limit=${limit}&page=${page}`;
@@ -79,10 +79,9 @@ async function getMessages(
 
   let nextPage: number | null = page + 1;
   const response = await res.json();
-  if (response.count == 0) {
+  if (response.messages.length == 0) {
     nextPage = null;
   }
-
   return { ...response, nextPage: nextPage };
 }
 
@@ -90,32 +89,31 @@ function MessagesList(props: MessagesListProps) {
   const { ref, inView } = useInView();
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
-  const { data, isFetchingPreviousPage, fetchPreviousPage } =
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useSuspenseInfiniteQuery<OldMessages>({
       queryKey: ["dms", props.receiver],
       queryFn: ({ pageParam }) => {
         return getMessages(pageParam as number, props.receiver, props.token);
       },
       initialPageParam: 1,
-      getPreviousPageParam: (_, pages) => {
-        return pages.length + 1 ?? undefined;
-      },
-      getNextPageParam: (_, pages) => {
-        return pages.length + 1 ?? undefined;
+      getNextPageParam: (page) => {
+        return page.nextPage ?? undefined;
       },
     });
 
   useEffect(() => {
     if (inView) {
-      fetchPreviousPage();
+      fetchNextPage();
     }
-  }, [fetchPreviousPage, inView]);
+  }, [fetchNextPage, inView]);
 
   return (
     <section>
-      <div className="flex justify-center" ref={ref}>
-        {isFetchingPreviousPage ? <Loading height="h-5" width="w-5" /> : null}
-      </div>
+      {hasNextPage && (
+        <div className="flex justify-center" ref={ref}>
+          {isFetchingNextPage ? <Loading height="h-5" width="w-5" /> : null}
+        </div>
+      )}
       {data?.pages?.map((page, key) => {
         return (
           <Fragment key={key}>
