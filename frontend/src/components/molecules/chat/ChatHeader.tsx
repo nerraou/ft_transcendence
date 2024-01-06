@@ -96,10 +96,15 @@ function MenuDotsPopover(props: MenuDotsPopoverProps) {
                 blockUserMutation.mutate({ token: props.token, id: props.id })
               }
             >
-              <UserBlock color="stroke-light-fg-primary dark:stroke-dark-fg-primary" />
-              <label className="text-base text-light-fg-primary dark:text-dark-fg-primary ml-sm">
-                Block
-              </label>
+              <Link href={"/chat/"}>
+                <UserBlock color="stroke-light-fg-primary dark:stroke-dark-fg-primary" />
+              </Link>
+
+              <Link href={"/chat/"}>
+                <label className="text-base text-light-fg-primary dark:text-dark-fg-primary ml-sm">
+                  Block
+                </label>
+              </Link>
             </button>
           </div>
         </Popover.Panel>

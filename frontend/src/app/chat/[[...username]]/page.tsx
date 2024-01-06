@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { Popover, Transition } from "@headlessui/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Fragment, Suspense, useState } from "react";
 
 import LoadingPage from "../../loading";
@@ -86,6 +86,7 @@ function Chat(props: ChatProps) {
     });
 
   const { data: userData } = useUserProfileQuery(props.token);
+  const router = useRouter();
 
   let username = userData.username;
   if (props.username) {
@@ -97,6 +98,17 @@ function Chat(props: ChatProps) {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
   return (
     <Fragment>
+      {friendData.isBlocked && (
+        <Modal
+          description="You are not allowed to see this page"
+          title="Error"
+          isOpen
+          action={
+            <Button text="Go Away" onClick={() => router.replace("/chat/")} />
+          }
+        />
+      )}
+
       <div className="w-1/3 lg:hidden md:hidden sm:hidden">
         <SidePanel
           image={imageUrl + userData.avatarPath}
@@ -146,7 +158,6 @@ function Chat(props: ChatProps) {
           />
         </div>
       )}
-
       {!isChannel && (
         <div className="flex flex-col w-2/3 lg:w-full md:w-full sm:w-full">
           <ChatHeader
@@ -174,6 +185,7 @@ function Chat(props: ChatProps) {
 
 function ChatPage({ params }: ChatPageProps) {
   const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
 
   if (sessionStatus === "unauthenticated") {
     redirect("/sign-in");
@@ -196,15 +208,24 @@ function ChatPage({ params }: ChatPageProps) {
           {({ reset }) => (
             <ErrorBoundary
               onReset={reset}
-              fallbackRender={({ resetErrorBoundary }) => (
+              fallbackRender={({ resetErrorBoundary, error }) => (
                 <Modal
                   isOpen
                   title="Error"
-                  description="Something went wrong"
+                  description={
+                    error.response?.status === 403
+                      ? `This User does not exist`
+                      : "Something went wrong"
+                  }
                   action={
                     <Button
-                      text="Retry"
+                      text={
+                        error.response?.status === 403 ? `Go Home` : "Retry"
+                      }
                       onClick={() => {
+                        if (error.response?.status === 403) {
+                          router.push("/chat/");
+                        }
                         resetErrorBoundary();
                       }}
                     />
