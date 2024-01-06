@@ -432,7 +432,7 @@ export class UsersService {
     return count == 1;
   }
 
-  async searchUsers(
+  async searchChannelsUsers(
     searchQuery: string,
     channelId: number,
     connectedUserId: number,
@@ -488,6 +488,53 @@ export class UsersService {
         status: true,
       },
       take: 10,
+    });
+  }
+
+  async findUserBlockListById(userId: number) {
+    const blocks = await this.prisma.block.findMany({
+      where: {
+        OR: [
+          {
+            blocked: userId,
+          },
+          {
+            blockedBy: userId,
+          },
+        ],
+      },
+    });
+
+    const blockedIds = [];
+
+    blocks.forEach((item) => {
+      blockedIds.push(item.blocked);
+      blockedIds.push(item.blockedBy);
+    });
+
+    return blockedIds;
+  }
+
+  async searchUsers(searchQuery: string, connectedUserId: number) {
+    const blockList = await this.findUserBlockListById(connectedUserId);
+
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          notIn: blockList,
+        },
+        username: {
+          startsWith: searchQuery,
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarPath: true,
+        status: true,
+        firstName: true,
+        lastName: true,
+      },
     });
   }
 }
