@@ -37,12 +37,11 @@ function SingInRedirect() {
 }
 
 function SettingsRedirect() {
-  const router = useRouter();
   return (
     <Button
       text="Settings"
       onClick={() => {
-        router.push("/profile/settings");
+        window.location.replace("/profile/settings");
       }}
     />
   );

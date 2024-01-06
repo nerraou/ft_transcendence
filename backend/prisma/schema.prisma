@@ -127,7 +127,7 @@ model Channel {
 
 model ChannelMember {
   id         Int                 @id @default(autoincrement()) @map("id")
-  memberId   Int                 @map("memeber_id")
+  memberId   Int                 @map("member_id")
   channelId  Int                 @map("channel_id")
   role       ChannelMemberRole   @map("role")
   state      ChannelMemberState? @map("state")
