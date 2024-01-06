@@ -153,6 +153,9 @@ function ChatBoxDms(props: ChatBoxProps) {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    setMessages([]);
+  }, [props.username]);
+  useEffect(() => {
     if (!socket) {
       return;
     }

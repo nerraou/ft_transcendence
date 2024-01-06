@@ -158,6 +158,10 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
 
   useEffect(() => {
+    setMessages([]);
+  }, [props.channelId]);
+
+  useEffect(() => {
     if (!socket) {
       return;
     }
