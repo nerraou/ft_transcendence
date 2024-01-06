@@ -115,7 +115,7 @@ function FeedPage(props: FeedPageProps) {
   const [posts, setPosts] = useState<FullPostData[]>([]);
   const {
     channels,
-    setQuery,
+    setQuery: communitySetQuery,
     isLoading: channelsLoading,
   } = useCommunitiesQuery(token);
   const [vCommunitiesQuery, setVCommunitiesQuery] = useState("");
@@ -125,7 +125,11 @@ function FeedPage(props: FeedPageProps) {
     token,
     true,
   );
-  const { users, isLoading: usersLoading } = useUsersQuery(token);
+  const {
+    users,
+    isLoading: usersLoading,
+    setQuery: setUsersQuery,
+  } = useUsersQuery(token);
 
   const onPostSuccess = (post: CreatePostResponse) => {
     setPosts([
@@ -186,13 +190,13 @@ function FeedPage(props: FeedPageProps) {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedCummunitiesQuery = useCallback(
-    debounce((q) => setQuery(q), 1000),
+    debounce((q) => communitySetQuery(q), 1000),
     [],
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedUsersQuery = useCallback(
-    debounce((q) => setQuery(q), 1000),
+    debounce((q) => setUsersQuery(q), 1000),
     [],
   );
 

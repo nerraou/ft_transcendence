@@ -1,7 +1,7 @@
 import React from "react";
 import UserCard from "./UserCard";
 import InputSearch from "@components/atoms/InputSearch";
-import Loading from "@app/loading";
+import Loading from "@components/atoms/icons/outline/Loading";
 
 export interface User {
   id: number;
