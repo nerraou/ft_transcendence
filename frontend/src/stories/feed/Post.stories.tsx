@@ -27,6 +27,7 @@ export const Default: Story = {
       id: 1,
       createdAt: "2021-08-01T00:00:00.000Z",
       user: {
+        username: "john",
         name: "John Doe",
         avatar: "/default/user-circle.png",
       },
@@ -44,6 +45,7 @@ export const LikedNoImage: Story = {
       id: 1,
       createdAt: "2021-08-01T00:00:00.000Z",
       user: {
+        username: "john",
         name: "John Doe",
         avatar: "/default/user-circle.png",
       },
