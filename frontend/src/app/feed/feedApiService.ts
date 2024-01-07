@@ -54,6 +54,11 @@ const PostValidation = (content: string, image: File | undefined) => {
       error: true,
       message: "Post should have content or image",
     };
+  } else if (image && !image.type.match("image.*")) {
+    return {
+      error: true,
+      message: "Image should be of type jpg, jpeg or png",
+    };
   } else {
     return {
       error: false,

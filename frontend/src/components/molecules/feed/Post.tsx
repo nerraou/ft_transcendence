@@ -4,10 +4,12 @@ import Like from "@icons/outline/Like";
 import LikeFilled from "@icons/outline/LikeFilled";
 import { useState } from "react";
 import { useLikePost } from "@app/feed/feedApiService";
+import Link from "next/link";
 
 interface User {
   name: string;
   avatar?: string | null;
+  username: string;
 }
 
 interface UserCardProps {
@@ -18,7 +20,10 @@ const UserCard = ({ user }: UserCardProps) => {
   const defaultImage = "/default/user-circle.png";
 
   return (
-    <div className="flex items-center gap-4 text-lg">
+    <Link
+      className="flex items-center gap-4 text-lg"
+      href={`/profile/${user.username}`}
+    >
       <Image
         src={user.avatar || defaultImage}
         alt={user.name}
@@ -27,7 +32,7 @@ const UserCard = ({ user }: UserCardProps) => {
         className="rounded-full"
       />
       <p>{user.name}</p>
-    </div>
+    </Link>
   );
 };
 

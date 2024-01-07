@@ -96,6 +96,7 @@ const CreatePost = ({
                 onChange={handleChange}
                 ref={hiddenFileInput}
                 className="hidden"
+                accept="image/*"
               />
             </button>
             <button

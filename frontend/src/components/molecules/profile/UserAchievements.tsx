@@ -27,6 +27,17 @@ const achievements: Record<string, ReactNode> = {
   OneHundredWins: <OneHundredWins />,
 };
 
+const achievementsTitles: Record<string, string> = {
+  CleanSheet: "Bono",
+  FirstWin: "First Win",
+  FirstRanked: "First Ranked",
+  SecondRanked: "Second Ranked",
+  ThirdRanked: "Third Ranked",
+  LastRanked: "Mrekkel",
+  FiveWins: "Five Wins",
+  OneHundredWins: "One Hundred Wins",
+};
+
 function UserAchievements(props: UserAchievementsProps) {
   const [sliderRef] = useKeenSlider({
     slides: {
@@ -51,6 +62,7 @@ function UserAchievements(props: UserAchievementsProps) {
           <div
             key={index}
             className="keen-slider__slide flex justify-center overflow-visible"
+            title={achievementsTitles[achievement]}
           >
             {achievements[achievement]}
           </div>

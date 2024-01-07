@@ -15,7 +15,7 @@ interface ButtonProps {
 function Button(props: ButtonProps) {
   return (
     <button
-      disabled={props.disabled}
+      disabled={props.disabled || props.loading}
       onClick={props.onClick}
       className={clsx(
         "border-light-fg-primary flex justify-center items-center",
