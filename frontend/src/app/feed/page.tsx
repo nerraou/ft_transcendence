@@ -43,7 +43,7 @@ export interface FullPostData {
   likedByUser: boolean;
   owner: {
     id: number;
-    username: string | null;
+    username: string;
     avatarPath: string;
     firstName: string | null;
     lastName: string | null;
@@ -69,6 +69,7 @@ const Feed = (props: FeedProps) => {
             content: post.content,
             image: post.imagePath ? imageUrl + post.imagePath : null,
             user: {
+              username: post.owner.username,
               name: `${post.owner.firstName} ${post.owner.lastName}`,
               avatar: post.owner.avatarPath
                 ? imageUrl + post.owner.avatarPath
