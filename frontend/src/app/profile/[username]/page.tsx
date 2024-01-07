@@ -35,7 +35,7 @@ function Profile({ token, username }: ProfileProps) {
 
   return (
     <>
-      {!user ? (
+      {!user || user.isBlocked ? (
         <Modal
           isOpen
           title="Error"

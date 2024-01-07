@@ -53,7 +53,7 @@ const Ranking = ({ users, onViewMore, isLoading }: RankingProps) => {
       </div>
       {isLoading && (
         <div className="flex flex-row justify-center w-full">
-          <Loading height="h-20" width="w-20" />
+          <Loading />
         </div>
       )}
       {users.map((user, index) => (

@@ -172,7 +172,7 @@ const Communities = ({
       <div className="flex flex-col align-start w-full min-h-[300px] gap-8">
         {isLoading && (
           <div className="flex flex-row justify-center w-full">
-            <Loading height="h-20" width="w-20" />
+            <Loading />
           </div>
         )}
 
