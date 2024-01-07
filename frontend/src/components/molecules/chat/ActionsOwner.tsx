@@ -1,4 +1,4 @@
-import ActionAddAdmin from "@components/atoms/chat/ActionAddAdmin";
+import ActionAddOrRemoveAdmin from "@components/atoms/chat/ActionAddRemoveAdmin";
 import ActionBanMember from "@components/atoms/chat/ActionBanMember";
 import ActionChallengeMember from "@components/atoms/chat/ActionChallengeMember";
 import ActionKickMember from "@components/atoms/chat/ActionKickMember";
@@ -69,7 +69,8 @@ function Owner(props: OwnerProps) {
           />
         )}
         {!isMe && (
-          <ActionAddAdmin
+          <ActionAddOrRemoveAdmin
+            isAdmin={props.role == "ADMIN"}
             channelId={props.channelId}
             memberId={props.memberId}
             token={props.token}
