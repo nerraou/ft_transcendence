@@ -209,7 +209,7 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
       socket.off("channel-chat-message", onDirectMessage);
       socket.off("error", onError);
     };
-  }, [socket, props.username, data.members]);
+  }, [socket, props.username, data.members, props.channelId]);
 
   function sendMessage() {
     if (!socket) {
