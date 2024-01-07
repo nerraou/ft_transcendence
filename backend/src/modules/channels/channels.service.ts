@@ -101,6 +101,7 @@ export class ChannelsService {
         data: {
           role: "MEMBER",
           isLeft: false,
+          state: null,
         },
       }),
       this.prisma.channel.update({
