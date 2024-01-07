@@ -296,10 +296,14 @@ export class UsersController {
     @User() user: UserEntity,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    const isPasswordsIdentical = await this.hashService.compare(
-      updatePasswordDto.currentPassword,
-      user.password,
-    );
+    let isPasswordsIdentical = true;
+
+    if (user.password) {
+      isPasswordsIdentical = await this.hashService.compare(
+        updatePasswordDto.currentPassword,
+        user.password,
+      );
+    }
 
     if (!isPasswordsIdentical) {
       throw new ForbiddenException();
