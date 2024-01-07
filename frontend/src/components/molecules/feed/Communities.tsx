@@ -179,7 +179,7 @@ const Communities = ({
         {channels.map((channel, index) => (
           <div
             key={index}
-            className="flex flex-row justify-between w-full gap-12 lg:gap-4 sm:flex-col sm:gap-2 sm:justify-center sm:items-center min-w-min"
+            className="flex flex-row justify-between w-full gap-12 lg:gap-4 sm:gap-2 min-w-min"
           >
             <ChannelCard
               channelName={channel.name}
