@@ -127,7 +127,7 @@ const Communities = ({
   const getErrorMessage = (status?: number) => {
     switch (status) {
       case 403:
-        return "You are already a member of this community";
+        return "You are not allowed to join this community or you are already a member";
       case 401:
         return "The password you entered is incorrect";
       default:
