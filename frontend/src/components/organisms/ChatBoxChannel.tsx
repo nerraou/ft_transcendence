@@ -156,6 +156,13 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
   const socket = useSocket();
 
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, []);
 
   useEffect(() => {
     setMessages([]);
@@ -174,6 +181,9 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
     }
 
     function onDirectMessage(message: Response) {
+      if (props.channelId != message.channelId) {
+        return;
+      }
       if (isMember(message.user.username)) {
         if (props.username != message.user.username) {
           setMessages((prevMessages) => [
@@ -218,7 +228,10 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
 
   return (
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
-      <div className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
+      <div
+        ref={chatBoxRef}
+        className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto"
+      >
         <MessagesList
           id={props.channelId}
           username={props.username}
@@ -256,13 +269,14 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
         onClick={(e) => {
           e.preventDefault();
           sendMessage();
-          if (ref.current) {
-            ref.current.scrollIntoView({
-              behavior: "instant",
-              block: "end",
-              inline: "end",
-            });
-          }
+          setTimeout(() => {
+            if (ref.current) {
+              ref.current.scrollIntoView({
+                behavior: "smooth",
+                inline: "end",
+              });
+            }
+          }, 0);
         }}
       />
     </div>

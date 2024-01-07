@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import baseQuery, { RequestError } from "@utils/baseQuery";
+import toast from "react-hot-toast";
 
 interface AddFriend {
   userId: number;
@@ -27,7 +28,13 @@ function useAddFriendMutation() {
     mutationFn: addFriend,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["friends"] });
+      queryClient.invalidateQueries({ queryKey: ["chatContact"] });
+      queryClient.invalidateQueries({ queryKey: ["chatFriends"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Success");
+    },
+    onError: () => {
+      toast.error("Error");
     },
   });
 }

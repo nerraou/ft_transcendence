@@ -1,6 +1,7 @@
 import baseQuery, { RequestError } from "@utils/baseQuery";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Kick from "../icons/outline/Kick";
+import toast from "react-hot-toast";
 
 interface ActionKickMemberProps {
   token: string | unknown;
@@ -31,8 +32,18 @@ async function kickMember(member: KickMember) {
 }
 
 function ActionKickMember(props: ActionKickMemberProps) {
+  const queryClient = useQueryClient();
+
   const mutation = useMutation<Response, RequestError, KickMember>({
     mutationFn: kickMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      queryClient.invalidateQueries({ queryKey: ["chatChannels"] });
+      toast.success("Success");
+    },
+    onError: () => {
+      toast.error("Error");
+    },
   });
 
   return (

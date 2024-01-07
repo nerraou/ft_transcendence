@@ -22,31 +22,35 @@ function Member(props: MemberProps) {
   const isMe = props.profileOwnerId == props.memberId;
 
   return (
-    <div className="flex justify-between hover:bg-light-fg-tertiary p-2">
-      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+    <div className="flex items-center hover:bg-light-fg-tertiary p-4 space-x-4">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary w-24 p-2">
         {props.role}
       </label>
-      <div className="flex space-x-2">
-        <div className="relative shrink-0 w-16 h-16">
-          <Image
-            src={imageUrl + props.imagePath}
-            alt="user image"
-            fill
-            sizes="w-16 h-16"
-            className="rounded-sm object-cover appearance-none"
-          />
+
+      <div className="flex justify-start items-center space-x-6">
+        <div className="flex flex-col justify-center items-center space-x-2">
+          <div className="relative shrink-0 w-16 h-16">
+            <Image
+              src={imageUrl + props.imagePath}
+              alt="user image"
+              fill
+              sizes="w-16 h-16"
+              className="rounded-sm object-cover appearance-none"
+            />
+          </div>
+
+          <p className="block text-light-fg-link text-lg">{props.username}</p>
         </div>
 
-        <p className="text-light-fg-link text-lg">{props.username}</p>
+        {!isMe && <ActionChallengeMember username={props.username} />}
       </div>
-      {!isMe && <ActionChallengeMember username={props.username} />}
     </div>
   );
 }
 
 function ActionsMember(props: ActionsMemberProps) {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col space-y-4">
       {props.members.map((member) => {
         return (
           <Member

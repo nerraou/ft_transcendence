@@ -30,7 +30,7 @@ export interface UserHeaderProps {
 
 export function useFriendQuery(token: string | unknown, username: string) {
   return useSuspenseQuery<UserHeaderProps>({
-    queryKey: ["chatContatct", username],
+    queryKey: ["chatContact", username],
     queryFn: () => {
       return getUserHeader(token, username);
     },

@@ -136,7 +136,7 @@ function ManageMemebers(props: ManageMemebersProps) {
           setFiltredMembers(data.members);
         }}
       />
-      <div className="px-2 overflow-scroll h-96 scrollbar-thin scrollbar-thumb-dark-bg-primary">
+      <div className="px-2 overflow-scroll h-96 sm:h-72 scrollbar-thin scrollbar-thumb-dark-bg-primary">
         {props.isMember && sub && (
           <ActionsMember
             members={filtredMembers}

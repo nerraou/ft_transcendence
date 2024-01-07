@@ -49,7 +49,7 @@ function Modal(props: ModalProps) {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flex flex-col items-center justify-center w-full max-w-max p-10 rounded-md bg-light-bg-tertiary border-solid border-2 border-light-fg-primary">
+              <Dialog.Panel className="flex flex-col items-center justify-center w-full max-w-max p-10 sm:p-5 rounded-md bg-light-bg-tertiary border-solid border-2 border-light-fg-primary">
                 <Dialog.Title className="text-xl text-light-fg-primary leading-6">
                   {props.title}
                 </Dialog.Title>

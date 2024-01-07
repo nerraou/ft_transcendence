@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
 import Mute from "../icons/outline/Mute";
+import toast from "react-hot-toast";
 
 interface ActionMuteMemberProps {
   token: string | unknown;
@@ -37,6 +38,12 @@ async function muteMember(member: MuteMember) {
 function ActionMuteMember(props: ActionMuteMemberProps) {
   const mutation = useMutation<Response, RequestError, MuteMember>({
     mutationFn: muteMember,
+    onSuccess: () => {
+      toast.success("Success");
+    },
+    onError: () => {
+      toast.error("Error");
+    },
   });
 
   return (
