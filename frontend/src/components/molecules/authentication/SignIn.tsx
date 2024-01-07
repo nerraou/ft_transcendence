@@ -177,8 +177,8 @@ function SignInForm() {
       <Modal
         isOpen={isSuccessModalVisible || isOAuthSuccess}
         title="Welcom to BongBoy"
-        description="Complete your acount from here"
-        action={<Redirect path="/profile/settings" text="Settings" />}
+        description="You are now connected"
+        action={<Redirect path="/feed" text="Home" />}
       />
 
       <div className="space-y-4">
