@@ -1,11 +1,11 @@
 import Image from "next/image";
 
-interface ChatBubbleResponseProps {
+interface ChatBubbleMessageProps {
   image: string;
   message: string;
 }
 
-function ChatBubbleResponse(props: ChatBubbleResponseProps) {
+function ChatBubbleMessage(props: ChatBubbleMessageProps) {
   return (
     <div className="relative max-h-max w-full p-1">
       <div className="absolute top-0 right-0">
@@ -28,4 +28,4 @@ function ChatBubbleResponse(props: ChatBubbleResponseProps) {
   );
 }
 
-export default ChatBubbleResponse;
+export default ChatBubbleMessage;

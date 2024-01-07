@@ -150,6 +150,7 @@ function ChatBoxDms(props: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
   const socket = useSocket();
+
   const ref = useRef<HTMLDivElement>(null);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -163,6 +164,7 @@ function ChatBoxDms(props: ChatBoxProps) {
   useEffect(() => {
     setMessages([]);
   }, [props.username]);
+
   useEffect(() => {
     if (!socket) {
       return;
@@ -182,6 +184,14 @@ function ChatBoxDms(props: ChatBoxProps) {
           ]);
         }
       }
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            inline: "end",
+          });
+        }
+      }, 1);
     }
 
     function onError(error: string) {
