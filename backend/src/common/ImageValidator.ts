@@ -52,12 +52,13 @@ export class ImageValidator extends FileValidator {
 
 interface BuildParseFilePipeOptions {
   required: boolean;
+  size?: number;
 }
 
 export function buildParseFilePipe(options: BuildParseFilePipeOptions) {
   return new ParseFilePipeBuilder()
     .addMaxSizeValidator({
-      maxSize: ONE_MEGA,
+      maxSize: options.size ?? ONE_MEGA,
       message: "size",
     })
     .addValidator(new ImageValidator())
