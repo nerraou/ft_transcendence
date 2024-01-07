@@ -40,8 +40,8 @@ interface ChatProps {
 function SidePanelPopover(props: SidePanelProps) {
   return (
     <Popover className="relative">
-      <Popover.Button className="outline-none">
-        <More color="stroke-light-fg-primary" />
+      <Popover.Button className="flex justify-center items-center outline-none bg-light-fg-secondary border-2 border-dark-fg-primary  dark:bg-light-bg-primary h-10 w-10 rounded-full">
+        <More color="stroke-dark-fg-primary " />
       </Popover.Button>
       <Transition
         as={Fragment}
