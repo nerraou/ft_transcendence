@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface UserImageProps {
@@ -45,11 +46,13 @@ export interface HistoryUserCardProps {
 const HistoryUserCard = (props: HistoryUserCardProps) => {
   return (
     <div className="flex flex-col gap-2 bg-inherit items-center">
-      <UserImage
-        image={props.avatarPath}
-        ratingChange={props.ratingChange}
-        side={props.side}
-      />
+      <Link href={`/profile/${props.username}`}>
+        <UserImage
+          image={props.avatarPath}
+          ratingChange={props.ratingChange}
+          side={props.side}
+        />
+      </Link>
       <div className="flex flex-col gap-[2px] items-center w-full">
         <p className="text-light-fg-tertiary text-sm border-2 border-light-fg-primary dark:border-dark-fg-primary rounded-lg bg-light-fg-link px-1 flex flex-col items-center min-w-[50px] max-w-[160px]">
           {props.username}

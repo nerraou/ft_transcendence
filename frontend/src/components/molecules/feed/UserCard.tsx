@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface UserImageProps {
@@ -25,15 +26,20 @@ interface UserCardProps {
 
 const UserCard = (props: UserCardProps) => {
   return (
-    <div className="flex gap-4 max-w-max bg-inherit lg:flex-col lg:align-center lg:gap-2 lg:justify-center sm:flex-col sm:align-center sm:gap-2 sm:justify-center">
+    <Link
+      href={`/profile/${props.username}`}
+      className="flex gap-4 max-w-max bg-inherit lg:flex-col lg:align-center lg:gap-2 lg:justify-center sm:flex-col sm:align-center sm:gap-2 sm:justify-center"
+    >
       <UserImage image={props.image} />
       <div className="flex flex-col gap-2">
-        <label className="text-light-fg-link text-base">{props.fullName}</label>
-        <label className="text-light-fg-link text-sm leading-none">
+        <label className="text-light-fg-link text-base cursor-pointer">
+          {props.fullName}
+        </label>
+        <label className="text-light-fg-link text-sm leading-none cursor-pointer">
           {props.username}
         </label>
       </div>
-    </div>
+    </Link>
   );
 };
 
