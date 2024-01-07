@@ -17,6 +17,7 @@ interface User {
   isProfileOwner: boolean;
   isFriend: boolean;
   rating: number;
+  isBlocked: boolean;
   gamesStats: {
     wins: number;
     losses: number;
