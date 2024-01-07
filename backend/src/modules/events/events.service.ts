@@ -321,6 +321,9 @@ export class EventsService {
         opponentSocket.join(game.getSocketRoomName());
 
         this.registerGameEvents(game, player, opponent, serverSocket);
+
+        this.broadcastStatusChanged(client, player.id, "IN_GAME");
+        this.broadcastStatusChanged(client, opponent.id, "IN_GAME");
       }
     } catch (error) {
       console.error(error.message);
@@ -471,6 +474,7 @@ export class EventsService {
 
     this.registerGameEvents(game, player, opponent, serverSocket);
     this.broadcastStatusChanged(client, player.id, "IN_GAME");
+    this.broadcastStatusChanged(client, opponent.id, "IN_GAME");
   }
 
   async cancelChallenge(token: string) {
@@ -523,6 +527,26 @@ export class EventsService {
 
       this.gameLoopService.removeGame(game.getId());
       serverSocket.to(game.getSocketRoomName()).emit("game-over", data);
+
+      // broadcast ONLINE on game-over
+      const playerSocketClient = serverSocket.sockets.sockets.get(
+        player.socketId,
+      );
+      const opponentSocketClient = serverSocket.sockets.sockets.get(
+        opponent.socketId,
+      );
+
+      if (playerSocketClient) {
+        this.broadcastStatusChanged(playerSocketClient, player.id, "ONLINE");
+      }
+
+      if (opponentSocketClient) {
+        this.broadcastStatusChanged(
+          opponentSocketClient,
+          opponent.id,
+          "ONLINE",
+        );
+      }
     });
   }
 
