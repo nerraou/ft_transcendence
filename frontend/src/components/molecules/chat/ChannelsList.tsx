@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import User from "@components/atoms/chat/User";
 import UserPlus from "@components/atoms/icons/outline/UserPlus";
+import toast from "react-hot-toast";
 
 export interface ChannelProps {
   id: number;
@@ -100,6 +101,10 @@ function useInviteMemberMutation() {
     mutationFn: inviteMember,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chatChannels"] });
+      toast.success("Success");
+    },
+    onError: () => {
+      toast.error("Error");
     },
   });
 }
@@ -193,10 +198,12 @@ function ChannelAddUser(props: ChannelAddUserProps) {
           membersCount={props.membersCount}
         />
       </div>
-      <UsersAdd
-        color="stroke-light-fg-primary"
-        onClick={() => setIsOpen(true)}
-      />
+      <button>
+        <UsersAdd
+          color="stroke-light-fg-primary"
+          onClick={() => setIsOpen(true)}
+        />
+      </button>
       <Modal
         title="INVITE USERS"
         onClose={onClose}
