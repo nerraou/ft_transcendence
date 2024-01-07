@@ -26,25 +26,26 @@ export class GamesService {
       opponentNewRating = opponent.rating + 10;
     }
 
-    this.prisma.$transaction(async (prisma) => {
-      await prisma.user.update({
+    await this.prisma.$transaction([
+      this.prisma.user.update({
         data: {
           rating: playerNewRating,
         },
         where: {
           id: player.id,
         },
-      });
-
-      await prisma.user.update({
+      }),
+      this.prisma.user.update({
         data: {
           rating: opponentNewRating,
         },
         where: {
           id: opponent.id,
         },
-      });
+      }),
+    ]);
 
+    return this.prisma.$transaction(async (prisma) => {
       const playerNewRanking = await this.usersService.getUserRanking(
         player.id,
       );

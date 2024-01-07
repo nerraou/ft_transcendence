@@ -179,6 +179,10 @@ export class UsersService {
 
     const data = await this.prisma.$queryRaw<{ ranking: number }[]>(sqlQuery);
 
+    if (data.length == 0) {
+      return null;
+    }
+
     return Number(data.at(0).ranking);
   }
 

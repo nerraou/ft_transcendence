@@ -76,6 +76,7 @@ export class ChannelsService {
           channelId: channelId,
           memberId: userId,
           role: "MEMBER",
+          state: null,
         },
       }),
       this.prisma.channel.update({
@@ -100,6 +101,7 @@ export class ChannelsService {
         data: {
           role: "MEMBER",
           isLeft: false,
+          state: null,
         },
       }),
       this.prisma.channel.update({
@@ -333,6 +335,7 @@ export class ChannelsService {
         members: {
           where: {
             memberId: userId,
+            state: null,
           },
         },
       },
@@ -353,14 +356,25 @@ export class ChannelsService {
     });
   }
 
-  findChannelMember(channelId: number, userId: number, isLeft = false) {
+  findChannelMember(channelId: number, userId: number) {
     return this.prisma.channelMember.findUnique({
       where: {
         channelId_memberId: {
           channelId,
           memberId: userId,
         },
-        isLeft,
+        isLeft: false,
+      },
+    });
+  }
+
+  findChannelMemberIgnoreIsLeft(channelId: number, userId: number) {
+    return this.prisma.channelMember.findUnique({
+      where: {
+        channelId_memberId: {
+          channelId,
+          memberId: userId,
+        },
       },
     });
   }
