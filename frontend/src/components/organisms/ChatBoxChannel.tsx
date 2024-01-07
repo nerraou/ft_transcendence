@@ -174,6 +174,9 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
     }
 
     function onDirectMessage(message: Response) {
+      if (props.channelId != message.channelId) {
+        return;
+      }
       if (isMember(message.user.username)) {
         if (props.username != message.user.username) {
           setMessages((prevMessages) => [
