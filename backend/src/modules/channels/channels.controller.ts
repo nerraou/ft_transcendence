@@ -28,6 +28,7 @@ import { AppEnv, JWTEnv } from "@config/env-configuration";
 import { NotificationsService } from "@modules/notifications/notifications.service";
 import { buildParseFilePipe } from "@common/ImageValidator";
 import { UsersService } from "@modules/users/users.service";
+import { TWO_MEGA } from "@common/constants";
 
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { JoinChannelDto } from "./dto/join-channel.dto";
@@ -77,7 +78,7 @@ export class ChannelsController {
   async createChannel(
     @User() user: UserEntity,
     @Body() createChannelDto: CreateChannelDto,
-    @UploadedFile(buildParseFilePipe({ required: true }))
+    @UploadedFile(buildParseFilePipe({ required: true, size: TWO_MEGA }))
     file: Express.Multer.File,
   ) {
     const filename = uuid4() + ".png";
@@ -103,7 +104,7 @@ export class ChannelsController {
   async updateChannel(
     @User() user: UserEntity,
     @Body() updateChannelDto: UpdateChannelDto,
-    @UploadedFile(buildParseFilePipe({ required: false }))
+    @UploadedFile(buildParseFilePipe({ required: false, size: TWO_MEGA }))
     file: Express.Multer.File,
   ) {
     let filename: string | undefined;

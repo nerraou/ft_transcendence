@@ -341,7 +341,11 @@ export class ChannelsService {
       },
     });
 
-    return channels.map((channel) => {
+    const filtredChannels = channels.filter(
+      (channel) => channel.members.length > 0,
+    );
+
+    return filtredChannels.map((channel) => {
       const role = channel.members.at(0).role;
 
       return {
