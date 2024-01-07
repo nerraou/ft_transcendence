@@ -42,6 +42,7 @@ function ActionAddOrRemoveAdmin(props: ActionAddOrRemoveAdminProps) {
     mutationFn: addOrRemoveAdmin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["members"] });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
       toast.success("Success");
     },
     onError: () => {

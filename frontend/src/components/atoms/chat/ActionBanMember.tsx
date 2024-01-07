@@ -1,6 +1,7 @@
 import baseQuery, { RequestError } from "@utils/baseQuery";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Ban from "../icons/outline/Ban";
+import toast from "react-hot-toast";
 
 interface ActionBanMemberProps {
   token: string | unknown;
@@ -31,8 +32,18 @@ async function banMember(member: BanMember) {
 }
 
 function ActionBanMember(props: ActionBanMemberProps) {
+  const queryClient = useQueryClient();
+
   const mutation = useMutation<Response, RequestError, BanMember>({
     mutationFn: banMember,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      queryClient.invalidateQueries({ queryKey: ["chatChannels"] });
+      toast.success("Success");
+    },
+    onError: () => {
+      toast.error("Error");
+    },
   });
 
   return (
