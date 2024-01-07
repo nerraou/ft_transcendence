@@ -1,6 +1,4 @@
 import React from "react";
-import Link from "next/link";
-
 import UserCard from "./UserCard";
 import InputSearch from "@components/atoms/InputSearch";
 import Loading from "@components/atoms/icons/outline/Loading";
@@ -48,13 +46,12 @@ const Users = ({
       <div className="flex flex-col align-start w-full min-h-[300px] gap-8">
         {isLoading && (
           <div className="flex flex-row justify-center w-full">
-            <Loading height="h-20" width="w-20" />
+            <Loading />
           </div>
         )}
         {users.map((user, index) => (
-          <Link
+          <div
             key={index}
-            href={`/profile/${user.username}`}
             className="flex flex-row justify-between w-full gap-12 lg:gap-4 sm:flex-col sm:gap-2 sm:justify-center sm:items-center min-w-min"
           >
             <UserCard
@@ -62,7 +59,7 @@ const Users = ({
               image={imageUrl + user.avatarPath}
               username={user.username}
             />
-          </Link>
+          </div>
         ))}
       </div>
     </div>

@@ -27,7 +27,7 @@ function Admin(props: AdminProps) {
 
   return (
     <div className="flex flex-col items-center hover:bg-light-fg-tertiary border-2 rounded-md border-dark-fg-primary p-2 space-y-4">
-      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary w-24 p-2">
         {props.role}
       </label>
 

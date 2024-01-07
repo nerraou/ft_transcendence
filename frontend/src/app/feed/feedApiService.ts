@@ -313,8 +313,8 @@ const fetchUsers = async (token: string | unknown, query: string) => {
 
   const url =
     process.env.NEXT_PUBLIC_API_BASE_URL +
-    "/users/search" +
-    `${query.length > 1 ? "?search_query=" + query : ""}`;
+    "/users/search?search_query=" +
+    query;
 
   const res = await baseQuery(url, {
     headers: { Authorization: `Bearer ${token}` },

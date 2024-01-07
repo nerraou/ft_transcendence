@@ -7,6 +7,7 @@ import {
   useRankingQuery,
 } from "@app/feed/feedApiService";
 import { User } from "./Ranking";
+import Link from "next/link";
 
 interface RankingPlayerCardProps {
   user: User;
@@ -55,7 +56,9 @@ const RankingPlayerCard = ({ user }: RankingPlayerCardProps) => {
     <div className="flex items-start justify-between w-full bg-light-fg-tertiary dark:bg-dark-fg-primary p-4 rounded-lg gap-4">
       <div className="text-start">
         <div className="flex sm:flex-col sm:items-center gap-4 sm:gap-1 sm:w-full">
-          <UserImage image={imageUrl + user.avatarPath} />
+          <Link href={`/profile/${user.username}`}>
+            <UserImage image={imageUrl + user.avatarPath} />
+          </Link>
           <Username
             username={user.username}
             fullName={user.firstName + " " + user.lastName}

@@ -1,4 +1,4 @@
-import ActionAddAdmin from "@components/atoms/chat/ActionAddAdmin";
+import ActionAddOrRemoveAdmin from "@components/atoms/chat/ActionAddRemoveAdmin";
 import ActionBanMember from "@components/atoms/chat/ActionBanMember";
 import ActionChallengeMember from "@components/atoms/chat/ActionChallengeMember";
 import ActionKickMember from "@components/atoms/chat/ActionKickMember";
@@ -27,7 +27,7 @@ function Owner(props: OwnerProps) {
 
   return (
     <div className="flex flex-col items-center hover:bg-light-fg-tertiary border-2 rounded-md border-dark-fg-primary p-2 space-y-4">
-      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary p-2">
+      <label className="block self-start bg-dark-bg-primary text-light-fg-tertiary w-24 p-2">
         {props.role}
       </label>
       <div className="flex flex-col justify-center items-center">
@@ -69,7 +69,8 @@ function Owner(props: OwnerProps) {
           />
         )}
         {!isMe && (
-          <ActionAddAdmin
+          <ActionAddOrRemoveAdmin
+            isAdmin={props.role == "ADMIN"}
             channelId={props.channelId}
             memberId={props.memberId}
             token={props.token}
