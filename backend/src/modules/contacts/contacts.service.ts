@@ -58,7 +58,7 @@ export class ContactsService {
     });
   }
 
-  acceptContactRequest(id: number, senderUsername: string) {
+  acceptContactRequest(id: number, userId: number, senderUsername: string) {
     return this.prisma.$transaction(async (tx) => {
       const contact = await this.prisma.contact.update({
         where: {
@@ -69,7 +69,7 @@ export class ContactsService {
         },
       });
 
-      await this.notificationsService.createContactNotification(id, tx, {
+      await this.notificationsService.createContactNotification(userId, tx, {
         type: "contact",
         id: contact.id,
         status: "ACCEPTED",

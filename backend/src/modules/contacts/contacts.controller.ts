@@ -113,8 +113,15 @@ export class ContactsController {
       throw new ForbiddenException();
     }
 
+    let userId = contact.followerId;
+
+    if (userId == connectedUser.id) {
+      userId = contact.followingId;
+    }
+
     await this.contactsService.acceptContactRequest(
       contactId,
+      userId,
       connectedUser.username,
     );
 

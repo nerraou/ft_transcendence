@@ -304,10 +304,15 @@ export class ChannelsController {
       }
     }
 
-    const channelMember = await this.channelsService.findChannelMember(
-      channel.id,
-      userId,
-    );
+    const channelMember =
+      await this.channelsService.findChannelMemberIgnoreIsLeft(
+        channel.id,
+        userId,
+      );
+
+    if (channelMember && channelMember.state == "BANNED") {
+      throw new ForbiddenException();
+    }
 
     if (!channelMember) {
       await this.channelsService.joinChannel(userId, channel.id);
@@ -341,12 +346,13 @@ export class ChannelsController {
         throw new ForbiddenException();
       }
 
-      const isChannelMember = await this.channelsService.isChannelMember(
-        channelId,
-        userId,
-      );
+      const channelMember =
+        await this.channelsService.findChannelMemberIgnoreIsLeft(
+          channelId,
+          userId,
+        );
 
-      if (!isChannelMember) {
+      if (!channelMember) {
         await this.channelsService.joinChannel(userId, channelId);
       }
 
