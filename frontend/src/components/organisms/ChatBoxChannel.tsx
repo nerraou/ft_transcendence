@@ -264,7 +264,9 @@ function ChatBoxChannel(props: ChatBoxChannelProps) {
       <InputChat
         value={messageText}
         onChange={(e) => {
-          setMessageText(e.target.value);
+          if (e.target.value.length <= 500) {
+            setMessageText(e.target.value);
+          }
         }}
         onClick={(e) => {
           e.preventDefault();
