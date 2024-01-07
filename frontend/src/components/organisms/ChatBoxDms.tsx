@@ -150,7 +150,15 @@ function ChatBoxDms(props: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
   const socket = useSocket();
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, []);
 
   useEffect(() => {
     setMessages([]);
@@ -206,29 +214,36 @@ function ChatBoxDms(props: ChatBoxProps) {
 
   return (
     <div className="flex flex-col bg-dark-bg-primary h-screen border-4 px-5 py-10 border-light-bg-tertiary rounded-br-2xl">
-      <div className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto">
+      <div
+        ref={chatBoxRef}
+        className="h-5/6 pr-4 scrollbar-thin scrollbar-thumb-dark-fg-primary overflow-auto"
+      >
         <MessagesList
           receiver={props.receiver}
           username={props.username}
           token={props.token}
         />
-        <section ref={ref}>
+        <section>
           {messages.map((message, index) => {
             if (message.isReceived) {
               return (
-                <ChatBubbleResponse
-                  key={index}
-                  image={props.friendImage}
-                  message={message.text}
-                />
+                <div key={index} ref={ref}>
+                  <ChatBubbleResponse
+                    key={index}
+                    image={props.friendImage}
+                    message={message.text}
+                  />
+                </div>
               );
             } else {
               return (
-                <ChatBubbleMessage
-                  key={index}
-                  image={props.userImage}
-                  message={message.text}
-                />
+                <div key={index} ref={ref}>
+                  <ChatBubbleMessage
+                    key={index}
+                    image={props.userImage}
+                    message={message.text}
+                  />
+                </div>
               );
             }
           })}
@@ -243,11 +258,14 @@ function ChatBoxDms(props: ChatBoxProps) {
         onClick={(e) => {
           e.preventDefault();
           sendMessage();
-          if (ref.current) {
-            ref.current.scrollIntoView({
-              behavior: "instant",
-            });
-          }
+          setTimeout(() => {
+            if (ref.current) {
+              ref.current.scrollIntoView({
+                behavior: "smooth",
+                inline: "end",
+              });
+            }
+          }, 0);
         }}
       />
     </div>
