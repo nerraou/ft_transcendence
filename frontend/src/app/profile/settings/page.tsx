@@ -30,14 +30,14 @@ function Settings(props: SettingsProps) {
   return (
     <Fragment>
       <UserHeader
-        fullname={data.firstName + " " + data.lastName}
+        fullname={(data.firstName || "") + " " + (data.lastName || "")}
         image={imageUrl + data.avatarPath}
         noIcons={true}
         isProfileOwner={true}
         isFriend={false}
         level={data.ranking}
         userStatus="ONLINE"
-        username={data?.username}
+        username={data?.username || ""}
         id={data.id}
       />
 
