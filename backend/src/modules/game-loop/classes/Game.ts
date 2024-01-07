@@ -231,7 +231,7 @@ export default class Game {
       opponent.rating,
       opponent.avatar,
       opponent.username,
-      player.ranking,
+      opponent.ranking,
       opponent.socketId,
     );
   }

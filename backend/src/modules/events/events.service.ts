@@ -247,7 +247,6 @@ export class EventsService {
           user.blocked == socket.data.userId ||
           user.blockedBy == socket.data.userId,
       );
-
       if (!isBlocked) {
         client.to(socket.id).emit("channel-chat-message", {
           ...createChannelMessageDto,
@@ -302,14 +301,7 @@ export class EventsService {
           throw new Error("no player to play");
         }
 
-        const opponent: PlayerEntity = {
-          id: user.id,
-          rating: user.rating,
-          socketId: client.id,
-          avatar: user.avatarPath,
-          username: user.username,
-          ranking,
-        };
+        const opponent = incommingPlayer;
 
         const game = this.gameLoopService.createGame(
           player,
