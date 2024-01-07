@@ -96,19 +96,22 @@ function Chat(props: ChatProps) {
   const { data: friendData } = useFriendQuery(props.token, username);
 
   const imageUrl = process.env.NEXT_PUBLIC_API_BASE_URL + "/assets/images/";
+
+  if (friendData.isBlocked) {
+    return (
+      <Modal
+        description="You are not allowed to see this page"
+        title="Error"
+        isOpen
+        action={
+          <Button text="Go Away" onClick={() => router.replace("/chat/")} />
+        }
+      />
+    );
+  }
+
   return (
     <Fragment>
-      {friendData.isBlocked && (
-        <Modal
-          description="You are not allowed to see this page"
-          title="Error"
-          isOpen
-          action={
-            <Button text="Go Away" onClick={() => router.replace("/chat/")} />
-          }
-        />
-      )}
-
       <div className="w-1/3 lg:hidden md:hidden sm:hidden">
         <SidePanel
           image={imageUrl + userData.avatarPath}

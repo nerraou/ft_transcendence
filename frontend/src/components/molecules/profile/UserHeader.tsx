@@ -151,9 +151,7 @@ function UserHeaderActions(props: UserHeaderActionsProps) {
           round="rounded-sm"
           animated={props.status == "ONLINE"}
           onClick={() => {
-            if (props.isProfileOwner) {
-              router.push("/game/make");
-            } else {
+            if (props.status == "ONLINE") {
               router.push(`/game/make?username=${props.username}`);
             }
           }}
