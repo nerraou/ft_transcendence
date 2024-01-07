@@ -187,7 +187,10 @@ export class ChannelsController {
 
     delete channel.password;
 
-    return channel;
+    return {
+      ...channel,
+      isOwner: member.role == "OWNER",
+    };
   }
 
   @Get("/:id([0-9]{1,11})/members")

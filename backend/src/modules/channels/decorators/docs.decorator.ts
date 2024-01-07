@@ -704,6 +704,7 @@ export function GetChannelApiDocumentation() {
           membersCount: 6,
           type: "PUBLIC",
           creatorId: 1,
+          isOwner: false,
           createdAt: "2023-12-25T19:44:25.565Z",
           updatedAt: "2023-12-31T17:54:21.947Z",
         },
