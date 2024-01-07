@@ -53,6 +53,8 @@ function UserPopover(props: UserPopoverProps) {
   const addUserMutation = useAddFriendMutation();
   const removeUserMutation = useRemoveFriendMutation();
 
+  const router = useRouter();
+
   return (
     <Popover className="relative">
       <Popover.Button className="outline-none">
@@ -112,9 +114,10 @@ function UserPopover(props: UserPopoverProps) {
             <button
               disabled={blockUserMutation.isPending}
               className="flex items-center py-xs px-xs hover:bg-light-bg-tertiary rounded-sm"
-              onClick={() =>
-                blockUserMutation.mutate({ token: token, id: props.id })
-              }
+              onClick={() => {
+                blockUserMutation.mutate({ token: token, id: props.id });
+                router.replace("/feed");
+              }}
             >
               <UserBlock color="stroke-light-fg-link" />
               <label className="text-sm text-light-fg-primary ml-sm">

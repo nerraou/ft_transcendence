@@ -24,7 +24,7 @@ function formatOutput(value: DateValue) {
 
 export default function DatePicker(props: DatePickerProps) {
   const headerClassName =
-    "inline-flex items-center h-9 rounded-md px-2 bg-light-bg-tertiary text-light-fg-primary dark:bg-dark-bg-primary";
+    "inline-flex items-center h-9 rounded-md px-2 bg-light-bg-tertiary text-light-fg-primary dark:bg-dark-bg-primary dark:text-light-bg-tertiary";
 
   return (
     <Datepicker value={props.value} onChange={props.onChange}>

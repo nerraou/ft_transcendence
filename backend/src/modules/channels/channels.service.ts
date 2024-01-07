@@ -91,6 +91,30 @@ export class ChannelsService {
     ]);
   }
 
+  rejoinChannel(memberId: number, channelId: number) {
+    return this.prisma.$transaction([
+      this.prisma.channelMember.update({
+        where: {
+          id: memberId,
+        },
+        data: {
+          role: "MEMBER",
+          isLeft: false,
+        },
+      }),
+      this.prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          membersCount: {
+            increment: 1,
+          },
+        },
+      }),
+    ]);
+  }
+
   leaveChannel(memberId: number, channelId: number) {
     return this.prisma.$transaction([
       this.prisma.channelMember.update({
@@ -363,8 +387,11 @@ export class ChannelsService {
     const blockedIds = [];
 
     blocks.forEach((item) => {
-      blockedIds.push(item.blocked);
-      blockedIds.push(item.blockedBy);
+      if (item.blocked != userId) {
+        blockedIds.push(item.blocked);
+      } else {
+        blockedIds.push(item.blockedBy);
+      }
     });
 
     return await this.prisma.channelMessage.findMany({

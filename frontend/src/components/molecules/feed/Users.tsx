@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+
 import UserCard from "./UserCard";
 import InputSearch from "@components/atoms/InputSearch";
 import Loading from "@components/atoms/icons/outline/Loading";
@@ -49,17 +51,18 @@ const Users = ({
             <Loading height="h-20" width="w-20" />
           </div>
         )}
-        {users.map((channel, index) => (
-          <div
+        {users.map((user, index) => (
+          <Link
             key={index}
+            href={`/profile/${user.username}`}
             className="flex flex-row justify-between w-full gap-12 lg:gap-4 sm:flex-col sm:gap-2 sm:justify-center sm:items-center min-w-min"
           >
             <UserCard
-              fullName={channel.firstName + " " + channel.lastName}
-              image={imageUrl + channel.avatarPath}
-              username={channel.username}
+              fullName={user.firstName + " " + user.lastName}
+              image={imageUrl + user.avatarPath}
+              username={user.username}
             />
-          </div>
+          </Link>
         ))}
       </div>
     </div>

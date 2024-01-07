@@ -25,7 +25,7 @@ export default function GameOverModal(props: GameOverModalProps) {
       return "YOU LOST";
     }
 
-    return "GAME ABORTED";
+    return "ABORTED";
   }
 
   return (
@@ -49,7 +49,7 @@ export default function GameOverModal(props: GameOverModalProps) {
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-center justify-center p-4 sm:p-2">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -61,11 +61,11 @@ export default function GameOverModal(props: GameOverModalProps) {
             >
               <Dialog.Panel
                 as="section"
-                className="bg-light-bg-tertiary dark:bg-dark-bg-primary p-8 rounded-lg"
+                className="bg-light-bg-tertiary dark:bg-dark-bg-primary p-8 rounded-lg sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl"
               >
                 <section className="flex flex-col items-center gap-4">
                   <output
-                    className={clsx("text-xxl", {
+                    className={clsx("text-xxl sm:text-xl", {
                       "text-light-accent": props.status == "win",
                       "text-light-fg-secondary":
                         props.status == "lose" || props.status == "aborted",
@@ -76,7 +76,7 @@ export default function GameOverModal(props: GameOverModalProps) {
                   {props.status == "win" ? <Logo /> : <SittingLogo />}
                 </section>
 
-                <section className="flex justify-center gap-16 mt-8">
+                <section className="flex justify-center gap-16 mt-8 md:gap-6 sm:flex-col sm:gap-3 items-center">
                   <Button text="New game" onClick={props.onNewGame} />
                   {props.status != "aborted" && (
                     <Button text="Rematch" onClick={props.onRematch} />
