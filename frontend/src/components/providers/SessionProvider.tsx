@@ -8,7 +8,11 @@ interface SessionProviderProps {
 }
 
 function AuthSessionProvider(props: SessionProviderProps) {
-  return <SessionProvider>{props.children}</SessionProvider>;
+  return (
+    <SessionProvider refetchOnWindowFocus={false}>
+      {props.children}
+    </SessionProvider>
+  );
 }
 
 export default AuthSessionProvider;
