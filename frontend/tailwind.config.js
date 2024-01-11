@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     // work with Fixed-range breakpoints instead of min-width: desktop first
     screens: {
-      "2xl": { min: "1280px", max: "1969px" },
+      "2xl": { min: "1280px", max: "3000px" },
       xl: { min: "1025px", max: "1279px" },
       lg: { min: "770px", max: "1024px" },
       md: { min: "640px", max: "769px" },
